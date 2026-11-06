@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Provisional SolarScribe icon (packaging placeholder).
+  The ux agent owns the visual identity; replace this file and regenerate the
+  PNG/ICO set with installer/make-icons.sh when the final mark is ready.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <rect width="256" height="256" rx="48" ry="48" fill="#101820"/>
+  <g fill="none" stroke="#ffb000" stroke-width="10" stroke-linecap="round">
+    <line x1="128" y1="22" x2="128" y2="46"/>
+    <line x1="128" y1="210" x2="128" y2="234"/>
+    <line x1="22" y1="128" x2="46" y2="128"/>
+    <line x1="210" y1="128" x2="234" y2="128"/>
+    <line x1="53" y1="53" x2="70" y2="70"/>
+    <line x1="186" y1="186" x2="203" y2="203"/>
+    <line x1="53" y1="203" x2="70" y2="186"/>
+    <line x1="186" y1="70" x2="203" y2="53"/>
+  </g>
+  <circle cx="128" cy="128" r="58" fill="#ff8c00"/>
+  <circle cx="128" cy="128" r="44" fill="#ffc23c"/>
+  <path d="M70 128h116" stroke="#3a1d00" stroke-width="7" stroke-linecap="round"/>
+</svg>

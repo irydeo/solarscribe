@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RoiManagerDialog</class>
+ <widget class="QWidget" name="RoiManagerDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>460</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ROI manager</string>
+  </property>
+  <layout class="QVBoxLayout" name="roiManagerLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>14</number>
+   </property>
+   <property name="topMargin">
+    <number>12</number>
+   </property>
+   <property name="rightMargin">
+    <number>14</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="roiManagerTitle">
+     <property name="role" stdset="0">
+      <string>title</string>
+     </property>
+     <property name="text">
+      <string>ROI manager</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="roiManagerWhy">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Presets are stored per camera and optic with the profile. Using one writes both rectangles into the ROI step; it does not touch the camera until you apply it there.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="presetTable">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="roiManagerEmpty">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>No presets yet. Set the rectangles in the ROI step and press Save preset.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="roiManagerButtonRow">
+     <item>
+      <widget class="QPushButton" name="usePresetButton">
+       <property name="primary" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Use in the ROI step</string>
+       </property>
+       <property name="toolTip">
+        <string>Copies the preset into the ROI step and closes this dialog. Apply it there when you are ready.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="roiManagerButtonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="roiManagerCloseButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

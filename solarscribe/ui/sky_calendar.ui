@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SkyCalendarDialog</class>
+ <widget class="QWidget" name="SkyCalendarDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>780</width>
+    <height>620</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Sky calendar</string>
+  </property>
+  <layout class="QVBoxLayout" name="calendarLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>14</number>
+   </property>
+   <property name="topMargin">
+    <number>12</number>
+   </property>
+   <property name="rightMargin">
+    <number>14</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="calendarTabs">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="sunTab">
+      <attribute name="title">
+       <string>Sun</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="sunTabLayout">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <property name="bottomMargin">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="sunTitle">
+         <property name="role" stdset="0">
+          <string>title</string>
+         </property>
+         <property name="text">
+          <string>The Sun today</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sunWhy">
+         <property name="role" stdset="0">
+          <string>hint</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>The solar diameter sets the scan geometry, and the position tells the mount where to point. Both are computed locally from your observatory coordinates, without network access.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="sunMainRow">
+         <item>
+          <widget class="QWidget" name="sunDiscHost" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>230</width>
+             <height>230</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>260</width>
+             <height>320</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="sunDataBox">
+           <property name="title">
+            <string>Today's figures</string>
+           </property>
+           <layout class="QGridLayout" name="sunDataLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="sunDateCaption">
+              <property name="text">
+               <string>Date</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="sunDateValue">
+              <property name="text">
+               <string>--</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="sunDiameterCaption">
+              <property name="text">
+               <string>Angular diameter</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="sunDiameterValue">
+              <property name="text">
+               <string>--</string>
+              </property>
+              <property name="toolTip">
+               <string>How wide the Sun looks today, in arcminutes. It changes with the Earth-Sun distance and decides how long the sweep has to be.</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="sunRaCaption">
+              <property name="text">
+               <string>Right ascension</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="sunRaValue">
+              <property name="text">
+               <string>--</string>
+              </property>
+              <property name="toolTip">
+               <string>Where the Sun is on the celestial equator, in hours. It is what the GOTO uses.</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="sunDecCaption">
+              <property name="text">
+               <string>Declination</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="sunDecValue">
+              <property name="text">
+               <string>--</string>
+              </property>
+              <property name="toolTip">
+               <string>How far the Sun is north or south of the equator, in degrees. It follows the seasons.</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="sunRotationCaption">
+              <property name="text">
+               <string>North pole angle P</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="sunRotationValue">
+              <property name="text">
+               <string>--</string>
+              </property>
+              <property name="toolTip">
+               <string>How far the Sun's north pole is tilted east or west in the sky, in degrees. Post-processing uses it to orient the reconstructed image.</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="sunHeliographicCaption">
+              <property name="text">
+               <string>Heliographic centre</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QLabel" name="sunHeliographicValue">
+              <property name="text">
+               <string>--</string>
+              </property>
+              <property name="toolTip">
+               <string>Heliographic latitude B0 and Carrington longitude L0 of the point at the centre of the disk. It says which part of the Sun the slit crosses.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="sunEmptyState">
+         <property name="role" stdset="0">
+          <string>hint</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>The local ephemeris module is not available in this build, so these figures are hidden instead of guessed.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="sunImageRow">
+         <item>
+          <widget class="QCheckBox" name="sunSdoCheck">
+           <property name="text">
+            <string>Show today's Sun image</string>
+           </property>
+           <property name="toolTip">
+            <string>Downloads the day's image from the SDO service. It is the only optional network use in the app; without it the schematic disk is shown.</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="sunRefreshButton">
+           <property name="text">
+            <string>Refresh</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="sunImageSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="sunImageSource">
+           <property name="role" stdset="0">
+            <string>hint</string>
+           </property>
+           <property name="text">
+            <string>Schematic disk: works without a network.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="sunSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="calendarButtonRow">
+     <item>
+      <spacer name="calendarButtonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="calendarCloseButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

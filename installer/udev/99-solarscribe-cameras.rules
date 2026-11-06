@@ -1,0 +1,48 @@
+# SolarScribe - camera access rules (Linux)
+#
+# Installed by the .deb/.rpm to /usr/lib/udev/rules.d/ and by
+# installer/install-udev-rules.sh for source and tarball installs.
+#
+# Why this file exists: the camera SDKs open the USB device through libusb.
+# Without a rule, a normal desktop user gets "permission denied" and the
+# backend looks broken. TAG+="uaccess" grants the logged-in seat an ACL, which
+# is narrower than the MODE="0666" the vendor rules use, and it follows the
+# user session instead of opening the device to every account.
+#
+# The usbfs_memory_mb bump matters for the high frame rate: the kernel's
+# default USB buffer is 16 MB, and a 3480x248 16-bit ROI at 120 fps is about
+# 207 MB/s, so a larger ring is what keeps the SDK from returning short reads
+# and dropping frames on the host side.
+#
+# Unplug and replug the camera after installing the rule (or run
+# `udevadm control --reload-rules && udevadm trigger`).
+
+# ZWO ASI: cameras, filter wheels and the EFW HID interface.
+ACTION=="add", ATTR{idVendor}=="03c3", RUN+="/bin/sh -c 'echo 1024 >/sys/module/usbcore/parameters/usbfs_memory_mb'"
+SUBSYSTEM=="usb", ATTR{idVendor}=="03c3", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="03c3", MODE="0660", TAG+="uaccess"
+
+# Player One: cameras and the filter wheel HID interface.
+ACTION=="add", ATTRS{idVendor}=="a0a0", RUN+="/bin/sh -c 'echo 256 >/sys/module/usbcore/parameters/usbfs_memory_mb'"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="a0a0", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="a0a0", MODE="0660", TAG+="uaccess"
+
+# ToupTek and its rebrands (Altair, Omegon, RisingCam, Mallincam, OGMA...):
+# the SDK enumerates 0547 and 04b4, Altair uses 16d0.
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0547", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="04b4", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="16d0", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="0547", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="04b4", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="16d0", MODE="0660", TAG+="uaccess"
+
+# QHY: the camera proper, plus the Cypress FX2/FX3 IDs it shows before and
+# after firmware loading (16c0 is Van Ooijen's VID, 1856 Orion SSAG and 1781
+# CCD-Labs are QHY5 rebrands, 706d is a QHY USB-serial bridge). The firmware
+# loader itself lives in 85-solarscribe-qhy.rules, which is installed only
+# when the firmware files are present.
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1618", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="16c0", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1856", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1781", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="706d", MODE="0660", TAG+="uaccess"

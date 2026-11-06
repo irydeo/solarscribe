@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=SolarScribe
+GenericName=Solar spectroheliograph capture
+Comment=Capture SHG scans and leave the SER files ready for post-processing
+Comment[es]=Captura barridos SHG y deja los ficheros SER listos para el post-proceso
+Exec=solarscribe gui
+TryExec=solarscribe
+Icon=solarscribe
+Terminal=false
+Categories=Science;Astronomy;
+Keywords=astronomy;solar;spectroheliograph;SHG;spectrum;
+StartupNotify=true

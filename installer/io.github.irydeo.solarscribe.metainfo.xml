@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AppStream metainfo for the Linux packages (ADR-004, ADR-017).
+
+  A .deb or .rpm that ships only a .desktop entry has no licence, no developer
+  and no icon in the software centres. AppStream is where those three facts
+  live, and the component id must match the .desktop file's name (reverse-DNS),
+  which is why the desktop entry is io.github.irydeo.solarscribe.desktop.
+-->
+<component type="desktop-application">
+  <id>io.github.irydeo.solarscribe</id>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>SolarScribe</name>
+  <summary>Capture scans for a solar spectroheliograph</summary>
+  <summary xml:lang="es">Captura barridos para un espectroheliógrafo solar</summary>
+
+  <description>
+    <p>
+      SolarScribe opens the camera and the mount, measures the live spectrum
+      and runs the SHG scan, and leaves the SER files and logs ready for
+      post-processing. It does not post-process. The camera is a vendor SDK
+      loaded dynamically; the mount is ASCOM COM on Windows and INDI on Linux.
+      A missing SDK or mount server is reported and the application keeps
+      working with what is present.
+    </p>
+    <p xml:lang="es">
+      SolarScribe abre la cámara y la montura, mide el espectro en vivo y
+      ejecuta el barrido SHG, y deja los ficheros SER y los registros listos
+      para el post-proceso. No hace post-proceso. La cámara es un SDK del
+      fabricante cargado de forma dinámica; la montura es ASCOM COM en Windows
+      e INDI en Linux. Si falta un SDK o el servidor de montura, la aplicación
+      lo dice y sigue con lo que haya.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.irydeo.solarscribe.desktop</launchable>
+
+  <developer id="io.github.irydeo">
+    <name>Francisco José Calvo Fernández</name>
+  </developer>
+
+  <url type="homepage">https://www.irydeo.com</url>
+  <url type="bugtracker">https://github.com/irydeo/solarscribe/issues</url>
+  <url type="vcs-browser">https://github.com/irydeo/solarscribe</url>
+
+  <provides>
+    <binary>solarscribe</binary>
+  </provides>
+
+  <categories>
+    <category>Science</category>
+    <category>Astronomy</category>
+  </categories>
+
+  <keywords>
+    <keyword>astronomy</keyword>
+    <keyword>solar</keyword>
+    <keyword>spectroheliograph</keyword>
+    <keyword>SHG</keyword>
+    <keyword>spectrum</keyword>
+  </keywords>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="0.1.0" date="2026-11-06"/>
+  </releases>
+</component>

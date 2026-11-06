@@ -1,0 +1,75 @@
+# SolarScribe - QHY firmware loader rules (Linux)
+#
+# Installed only when the QHY firmware files are bundled with the package
+# (installer/vendor/bundle/linux/firmware/qhy). The QHY SDK archive itself
+# carries no licence file, so sdk-manifest.json marks it non-redistributable
+# by default: this rule stays out of a release unless a maintainer has written
+# permission and rebuilds with the bundle. The camera-access rule
+# (99-solarscribe-cameras.rules) is always installed and does not need this
+# file.
+#
+# The device IDs and firmware names follow the QHYCCD SDK udev rule
+# (85-qhyccd.rules) and the INDI libqhy copy, both GPL-2.0-or-later. Only the
+# firmware-loading lines are kept here; the permissions are in the companion
+# rule, so the two files do not disagree.
+#
+# fxload comes from the distribution (Debian/Ubuntu: fxload, Fedora: fxload).
+
+ACTION!="add", GOTO="solarscribe_qhy_end"
+SUBSYSTEM!="usb", GOTO="solarscribe_qhy_end"
+
+# QHY5 family and the rebrands that ship the same FX2 loader.
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="081a", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="0818", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="2972", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY8.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="29a2", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+ATTRS{idVendor}=="1856", ATTRS{idProduct}=="0011", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c7c", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+ATTRS{idVendor}=="04b4", ATTRS{idProduct}=="8613", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+ATTRS{idVendor}=="0547", ATTRS{idProduct}=="1002", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/qhy/QHY5.HEX -D $env{DEVNAME} -s /lib/firmware/qhy/QHY5LOADER.HEX"
+
+# Classic cooled CCD (QHY2, QHY6, IMG2P, QHY7, QHY8, QHY8L, QHY8PRO, QHY9S,
+# QHY10, QHY11, QHY12, QHY15, QHY16, QHY21, QHY22, QHY23).
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0412", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY2.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0259", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY6.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="2850", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/IMG2P.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="4022", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY7.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="6000", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY8.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="6004", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY8L.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="6002", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY8PRO.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="8300", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY9S.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="1000", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY10.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="1110", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY11.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="1200", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY12.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="1500", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY15.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="1600", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY16.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="6940", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY22.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="6740", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY21.HEX -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="8140", RUN+="/sbin/fxload -t fx2lp -I /lib/firmware/qhy/QHY23.HEX -D $env{DEVNAME}"
+
+# QHY5III and cooled CMOS (FX3): the .img firmware is part of the SDK archive.
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0174", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III174.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0178", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III178.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0185", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III185.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0224", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III224.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0290", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III290.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0462", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III462.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0485", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III485.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0482", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III482.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0334", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III334.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0415", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III415.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0585", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III585.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0678", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III678.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="0715", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY5III715.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c163", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY163.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c168", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY168.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c174", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY174.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c178", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY178.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c183", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY183.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c224", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY224.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c290", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY290.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c294", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY294.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c367", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY367.img -D $env{DEVNAME}"
+ATTRS{idVendor}=="1618", ATTRS{idProduct}=="c600", RUN+="/sbin/fxload -t fx3 -I /lib/firmware/qhy/QHY600.img -D $env{DEVNAME}"
+
+LABEL="solarscribe_qhy_end"

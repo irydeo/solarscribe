@@ -1,0 +1,5 @@
+# Fetched vendor archives and their extracted bundle. Never commit these:
+# their size and their redistribution terms belong to the vendor, and the
+# licence gate is re-run on every build (installer/prepare_vendor.py).
+raw/
+bundle/

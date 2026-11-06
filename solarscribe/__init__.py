@@ -18,5 +18,15 @@ and cli. ui/cli depend on capture/shg; capture/shg depend on devices; devices
 depends on nothing from the application.
 """
 
-# Version fallback: the real one comes from setuptools-scm at build time.
-__version__ = "0.0.0"
+from importlib.metadata import PackageNotFoundError, version as _dist_version
+
+# The real version is written into the dist-info by setuptools-scm at build
+# time (pyproject.toml, ADR-017). Reading it here keeps one source of truth:
+# the installers, the wheel and session_meta.json all see the same string.
+# A bare source tree has no dist-info, so that case keeps the explicit
+# fallback and `import solarscribe` still works. This is a read-only metadata
+# lookup: no files are created and nothing outside the package is touched.
+try:
+    __version__ = _dist_version("solarscribe")
+except PackageNotFoundError:
+    __version__ = "0.0.0"

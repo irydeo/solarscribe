@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CameraPanel</class>
+ <widget class="QWidget" name="CameraPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>260</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="cameraLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>10</number>
+   </property>
+   <property name="topMargin">
+    <number>10</number>
+   </property>
+   <property name="rightMargin">
+    <number>10</number>
+   </property>
+   <property name="bottomMargin">
+    <number>10</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="cameraStateRow">
+     <item>
+      <widget class="QLabel" name="cameraStateDot">
+       <property name="text">
+        <string>●</string>
+       </property>
+       <property name="state" stdset="0">
+        <string>muted</string>
+       </property>
+       <property name="toolTip">
+        <string>Green means streaming, amber means a camera is open but stopped, red means the last command failed.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="cameraStateLabel">
+       <property name="text">
+        <string>No camera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="cameraStateSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cameraFindButton">
+       <property name="text">
+        <string>Find</string>
+       </property>
+       <property name="toolTip">
+        <string>Searches for cameras through every backend. The simulator is always found; a native SDK appears only when its library is installed.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QComboBox" name="cameraCombo">
+     <property name="toolTip">
+      <string>The cameras found by discovery. The model and the backend are in the name, so a simulator is never mistaken for hardware.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="cameraButtonRow">
+     <item>
+      <widget class="QPushButton" name="cameraOpenButton">
+       <property name="primary" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Use this camera</string>
+       </property>
+       <property name="toolTip">
+        <string>Opens the camera, restores the ROI preset from the profile and starts the stream. If the preset does not fit this sensor, the best fitting rectangle is used and the ROI step explains it.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cameraCloseButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+       <property name="toolTip">
+        <string>Stops the stream and closes the camera. The session and the telescope stay as they are.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="cameraDetailBox">
+     <property name="title">
+      <string>Live camera</string>
+     </property>
+     <layout class="QGridLayout" name="cameraDetailLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="cameraModelCaption">
+        <property name="text">
+         <string>Model</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="cameraModelValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="cameraSensorCaption">
+        <property name="text">
+         <string>Sensor</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="cameraSensorValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>The largest frame the sensor can deliver at binning 1, in pixels. The capture ROI must fit inside it.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="cameraRoiCaption">
+        <property name="text">
+         <string>ROI</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="cameraRoiValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>The rectangle the camera is actually delivering now, in sensor pixels. It is the same rectangle the SER receives.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="cameraRateCaption">
+        <property name="text">
+         <string>Rate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="cameraRateValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Frames per second the camera is delivering now. It is measured by the capture engine, not requested from the SDK.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="cameraMessage">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Press Find to see the cameras. The simulator is always available and is labelled as such.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="cameraSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

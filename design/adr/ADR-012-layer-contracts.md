@@ -3,7 +3,9 @@
 **Estado / Status**: Aceptado / Accepted · **Fecha / Date**: 2026-11-06
 
 **Ver / See**: ADR-001 (arquitectura), ADR-008 (base de cámara), ADR-010 (ROI),
-ADR-011 (sesión).
+ADR-011 (sesión). ADR-023 concreta esta decisión: los contratos ya están escritos
+en código (`devices/abc.py`, `capture/abc.py`, `shg/abc.py`, `config/schema.py`) y
+fija dónde vive cada tipo.
 
 ## Español
 

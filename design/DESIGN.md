@@ -95,9 +95,12 @@ solarscribe/                   (repo público, raíz de trabajo)
 ```
 
 Regla de dependencias: `ui` y `cli` dependen de `capture` y `shg`; `capture` y
-`shg` dependen de `devices`; `devices` no depende de nada de la aplicación. Así
+`shg` dependen de `devices`; `devices` no depende de nada de la aplicación.
+`config` es una **hoja de soporte**: solo importa `devices` y la pueden leer todas
+las capas; `capture` y `shg` no se importan entre sí (ADR-023). Así
 la lógica SHG y la UI se pueden probar sin hardware. Los **contratos entre capas
-y el modelo de datos** están en `design/ARCHITECTURE.md` (ADR-012).
+y el modelo de datos** están en `design/ARCHITECTURE.md` (ADR-012) y escritos en
+`devices/abc.py`, `capture/abc.py`, `shg/abc.py` y `config/schema.py` (ADR-023).
 
 ---
 
@@ -340,9 +343,9 @@ control manual de respaldo):
 - Ajusta la recta de deriva y deduce el error de **azimut** y **altitud**.
 - Guía al usuario (cuánto girar cada tornillo) y pide una **segunda medida de
   confirmación**.
-- Recomienda **cuándo** medir: cerca del meridiano para la altitud, y hacia el
-  Este/Oeste para el azimut; de día el Sol barre de Este a Oeste, así que
-  conviene repartir la medida.
+- Recomienda **cuándo** medir: cerca del meridiano para el azimut, y hacia el
+  Este/Oeste para la altitud (ADR-025 corrige la guía de ADR-007); de día el
+  Sol barre de Este a Oeste, así que conviene repartir la medida.
 - Es **preciso y sin prisa**: la medida se reparte en 20–40 min para separar bien
   los errores de azimut y altitud.
 
@@ -594,6 +597,13 @@ Estado inicial:
 - ADR-020: resultado de la sesión, visualización del barrido y recon rápido.
 - ADR-021: política de red y efemérides locales.
 - ADR-022: medición de tilt del espectro/rendija (medir, guiar y registrar).
+- ADR-023: módulos de contrato y hogar del modelo de ROI (los contratos escritos en
+  código, `config` como hoja de soporte, los puertos de `shg` y el estado de sesión
+  en `config`).
+- ADR-024: reconciliación del INI con `nightscribe-scan` y contrato de
+  `config/store.py` (claves heredadas con su ortografía y defaults, alias de los
+  nombres antiguos, perfil v2 con migración v1 y carpetas por plataforma con el id
+  `SolarScribe`).
 
 ---
 

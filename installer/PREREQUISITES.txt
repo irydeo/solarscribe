@@ -1,0 +1,33 @@
+SolarScribe 0.1: what this computer needs
+=========================================
+
+Windows 10 or 11, 64 bit.
+
+CAMERA
+  The camera SDKs that may legally be redistributed travel inside this
+  installer. If your camera model needs a vendor SDK that is not included,
+  SolarScribe says which one is missing and keeps working with the simulator
+  and with any other camera it finds. Install the camera vendor's driver or
+  SDK, then reopen SolarScribe.
+
+  The per-SDK licence notes are in the "licenses" folder next to the
+  application.
+
+MOUNT: ASCOM PLATFORM
+  The Windows mount backend uses ASCOM COM. It needs:
+    - ASCOM Platform 7 (or the current version), and
+    - the .NET runtime that the ASCOM Platform installer asks for.
+  Neither is bundled: they are separate installations from ascom-standards.org.
+
+  Without the ASCOM Platform the camera, the SHG engine and the session flow
+  still work; the telescope panel reports that the mount backend is missing
+  and the mount simulator can be used for a dry run.
+
+INTERNET
+  Optional. SolarScribe is local by design; the network is used only for the
+  optional SDO Sun image. The ephemeris and the Sun position are computed
+  locally.
+
+No administrator rights are needed: the installer writes to
+%LOCALAPPDATA%\Programs\SolarScribe, and your settings and sessions stay in
+%LOCALAPPDATA%\SolarScribe.

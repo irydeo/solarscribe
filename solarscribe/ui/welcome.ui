@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WelcomeBanner</class>
+ <widget class="QFrame" name="WelcomeBanner">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>150</height>
+   </rect>
+  </property>
+  <property name="frameShape">
+   <enum>QFrame::StyledPanel</enum>
+  </property>
+  <property name="frameShadow">
+   <enum>QFrame::Plain</enum>
+  </property>
+  <layout class="QVBoxLayout" name="welcomeLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>14</number>
+   </property>
+   <property name="topMargin">
+    <number>10</number>
+   </property>
+   <property name="rightMargin">
+    <number>14</number>
+   </property>
+   <property name="bottomMargin">
+    <number>10</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="welcomeTitleRow">
+     <item>
+      <widget class="QLabel" name="welcomeTitle">
+       <property name="role" stdset="0">
+        <string>title</string>
+       </property>
+       <property name="text">
+        <string>Welcome to SolarScribe</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="welcomeTitleSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="welcomeLaterButton">
+       <property name="text">
+        <string>Remind me later</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="welcomeWhy">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Three things make the first session work: where you observe from, the camera, and the mount. The app computes the Sun's position from your latitude and longitude, so without them the GOTO cannot find it.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="welcomeDataRow">
+     <item>
+      <widget class="QLabel" name="welcomeLatCaption">
+       <property name="text">
+        <string>Latitude (deg, north positive)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="welcomeLatSpin">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>-90.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>90.000000000000000</double>
+       </property>
+       <property name="toolTip">
+        <string>Latitude of the observatory, north positive. A degree of error moves the computed Sun by a degree, which is wider than the slit.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="welcomeLonCaption">
+       <property name="text">
+        <string>Longitude (deg, east positive)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="welcomeLonSpin">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>-180.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>180.000000000000000</double>
+       </property>
+       <property name="toolTip">
+        <string>Longitude east positive. It sets the hour angle, so an error turns into an east or west pointing error.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="welcomeDataSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="welcomeCameraStatus">
+       <property name="text">
+        <string>Camera: searching</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="welcomeMountStatus">
+       <property name="text">
+        <string>Mount: searching</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="welcomeButtonRow">
+     <item>
+      <widget class="QCheckBox" name="welcomeDontAskCheck">
+       <property name="text">
+        <string>Do not show this again</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="welcomeButtonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="welcomeSaveButton">
+       <property name="primary" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Save and start</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

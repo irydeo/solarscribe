@@ -1,0 +1,1546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1360</width>
+    <height>860</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SolarScribe</string>
+  </property>
+  <property name="windowIcon">
+   <iconset/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="centralLayout">
+    <property name="spacing">
+     <number>8</number>
+    </property>
+    <property name="leftMargin">
+     <number>10</number>
+    </property>
+    <property name="topMargin">
+     <number>8</number>
+    </property>
+    <property name="rightMargin">
+     <number>10</number>
+    </property>
+    <property name="bottomMargin">
+     <number>8</number>
+    </property>
+    <item>
+     <widget class="QWidget" name="welcomeHost" native="true">
+      <property name="visible">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="stepRailHost" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>64</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QSplitter" name="mainSplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="sidePanel">
+       <property name="minimumSize">
+        <size>
+         <width>340</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>460</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="sideLayout">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="recommendationLabel">
+          <property name="role" stdset="0">
+           <string>hint</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Recommended next: Find the Sun. You can go to any step at any time.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QStackedWidget" name="sideStack">
+          <widget class="QWidget" name="findPage">
+           <layout class="QVBoxLayout" name="findLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="findTitle">
+              <property name="role" stdset="0">
+               <string>title</string>
+              </property>
+              <property name="text">
+               <string>Find the Sun</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="findWhy">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>The Sun has to sit on the slit before anything can be measured. The app computes where the Sun is from your observatory position; the telescope panel on the right lets you nudge it by hand.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="findLiveBox">
+              <property name="title">
+               <string>Live reading</string>
+              </property>
+              <layout class="QGridLayout" name="findLiveLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="sunCaption">
+                 <property name="text">
+                  <string>Sun on the slit</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="sunStateValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not measured yet</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>Measured from the bright fraction of the frame. A missing Sun means the spectrum is dark and the scan cannot start.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="decCaption">
+                 <property name="text">
+                  <string>Dec error</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="decErrorValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not measured yet</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>How far the Sun is from the slit centre, in arcseconds. Close to zero means the slit crosses the middle of the disk; a large error cuts the scan short.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="slitCaption">
+                 <property name="text">
+                  <string>Slit signal</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="slitValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not measured yet</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>How much light is reaching the slit, as a fraction of the brightest possible frame. Too low means the Sun is off the slit or the exposure is short.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="deadZoneCaption">
+                 <property name="text">
+                  <string>Centring limit</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="deadZoneValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not measured yet</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>How close to the centre the method can resolve, in arcseconds. Near the centre the bright-fraction signal is flat, and the chord length has zero slope there, so the coarse centring cannot do better than this. The fine centring in the Scanning step finishes the job; this figure says how much is left for it.</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="findPrimaryButton">
+              <property name="primary" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Point at the Sun and centre</string>
+              </property>
+              <property name="toolTip">
+               <string>Moves the telescope to the Sun's computed position and then centres it on the slit. It needs a connected mount and your observatory position.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="findStopButton">
+              <property name="danger" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Stop the telescope</string>
+              </property>
+              <property name="toolTip">
+               <string>Stops every axis at once. Use it whenever the telescope is moving somewhere you did not intend.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="findHint">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>The coarse centring uses the bright fraction of the frame. Near the centre it is flat, so it gets you close and the Scanning step finishes the job.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="findSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="polarPage">
+           <layout class="QVBoxLayout" name="polarLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="polarTitle">
+              <property name="role" stdset="0">
+               <string>title</string>
+              </property>
+              <property name="text">
+               <string>Polar alignment</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="polarWhy">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun's drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="polarWhenLabel">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="polarLiveBox">
+              <property name="title">
+               <string>Live measurement</string>
+              </property>
+              <layout class="QGridLayout" name="polarLiveLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="polarStateCaption">
+                 <property name="text">
+                  <string>State</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="polarStateValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not started</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="polarAzCaption">
+                 <property name="text">
+                  <string>Azimuth error</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="polarAzValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not measured yet</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>How far the mount points east or west of the pole, in arcminutes. Turning the azimuth screw by this amount brings the drift line onto the pole.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="polarAltCaption">
+                 <property name="text">
+                  <string>Altitude error</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="polarAltValue">
+                 <property name="state" stdset="0">
+                  <string>muted</string>
+                 </property>
+                 <property name="text">
+                  <string>Not measured yet</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>How far the mount points above or below the pole, in arcminutes. It needs a measurement near the meridian to be trustworthy.</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="polarProgress">
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="polarStartButton">
+              <property name="primary" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Start the measurement</string>
+              </property>
+              <property name="toolTip">
+               <string>Samples the Sun's Dec every few minutes. Leave the telescope tracking and do not touch it while the measurement runs.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="polarSecondButton">
+              <property name="text">
+               <string>Take the confirmation measurement</string>
+              </property>
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="polarStopButton">
+              <property name="danger" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Stop the measurement</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="polarHint">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>The assistant subtracts the Sun's own motion from the measured drift. A second measurement confirms the first one; the step is done when the two agree.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="polarSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="roiPage">
+           <layout class="QVBoxLayout" name="roiLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="roiTitle">
+              <property name="role" stdset="0">
+               <string>title</string>
+              </property>
+              <property name="text">
+               <string>Capture ROI</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="roiWhy">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Draw the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="roiPresetRow">
+              <item>
+               <widget class="QComboBox" name="roiPresetCombo">
+                <property name="toolTip">
+                 <string>A preset saved for this camera and optic. Applying it restores both rectangles at once.</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="roiSavePresetButton">
+                <property name="text">
+                 <string>Save preset</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="captureBox">
+              <property name="title">
+               <string>Capture ROI, sensor pixels</string>
+              </property>
+              <property name="toolTip">
+               <string>The rectangle the camera reads out. Its width and height fix the frame rate and the SER size.</string>
+              </property>
+              <layout class="QGridLayout" name="captureLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="capXCaption">
+                 <property name="text">
+                  <string>X</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>Left edge on the sensor, in binned pixels.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="capX">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                 <property name="toolTip">
+                  <string>Left edge on the sensor, in binned pixels.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="capWCaption">
+                 <property name="text">
+                  <string>Width</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QSpinBox" name="capW">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                 <property name="toolTip">
+                  <string>Width of the delivered frame. Wider means a lower frame rate and a bigger SER.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="capYCaption">
+                 <property name="text">
+                  <string>Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="capY">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                 <property name="toolTip">
+                  <string>Top edge on the sensor, in binned pixels.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="capHCaption">
+                 <property name="text">
+                  <string>Height</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QSpinBox" name="capH">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                 <property name="toolTip">
+                  <string>Height of the delivered frame. It must hold the spectral band plus the tilt drift.</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="bandBox">
+              <property name="title">
+               <string>Spectral band, frame pixels</string>
+              </property>
+              <property name="toolTip">
+               <string>The useful strip of the dispersed spectrum inside the frame. If it does not fit, the order is clipped.</string>
+              </property>
+              <layout class="QGridLayout" name="bandLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="bandXCaption">
+                 <property name="text">
+                  <string>X</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="bandX">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="bandWCaption">
+                 <property name="text">
+                  <string>Width</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QSpinBox" name="bandW">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="bandYCaption">
+                 <property name="text">
+                  <string>Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="bandY">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="bandHCaption">
+                 <property name="text">
+                  <string>Height</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QSpinBox" name="bandH">
+                 <property name="maximum">
+                  <number>20000</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="tiltRow">
+              <item>
+               <widget class="QLabel" name="tiltCaption">
+                <property name="text">
+                 <string>Tilt</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="tiltValue">
+                <property name="role" stdset="0">
+                 <string>number</string>
+                </property>
+                <property name="text">
+                 <string>Not measured</string>
+                </property>
+                <property name="toolTip">
+                 <string>How far the spectral line leans across the frame, in degrees and in pixels of drift. A tilted line skews the reconstruction and needs a taller ROI.</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="roiMeasureButton">
+                <property name="text">
+                 <string>Measure tilt</string>
+                </property>
+                <property name="toolTip">
+                 <string>Fits a line to the slit edge of the current frame. If the edge is not straight, the app says so instead of showing a number.</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="roiRateValue">
+              <property name="role" stdset="0">
+               <string>number</string>
+              </property>
+              <property name="text">
+               <string>Rate: not estimated</string>
+              </property>
+              <property name="toolTip">
+               <string>Estimated frames per second and data rate of this ROI. It must reach the target rate, or the scan will be too slow to finish before the Sun moves.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="roiScaleValue">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="text">
+               <string>Scale: not available until the profile has the optics.</string>
+              </property>
+              <property name="toolTip">
+               <string>Arcseconds of sky per camera pixel, from the profile focal length and pixel size. It turns the ROI's pixels into sky: the tilt drift and the mosaic row step are measured with it.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="roiWarnings">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>No problems found yet.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="roiApplyButton">
+              <property name="primary" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Apply this ROI</string>
+              </property>
+              <property name="toolTip">
+               <string>Sends the rectangles to the camera. The stream restarts with the new ROI; a recording in progress is closed cleanly first.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="roiSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="scanPage">
+           <layout class="QVBoxLayout" name="scanLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="scanTitle">
+              <property name="role" stdset="0">
+               <string>title</string>
+              </property>
+              <property name="text">
+               <string>Scanning</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="scanWhy">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>One sweep writes one SER per row. The preparation centres the Sun on the slit and calibrates the sweep rate; then the scan runs. You can pause and recentre at any time, and the frames already written are kept.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="planBox">
+              <property name="title">
+               <string>What will run</string>
+              </property>
+              <layout class="QGridLayout" name="planLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="planModeCaption">
+                 <property name="text">
+                  <string>Mode</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="planModeCombo">
+                 <property name="toolTip">
+                  <string>A simple scan sweeps once. A mosaic sweeps several rows to cover a taller disk; it takes proportionally longer.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="planCyclesCaption">
+                 <property name="text">
+                  <string>Cycles</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="planCyclesSpin">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>20</number>
+                 </property>
+                 <property name="value">
+                  <number>3</number>
+                 </property>
+                 <property name="toolTip">
+                  <string>Scans per session. Three lets you reject a bad take without doubling the session time.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="planRowsCaption">
+                 <property name="text">
+                  <string>Rows</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QSpinBox" name="planRowsSpin">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>20</number>
+                 </property>
+                 <property name="value">
+                  <number>1</number>
+                 </property>
+                 <property name="toolTip">
+                  <string>Rows of a mosaic. One row is a simple scan; more rows cover a bigger part of the disk.</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="planSummary">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>The plan appears here before the scan runs: rows, sweep rate and expected duration.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="recenterCheck">
+              <property name="text">
+               <string>Recentre between cycles</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Before every cycle after the first, the app centres the Sun on the slit again. It costs a few minutes per session but stops the drift from cutting the later sweeps; the RA rewind happens either way.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="prepareButton">
+              <property name="text">
+               <string>Prepare the scan</string>
+              </property>
+              <property name="toolTip">
+               <string>Centres the Sun finely and calibrates the sweep rate. It needs a clear view of the limb and the telescope tracking.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="scanPrimaryButton">
+              <property name="primary" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Start the scan</string>
+              </property>
+              <property name="toolTip">
+               <string>Runs the cycles in order. Every row is a SER file in the session folder; stopping keeps the frames already written.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="scanButtonRow">
+              <item>
+               <widget class="QPushButton" name="scanPauseButton">
+                <property name="text">
+                 <string>Pause</string>
+                </property>
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="scanAbortButton">
+                <property name="danger" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>Stop the scan</string>
+                </property>
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="scanProgressBar">
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="scanStatusValue">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Not started.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="scanDroppedValue">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Dropped frames: none so far. Every dropped frame is a gap in the SER that the reconstruction has to bridge.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="scanResultValue">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>When a scan finishes, its result and the session folder appear here.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="scanSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="reopenStepButton">
+          <property name="text">
+           <string>Reopen this step</string>
+          </property>
+          <property name="toolTip">
+           <string>Marks this completed step as in progress again. The numbers already saved are kept, so you can correct one thing without redoing the session.</string>
+          </property>
+          <property name="visible">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="videoPanel">
+       <layout class="QVBoxLayout" name="videoLayout">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="viewerToolbar">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="stretchCaption">
+            <property name="text">
+             <string>Brightness</string>
+            </property>
+            <property name="toolTip">
+             <string>How the 16 bit frame is mapped to the screen. Stretching affects what you see, never the SER.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="stretchCombo">
+            <property name="toolTip">
+             <string>How the 16 bit frame is mapped to the screen. Stretching affects what you see, never the SER.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="zoomCaption">
+            <property name="text">
+             <string>Zoom</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="zoomSpin">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>8</number>
+            </property>
+            <property name="value">
+             <number>1</number>
+            </property>
+            <property name="toolTip">
+             <string>Magnifies the video. It changes only the view: the ROI coordinates stay in frame pixels.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="gridCheck">
+            <property name="text">
+             <string>Grid</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="crossCheck">
+            <property name="text">
+             <string>Slit cross</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Marks the centre of the slit. The Sun should be centred on this cross before a scan.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="roiCheck">
+            <property name="text">
+             <string>ROI</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Shows the capture ROI and the spectral band over the video. Drag the handles to edit them.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="fitButton">
+            <property name="text">
+             <string>Fit</string>
+            </property>
+            <property name="toolTip">
+             <string>Fits the whole frame in the view. It also resets the zoom to 1x.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="viewerToolbarSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="viewerHint">
+            <property name="role" stdset="0">
+             <string>hint</string>
+            </property>
+            <property name="text">
+             <string>Scroll to zoom, drag the handles to move the ROI</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QWidget" name="viewerHost" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSplitter" name="analysisSplitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="childrenCollapsible">
+           <bool>false</bool>
+          </property>
+          <widget class="QGroupBox" name="magnifierBox">
+           <property name="title">
+            <string>Spectrum magnifier</string>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>90</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="magnifierLayout">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <item>
+             <widget class="QWidget" name="magnifierHost" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>70</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="magnifierHint">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="text">
+               <string>Zoomed view of the spectral band: the slit image and the absorption lines must be straight and centred.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QGroupBox" name="histogramBox">
+           <property name="title">
+            <string>Brightness histogram</string>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>90</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="histogramLayout">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <item>
+             <widget class="QWidget" name="histogramHost" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>70</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="histogramHint">
+              <property name="role" stdset="0">
+               <string>hint</string>
+              </property>
+              <property name="text">
+               <string>The two markers are the stretch limits: below the first and above the second everything is clipped to black or white.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="scanResultBox">
+          <property name="title">
+           <string>Scan progress and result</string>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>130</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="scanResultLayout">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="scanViewHost" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>320</width>
+               <height>130</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="reconLayout">
+             <property name="spacing">
+              <number>3</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="reconCaption">
+               <property name="role" stdset="0">
+                <string>subtitle</string>
+               </property>
+               <property name="text">
+                <string>Quick recon, screen only</string>
+               </property>
+               <property name="toolTip">
+                <string>A light reconstruction to check the take. It is not exported and it does not replace post-processing.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="reconHost" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>220</width>
+                 <height>86</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="reconMessage">
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>The preview appears as the scan advances.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="reconDisclaimer">
+               <property name="role" stdset="0">
+                <string>hint</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>A light, non-authoritative preview: the band averaged and stacked into a disk. It is not calibrated, not exported and not a substitute for post-processing.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="openSessionButton">
+               <property name="text">
+                <string>Open session folder</string>
+               </property>
+               <property name="toolTip">
+                <string>Opens the folder that holds the SER files and the logs of this session, so the post-processing can pick them up.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1360</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionNewSession"/>
+    <addaction name="actionOpenSession"/>
+    <addaction name="actionOpenSessionFolder"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionSettings"/>
+    <addaction name="actionSkyCalendar"/>
+    <addaction name="actionRoiManager"/>
+    <addaction name="actionFocusAid"/>
+    <addaction name="actionDiagnostics"/>
+    <addaction name="actionLogs"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionQuickStart"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="telescopeDock">
+   <property name="windowTitle">
+    <string>Telescope</string>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <widget class="QWidget" name="telescopeHost">
+    <property name="minimumSize">
+     <size>
+      <width>300</width>
+      <height>320</height>
+     </size>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="healthDock">
+   <property name="windowTitle">
+    <string>Stream health</string>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <widget class="QWidget" name="healthHost">
+    <property name="minimumSize">
+     <size>
+      <width>300</width>
+      <height>220</height>
+     </size>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="cameraDock">
+   <property name="windowTitle">
+    <string>Camera</string>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <widget class="QWidget" name="cameraHost">
+    <property name="minimumSize">
+     <size>
+      <width>300</width>
+      <height>240</height>
+     </size>
+    </property>
+   </widget>
+  </widget>
+  <action name="actionNewSession">
+   <property name="text">
+    <string>New session</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionOpenSession">
+   <property name="text">
+    <string>Open session…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionOpenSessionFolder">
+   <property name="text">
+    <string>Open session folder</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
+   </property>
+  </action>
+  <action name="actionSkyCalendar">
+   <property name="text">
+    <string>Sky calendar…</string>
+   </property>
+  </action>
+  <action name="actionRoiManager">
+   <property name="text">
+    <string>ROI manager…</string>
+   </property>
+  </action>
+  <action name="actionFocusAid">
+   <property name="text">
+    <string>Focus aid…</string>
+   </property>
+  </action>
+  <action name="actionDiagnostics">
+   <property name="text">
+    <string>Device diagnostics…</string>
+   </property>
+  </action>
+  <action name="actionLogs">
+   <property name="text">
+    <string>Logs</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionQuickStart">
+   <property name="text">
+    <string>Quick start</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About SolarScribe</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

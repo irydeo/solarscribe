@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HealthPanel</class>
+ <widget class="QWidget" name="HealthPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>330</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="healthLayout">
+   <property name="spacing">
+    <number>5</number>
+   </property>
+   <property name="leftMargin">
+    <number>10</number>
+   </property>
+   <property name="topMargin">
+    <number>10</number>
+   </property>
+   <property name="rightMargin">
+    <number>10</number>
+   </property>
+   <property name="bottomMargin">
+    <number>10</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="healthHint">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Live numbers from the capture engine. Each one says what it measures and the budget it must meet.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="healthBox">
+     <property name="title">
+      <string>Capture stream</string>
+     </property>
+     <layout class="QGridLayout" name="healthGrid">
+      <item row="0" column="0">
+       <widget class="QLabel" name="fpsCaption">
+        <property name="text">
+         <string>Rate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="fpsValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Frames per second actually received, against the target. At 120 fps each frame has 8.3 ms for everything the app does; falling short stretches the scan and risks missing the Sun's motion.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="droppedCaption">
+        <property name="text">
+         <string>Dropped</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="droppedValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Frames lost inside the SDK, as a count and as a fraction of the frames offered. Each one is a gap the reconstruction has to bridge, so the budget is 0.1 percent or less per scan.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="gapsValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Holes in the frame sequence seen by the host. Unlike the SDK counter, this catches frames lost on the way to the app; zero is the only healthy figure.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="queueCaption">
+        <property name="text">
+         <string>Queue</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="queueValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>How full the recording queue is, in megabytes, against its budget. When it fills, the oldest frames are dropped and counted; the queue is bounded so a slow disk can never stall the camera.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="diskCaption">
+        <property name="text">
+         <string>Disk write</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="diskValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Megabytes per second actually written to disk while recording. The budget is 250 MB/s sustained; below it the queue starts to fill.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="freeDiskCaption">
+        <property name="text">
+         <string>Free space</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="freeDiskValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Free space on the session disk. A recording does not start below 1 GB, because a full disk in the middle of a scan loses the take.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="bandwidthCaption">
+        <property name="text">
+         <string>Sensor rate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="bandwidthValue">
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>What the chosen ROI has to move: width x height x bits x frame rate. It explains why a taller ROI drops the rate so quickly.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="healthVerdict">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>The verdict appears here once frames are arriving.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="healthSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

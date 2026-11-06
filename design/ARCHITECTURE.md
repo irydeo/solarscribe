@@ -1,176 +1,289 @@
 # SolarScribe: contratos entre capas y modelo de datos
 
-Estado: **borrador v0** (a iterar). Fecha: 2026-11-06.
+Estado: **v1.1** (configuración reconciliada con el prototipo y `config/store.py`
+escrito). Fecha: 2026-11-06.
 Documento de apoyo de [DESIGN.md](../DESIGN.md) y de los ADRs. Describe **cómo se
 construye en paralelo**: los contratos que cada agente implementa o consume, y
 los datos que viajan entre capas. La versión inglesa llegará cuando el diseño se
 estabilice.
 
+Desde v1 los contratos **están escritos** en `solarscribe/devices/abc.py`,
+`solarscribe/capture/abc.py`, `solarscribe/shg/abc.py` y
+`solarscribe/config/schema.py`: ese código es la firma autoritativa, con sus
+unidades y sus porqués en los comentarios. Este documento guarda **el inventario
+y las razones** (qué tipo existe, dónde vive y por qué), que es lo que no se puede
+deducir del código. Cambiar una firma exige cambiar aquí y pasar por el `lead`
+(ADR-012, ADR-023).
+
+**v1.1** cierra la deuda que v1 dejó abierta: la ortografía del INI se cotejó
+contra el `CONFIG_SCHEMA` real de `nightscribe-scan` y contra su
+`docs/nightscribe-scan.cfg.reference`, y las claves heredadas están ya en
+`config/schema.py` con su sección y su default (ADR-024). Además, la lectura y la
+escritura dejan de ser una promesa: `config/store.py` y `config/paths.py` existen
+con el contrato de §3.2. No cambia ningún tipo de §2.
+
 > Regla de oro: **ningún contrato implícito**. Si un agente necesita saber qué es
-> un tipo o qué promete un método, está aquí. Si cambia, cambia el ADR
-> correspondiente (ADR-012).
+> un tipo o qué promete un método, la firma está en los módulos de contrato y su
+> razón está aquí. Si cambia, cambian el módulo, este documento y el ADR
+> correspondiente (ADR-012, ADR-023).
 
 ---
 
 ## 1. Capas y regla de dependencias
 
 ```
-ui/  cli/            <- presentación y arranque
-   \   /
-  capture/  shg/      <- motores (lógica sin Qt)
-      \    /
-     devices/         <- interfaces + drivers (no conoce la aplicación)
-        |
-      SDK / hardware
+  ui/   cli/               <- presentación y arranque
+    |  \ | /  |
+    |   capture/  shg/     <- motores (lógica sin Qt)
+    |        \    /
+    +-->  devices/   config/   <- hojas: contratos y datos
+               |
+             SDK / hardware
 ```
 
-- `ui` y `cli` dependen de `capture` y `shg`.
-- `capture` y `shg` dependen de `devices`.
-- `devices` **no** depende de nada de la aplicación.
-- `shg` no toca Qt ni un driver: consume `Frame` y `FrameStats`, y pide
-  movimiento por el contrato `Mount`.
+- `ui` y `cli` dependen de `capture` y `shg`, y también de `devices` y `config`:
+  el panel de telescopio habla con `Mount` (ADR-019) y el diálogo de ajustes lee el
+  esquema. Importar **hacia abajo** siempre es seguro; lo prohibido es importar
+  hacia arriba.
+- `capture` y `shg` dependen de `devices` y de `config`.
+- `capture` y `shg` **no se importan entre sí**: son dos motores hermanos bajo el
+  mismo techo. Cuando `shg` necesita el stream o la grabación, declara **puertos**
+  propios y la UI los conecta (§2.3).
+- `devices` **no** depende de nada de la aplicación (numpy sí).
+- `config` es una **hoja de soporte**: importa `devices` (solo el alias `ROI`) y
+  nada más de la aplicación (y `platformdirs`, que es externo). Guarda tipos de
+  valor y el esquema (`config/schema.py`), la lectura y la escritura
+  (`config/store.py`) y la resolución de carpetas por plataforma
+  (`config/paths.py`). Así cualquier capa puede leer un ajuste o un perfil sin
+  arrastrar un motor ni un driver.
+- `shg` no toca Qt ni un driver: consume `Frame` y `FrameStats`, y pide movimiento
+  por el contrato `Mount`.
+- Qt (`PySide6`) solo entra en `ui`; `ctypes`/`cffi` (la vía a los SDK en C,
+  ADR-001) solo en `devices`.
 - Los contratos viven en `devices/abc.py`, `capture/abc.py`, `shg/abc.py` y
-  `config/schema.py`. Se expresan como `Protocol`/ABC de Python.
+  `config/schema.py`, como `Protocol`/`dataclass`/`Enum` de Python.
 
-La regla se verifica con un test (`tests/unit/test_layers.py`) que falla si
-`devices` importa de `capture`/`shg`/`ui`, o si `shg` importa de Qt.
+La regla se verifica con `tests/unit/test_layers.py`, que **parsea las fuentes con
+`ast`** en vez de importarlas: un SDK o un Qt ausentes no pueden enmascarar una
+violación (el import fallaría antes, o la línea ofensiva quedaría detrás de un
+`try`), y el árbol dice lo que el código pide de verdad en cualquier plataforma y
+en cualquier job de CI. Falla si `devices` o `config` importan de la aplicación,
+si `capture` o `shg` importan de `ui`/`cli` o entre sí, si Qt o `ctypes` aparecen
+fuera de su capa, o si un módulo de contrato pierde un nombre de su superficie.
 
 ---
 
 ## 2. Contratos
 
 Los nombres son los del proyecto base `simple-astro-cap` (ADR-008) allí donde ya
-existen (`Frame`, `Param`, `ROI`, `CameraInfo`, `CameraBase`, `MultiCamera`).
+existen (`Frame`, `Param`, `ROI`, `CameraInfo`).
 
-### 2.1 `devices` (cámara y montura)
+Dos reglas que valen para los cuatro módulos (ADR-023):
 
-```python
-# ROI: región rectangular en píxeles del sensor (o del frame ya bineado).
-ROI = (x: int, y: int, width: int, height: int)
+1. **Tipos de valor frente a comportamiento.** Lo que viaja entre capas
+   (`dataclass` congelado, `Enum`) es **concreto**: todos deben coincidir en sus
+   campos y en sus unidades. Lo que se comporta (`typing.Protocol`) se declara
+   **sin cuerpo** y se implementa en los módulos de la capa. Un módulo de contrato
+   no contiene nunca un algoritmo: `validate_roi()` vive en `capture/roi.py` y la
+   lectura del INI en `config/store.py`, aunque sus tipos vivan en el contrato.
+2. **Códigos de motivo.** Ningún contrato devuelve una frase: devuelve un código
+   estable en `snake_case` (`DeviceError.code`, `BackendReason`, `RoiIssue`,
+   `reason_code`) y los números que lo justifican. La UI compone la frase con
+   `self.tr()` (ADR-016) y nunca muestra un código crudo (ADR-014).
 
-# Frame: fotograma inmutable entregado por el backend. El backend copia y sella;
-# el consumidor no lo modifica.
-class Frame(Protocol):
-    data: memoryview          # uint8 | uint16, C-contiguo
-    width: int
-    height: int
-    dtype: np.dtype           # uint8 | uint16
-    roi: ROI                  # ROI de captura del que procede
-    sequence: int             # contador del backend, para detectar huecos
-    timestamp: float          # segundos, tomado al recibir (no al escribir)
-    def stats(self) -> FrameStats: ...
-    def cut_roi(self, roi: ROI) -> "Frame": ...   # vista de sub-región
+Unidades y coordenadas, fijadas una sola vez para los cuatro módulos:
 
-# FrameStats: medidas de un frame o de una sub-región.
-class FrameStats(Protocol):
-    mean: float
-    std: float
+- RA en **horas** (0 a 24), Dec en **grados**, tasas y offsets en **arcosegundos**
+  (por segundo cuando es tasa), tiempos en **segundos**, exposición en
+  **microsegundos** (la unidad nativa de los cuatro SDK).
+- **Píxeles de sensor**: todo ROI que acepta una cámara (`set_roi`,
+  `effective_area`, `RoiConstraints`, `RoiModel.capture`, `RoiPreset.capture`),
+  contado desde la esquina superior izquierda del sensor y en píxeles ya bineados.
+- **Píxeles de frame**: toda sub-región de un frame entregado (`Frame.cut_roi`,
+  `RoiModel.band`, las regiones de análisis de `shg`), contada desde la esquina
+  superior izquierda del frame. Mezclarlos es el bug clásico del ROI, así que cada
+  firma dice cuál de los dos usa.
 
-# Camera: lo que usan la app y el motor SHG. Ciclo de vida, propiedades, stream.
-class Camera(Protocol):
-    def open(self) -> None: ...
-    def close(self) -> None: ...
-    def is_open(self) -> bool: ...
-    def get_roi(self) -> ROI: ...
-    def set_roi(self, roi: ROI) -> None: ...
-    def effective_area(self) -> ROI: ...        # área máxima (sensor/binning)
-    def get_param(self, p: Param) -> float: ... # exposure, gain, offset, ...
-    def set_param(self, p: Param, value: float) -> None: ...
-    def start_stream(self, on_frame: Callable[[Frame], None]) -> None: ...
-    def stop_stream(self) -> None: ...
-    def info(self) -> CameraInfo: ...           # vendor, model, id, capabilities
+### 2.1 `devices` (cámara y montura): `solarscribe/devices/abc.py`
 
-# Mount: conexión, posición, movimiento, seguimiento, park. El motor SHG y el
-# panel de telescopio de la UI usan el mismo contrato; el backend es ASCOM con
-# COM nativo en Windows e INDI contra `indiserver` en Linux (ADR-019).
-class Mount(Protocol):
-    def connect(self) -> None: ...
-    def close(self) -> None: ...
-    def is_connected(self) -> bool: ...
-    def position(self) -> tuple[float, float]: ...   # (ra_horas, dec_grados)
-    def move_axis(self, axis: Axis, rate: float) -> None: ...
-    def stop(self) -> None: ...
-    def slew(self, ra: float, dec: float) -> None: ...
-    def sync(self, ra: float, dec: float) -> None: ...
-    def set_tracking(self, on: bool) -> None: ...
-    def park(self) -> None: ...
-    def unpark(self) -> None: ...
-    def abort_slew(self) -> None: ...
-    def capabilities(self) -> MountCaps: ...         # tasas, reporta posición...
+**Tipos de valor**: `ROI` (alias de `(x, y, ancho, alto)`; tupla, como en el
+proyecto base), `FrameStats`, `Param` (exposure, gain, offset, bit_depth, binning,
+readout, temperature, cooler, con sus unidades fijadas en el módulo),
+`ParamRange`, `RoiConstraints`, `CameraCaps`, `CameraInfo`, `Axis`, `MountCaps`,
+`MountStatus`, `MountInfo`, `DeviceKind`, `BackendReason`, `BackendInfo` y
+`DeviceError`.
 
-# DeviceManager: descubre backends y dispositivos; degrada si falta un SDK.
-class DeviceManager(Protocol):
-    def backends(self) -> list[BackendInfo]: ...     # presente/ausente y motivo
-    def cameras(self) -> list[CameraInfo]: ...
-    def mounts(self) -> list[MountInfo]: ...
-    def open_camera(self, camera_id: str) -> Camera: ...
-    def open_mount(self, mount_id: str) -> Mount: ...
-```
+**Protocolos**: `Frame`, `Camera`, `Mount` y `DeviceManager`, los cuatro
+`runtime_checkable` para que los simuladores y los mocks se comprueben con
+`isinstance` (ADR-005).
 
-### 2.2 `capture`
+Lo que se añade al boceto v0, y por qué:
 
-```python
-# CaptureEngine: stream, stats y grabación. No conoce Qt.
-class CaptureEngine(Protocol):
-    def configure(self, camera: Camera, roi: RoiModel,
-                  params: CaptureParams) -> None: ...
-    def start(self) -> None: ...
-    def stop(self) -> None: ...
-    def on_stats(self, cb: Callable[[FrameStats], None]) -> None: ...
-    # El motor publica cada frame a: consumidores inline (baratos) y, si graba,
-    # a la cola acotada del SerWriter.
-    def start_recording(self, path: Path, header: SerHeader) -> None: ...
-    def stop_recording(self) -> WriterCounters: ...
+| Miembro | Razón |
+| --- | --- |
+| `Camera.param_range(p)` | La UI necesita el intervalo aceptado para acotar sus campos y para explicar por qué se rechazó un valor. |
+| `Camera.dropped_frames()` | El contador del SDK es uno de los tres sitios donde se cuentan las pérdidas (ADR-013); sin él el panel de salud no puede mostrarlo. |
+| `Mount.status()` | El panel de telescopio pinta seguimiento, slew y park en vivo (ADR-019). Va aparte de `position()` para que leerlo siga siendo barato. |
+| `RoiConstraints` y `CameraCaps` en `devices` | Son hechos del sensor que el SDK declara. Si vivieran en `capture`, `CameraInfo` no podría llevarlos sin que `devices` importe `capture`. |
+| `BackendInfo.reason` (`BackendReason`) más `detail` | La app degrada diciendo qué falta (ADR-014): la UI traduce el código y el registro guarda el detalle técnico. |
+| `DeviceError` | Un único tipo de fallo para toda la capa: las capas de arriba capturan una excepción y la traducen una vez. |
+| `MountInfo` sin capacidades | La mayoría de los backends solo las conocen tras conectar: vienen de `Mount.capabilities()`. |
+| `Frame.cut_roi()` siempre C-contiguo | Una franja a ancho completo es una vista sin copia; cualquier otra sub-región se copia. Un `memoryview` con strides rompe `np.frombuffer`. |
 
-# SerWriter: escritura SER bufferizada, con contabilidad de frames perdidos.
-class SerWriter(Protocol):
-    def open(self, path: Path, header: SerHeader) -> None: ...
-    def write(self, frame: Frame) -> None: ...
-    def close(self) -> None: ...
-    def counters(self) -> WriterCounters: ...   # escritos, perdidos por cola
+`FrameStats` se queda en **dos números** a propósito: se calcula en línea en el
+hilo de captura a 120 fps y el presupuesto (ADR-013) solo paga una media y una
+desviación. Lo demás que el motor SHG necesite (la fracción de píxeles brillantes
+para el centrado grueso, las columnas del limbo, el ajuste del tilt) lo calcula él
+mismo sobre `Frame.data`: la ciencia vive en `shg`, no en el driver.
 
-class WriterCounters(Protocol):
-    frames_written: int
-    frames_dropped_queue: int
-    queue_high_water_mb: float
-```
+El descubrimiento (`DeviceManager.backends()/cameras()/mounts()`) habla con los
+SDK y puede bloquear un segundo o más: la UI lo llama desde un hilo de trabajo,
+nunca desde el hilo de GUI. `open_camera()` y `open_mount()` devuelven el
+dispositivo **sin abrir**: decide quien llama.
 
-### 2.3 `shg`
+### 2.2 `capture`: `solarscribe/capture/abc.py`
 
-```python
-# ScanEngine: plan -> preparación (centrado fino + autocalibración) -> barrido.
-class ScanEngine(Protocol):
-    def plan(self, config: ScanConfig) -> ScanPlan: ...
-    def prepare(self, cb: Callable[[PrepareStatus], None]) -> PrepareResult: ...
-    def run(self, plan: ScanPlan,
-            cb: Callable[[ScanProgress], None]) -> ScanResult: ...
-    def abort(self) -> None: ...
+**Tipos de valor**: `CaptureParams`, `SerColorId`, `SerHeader`, `WriterCounters`,
+`StreamCounters`, `RoiIssue`, `Severity`, `RoiWarning` y `RoiModel`.
+**Protocolos**: `SerWriter` y `CaptureEngine`.
 
-# El motor mide por sub-regiones del ROI de análisis (ADR-010):
-#   - mitades izquierda/derecha para el centrado en Dec,
-#   - columnas del limbo para la detección,
-#   - celdas de la rejilla de enfoque.
-```
+Implementaciones de la capa: `capture/engine.py` (pipeline, consumidores en línea,
+contadores), `capture/ser.py` (SER, ADR-018) y `capture/roi.py` (validación del ROI
+y conversión de presets).
 
-### 2.4 `ui` y estado de sesión
+Lo que se añade al boceto v0, y por qué:
 
-```python
-# SessionState: el estado persistente de los cuatro pasos (ADR-011).
-class StepStatus(Enum):
-    PENDING = "pending"; CURRENT = "current"
-    DONE = "done"; SKIPPED = "skipped"
+| Miembro | Razón |
+| --- | --- |
+| `CaptureEngine.on_frame(cb)` | El DisplayBridge y el motor SHG consumen **frames**, no solo stats (§4). Sin este gancho cada agente habría inventado el suyo. |
+| `CaptureEngine.counters()` (`StreamCounters`) | El panel de salud y la barra de estado (fps, pérdidas por SDK, huecos de secuencia, MB/s) son la materia del gate G3 (ADR-013). |
+| `CaptureEngine.is_running()` e `is_recording()` | La UI habilita y deshabilita acciones según el estado; preguntar no debe costar una excepción. |
+| `configure()` se puede llamar en marcha | Es lo que hace posible el editor de ROI en vivo (ADR-010): reinicia el stream con el ROI nuevo y, si estaba grabando, cierra la grabación limpiamente antes (ADR-014). |
+| `WriterCounters` y `StreamCounters` como `dataclass` | Son valores que cruzan la capa: la UI, los registros y los tests leen los mismos campos. |
 
-class SessionState:
-    steps: dict[str, StepState]     # find_sun, polar, roi, scan
-    def save(self, path: Path) -> None: ...
-    @classmethod
-    def load(cls, path: Path) -> "SessionState": ...
-    # Autoguardado silencioso tras cada cambio de estado.
-```
+**El hogar del `RoiModel`** (decisión de ADR-023): vive en `capture/abc.py`.
+
+- `devices` debe quedarse sin conceptos de la aplicación, y una banda espectral o
+  un tilt son conceptos del SHG.
+- `shg` es hermano de `capture`: ponerlo allí obligaría a `capture` a importar
+  `shg`.
+- `config` solo persiste los dos rectángulos que el usuario edita, como
+  `RoiPreset`, sin límites del SDK ni tilt.
+
+`capture` es además el dueño del ROI de captura (AGENTS.md), así que el modelo y su
+validación caen del mismo lado. Consecuencias prácticas:
+
+- `RoiModel` es un `dataclass` **de datos**: `capture`, `band`, `constraints`,
+  `binning`, `tilt_deg` y `tilt_px`, más `output()` (que devuelve `capture`, la
+  región 4 de ADR-010) y `set_tilt(tilt_deg, tilt_px)`.
+- La validación es `capture/roi.py: validate_roi(model, *, fps=None) ->
+  list[RoiWarning]`, con los chequeos de ADR-010 mapeados a códigos `RoiIssue`:
+  `BAND_CLIPPED`, `TILT_HEIGHT`, `SDK_MULTIPLE`, `SDK_BOUNDS`,
+  `BINNING_MISMATCH`, `LOW_RATE` y `SLIT_OFF_CENTRE`. `Severity.ERROR` significa
+  que el ROI no se puede barrer; `WARNING` e `INFO` son recomendaciones, nunca
+  puertas (ADR-011).
+- La conversión con el perfil es `capture/roi.py: preset_to_model(preset,
+  constraints)` y `model_to_preset(model, name)`: `capture` sí puede importar
+  `config`, y `config` no puede importar `capture`.
+- Las sub-regiones de análisis **no** están en el modelo: se calculan, no se
+  guardan (ADR-010), y las calcula `shg` desde `capture` y `band`, porque es quien
+  conoce su propia geometría de medida.
+
+**Pendiente de `video`**: cómo viajan los timestamps por frame dentro del SER.
+`SerHeader` fija los campos estándar (ancho, alto, profundidad de bits, color ID,
+endianess) y lleva el `roi` como metadato que el escritor registra en
+`session_meta.json`, porque el formato SER no tiene campo de ROI. Los campos
+estándar no cambian de forma (ADR-018).
+
+### 2.3 `shg`: `solarscribe/shg/abc.py`
+
+**Tipos de valor**: `ScanMode`, `DecCenterMethod`, `PreparePhase`, `ScanState`,
+`ScanStatus`, `ScanRow`, `ScanConfig`, `ScanPlan`, `PrepareStatus`,
+`PrepareResult`, `ScanProgress`, `ScanResult` y `TiltResult`. **Protocolos**:
+`FrameSource`, `RowRecorder`, `ScanEngine` y `TiltMeter`.
+
+**Puertos (inversión de dependencias).** `shg` no importa `capture`, así que
+declara lo que necesita y la UI lo conecta:
+
+- `FrameSource.on_frame(cb)`: de dónde salen los frames vivos. `CaptureEngine` lo
+  cumple **estructuralmente**, porque ambos declaran el mismo método.
+- `RowRecorder.start_row(path)` y `stop_row() -> RowCounters`: dónde se graba cada
+  fila del mosaico y con qué contabilidad. `RowCounters` es el tipo de valor propio
+  de `shg` (escritos, perdidos por cola, perdidos por SDK, huecos de secuencia y
+  profundidad máxima de la cola), para que `shg` pueda escribir los tres registros
+  de ADR-018 sin importar `capture`. La UI pasa un adaptador de unas líneas sobre
+  `start_recording()`, `stop_recording()` y `counters()`. Las rutas las da
+  `config/store.py` (§3.2), no la interfaz.
+
+**Construcción** (forma parte del contrato): `shg/engine.py` expone
+`ScanEngineImpl(mount: Mount, frames: FrameSource)`, que la UI construye una vez
+por sesión.
+
+Lo que se añade o se fija respecto al boceto v0:
+
+| Miembro | Razón |
+| --- | --- |
+| `run(plan, cb, recorder=None)` | Un mosaico escribe **un SER por fila**; sin el puerto la UI tendría que interleavar grabaciones con el barrido en marcha. `None` es el modo seco (DESIGN.md §14). |
+| `pause()` y `resume()` | Si el Sol se sale de la rendija el barrido **se pausa y avisa**, y se puede recentrar antes de continuar (DESIGN.md §7). |
+| `run()` ejecuta **un ciclo** | Los `config.cycles` (3 por defecto) los repite la UI, que puede recentrar entre ciclo y ciclo. |
+| `ScanConfig` lleva `capture`, `band`, `analysis` y el tilt como datos sueltos | `shg` no puede importar `RoiModel`: la UI copia los rectángulos al construir la configuración. |
+| Claves reservadas de `analysis`: `"left"`, `"right"`, `"limb"` | `"left"` y `"right"` son las mitades del centrado en Dec (ADR-006) y `"limb"` la franja donde se detecta el limbo. `shg` subdivide `"limb"` en columnas internamente: las columnas no son contrato. |
+| `TiltMeter` y `TiltResult` en `shg` | La medición del tilt es ciencia de `shg` (ADR-022). El paso ROI la llama y escribe los números en el `RoiModel` de `capture`, así que la matemática y el modelo se quedan cada uno en su capa. |
+| `ScanRow` con `ra_start_hours` y `ra_end_hours` | El barrido se mueve por **tasa** (`move_axis`), no por slew: los límites de AR son la geometría prevista para el overlay y el registro, y el final lo decide la parada adaptativa. |
+
+**Códigos de motivo del MVP**: `no_limb`, `sun_lost`, `calibration_failed`,
+`mount_no_rate`, `disk_full`, `device_lost`, `stalled`, `aborted`, `no_edge`,
+`low_contrast`.
+
+**Contratos que `shg` debe formalizar en `shg/abc.py` antes de que `ux` implemente
+los pasos 1 y 2** (la forma es obligatoria, la ciencia es suya):
+
+1. `analysis_regions(capture: ROI, band: ROI) -> dict[str, ROI]`, que devuelve las
+   regiones con las claves reservadas. La llama la UI para dibujarlas y para
+   construir `ScanConfig`.
+2. El servicio de **centrado del Sol** del paso *Buscar el Sol* (grueso por
+   histograma y extensión, fino por simetría o cuerda, ADR-006): un `Protocol` con
+   progreso por callback y un resultado con `dec_offset_arcsec`, el método usado y
+   `reason_code`.
+3. El **asistente de alineación polar** (ADR-007): muestreo, ajuste de la recta de
+   deriva y error de azimut y altitud, con su progreso por callback y su segunda
+   medida de confirmación.
+
+Reglas de forma para los tres: `Protocol` más `dataclass`, sin Qt, sin drivers, las
+unidades de §2 y códigos de motivo en vez de frases.
+
+### 2.4 Estado de sesión: `solarscribe/config/schema.py`
+
+El estado de los cuatro pasos **no vive en `ui`** (decisión de ADR-023): vive en
+`config/schema.py`, junto al esquema.
+
+- Es **persistencia**: `SessionState` se guarda y se carga de un fichero, y eso es
+  territorio de `config` (ADR-003).
+- `config` es una hoja, así que lo pueden leer `ui`, `cli`, `capture` y `shg`. Si
+  el estado viviera en `ui`, la CLI no podría reabrir una sesión sin importar la
+  GUI.
+- La UI **pinta** el estado y delega; no lo define.
+
+**Tipos**: `StepStatus` (`PENDING`, `CURRENT`, `DONE`, `SKIPPED`), `SESSION_STEPS`
+(`find_sun`, `polar`, `roi`, `scan`, en el orden del raíl), `StepState` (`status`,
+`updated_at`, `metrics`) y `SessionState` (`steps`, `session_dir`, `created_at`,
+`updated_at`).
+
+- El fichero es `session_state.json` **dentro de la carpeta de la sesión**, y no es
+  `session_meta.json`: ese es el contrato con el post-proceso (ADR-018) y sus
+  columnas no cambian de forma.
+- `StepState.metrics` guarda **solo números**, con claves estables (`tilt_deg`,
+  `rate_arcsec_s`, `dec_error_arcsec`...). La frase la compone la UI con
+  `self.tr()` alrededor de esos números (ADR-016): una frase guardada en un fichero
+  no se puede traducir después, y un número sin su etiqueta no le dice nada al
+  observador.
+- `save_session_state(state, path)` y `load_session_state(path)` se implementan en
+  `config/store.py`, con el autoguardado silencioso tras cada cambio de estado
+  (ADR-011).
 
 La UI **no** contiene lógica de negocio: escucha `CaptureEngine` y `ScanEngine`,
-pinta el estado de `SessionState` y delega. La regla de `self.tr()` (ADR-016)
-aplica a toda cadena visible.
+pinta el estado de `SessionState` y delega. La regla de `self.tr()` (ADR-016) aplica
+a toda cadena visible.
 
 ---
 
@@ -178,45 +291,215 @@ aplica a toda cadena visible.
 
 ### 3.1 ROI y tilt (ADR-010, ADR-022)
 
-```python
-class RoiModel:
-    capture: ROI                 # ROI de hardware (manda en el FPS); lo elige el usuario
-    band: ROI                    # banda/orden espectral (debe caber en capture)
-    analysis: dict[str, ROI]     # sub-regiones con nombre (left, right, limb...)
-    constraints: RoiConstraints  # múltiplos, mínimos, binning admitidos
-    tilt_deg: float              # tilt medido del espectro/rendija (grados)
-    tilt_px: float               # deriva del tilt a lo ancho del ROI (px)
-    # output == capture (lo que va al SER)
+Las cuatro regiones de ADR-010 se reparten así:
 
-    def validate(self) -> list[RoiWarning]: ...       # recorte, alineación, altura/tilt, SDK
-    def measure_tilt(self, frame: Frame) -> float: ... # ajuste lineal del borde/línea
-    def save(self, profile: "Profile") -> None: ...
-    def load(self, profile: "Profile") -> None: ...
+| Región | Dónde vive | Coordenadas |
+| --- | --- | --- |
+| ROI de captura (sensor) | `RoiModel.capture`, `RoiPreset.capture`, claves `[roi] capture_*` | píxeles de sensor, bineados |
+| Banda/orden espectral | `RoiModel.band`, `RoiPreset.band`, claves `[roi] band_*` | píxeles de frame |
+| ROI de análisis (software) | las calcula `shg` y viajan en `ScanConfig.analysis` | píxeles de frame |
+| ROI de salida (SER) | `RoiModel.output()`, que devuelve `capture` | píxeles de sensor |
+
+El modelo (solo datos, en `capture/abc.py`):
+
+```python
+@dataclass
+class RoiModel:
+    capture: ROI                 # lo elige el usuario; fija el FPS y el SER
+    band: ROI                    # debe caber en capture o se recorta el orden
+    constraints: RoiConstraints  # límites del sensor y del SDK (viven en devices)
+    binning: int = 1             # a qué binning se refieren los rectángulos
+    tilt_deg: float = 0.0        # tilt medido por shg (ADR-022)
+    tilt_px: float = 0.0         # su deriva a lo ancho del ROI, en píxeles
 ```
 
-La **medición de tilt** (ADR-022) ajusta una recta a la posición del borde de la
-rendija (o de una línea de absorción) a lo largo del ancho del ROI; la pendiente
-es el tilt. La validación exige que la banda quepa con la deriva por tilt:
+La **medición de tilt** (ADR-022) la hace `shg`
+(`TiltMeter.measure(frame, band) -> TiltResult`): ajusta una recta a la posición del
+borde de la rendija (o de una línea de absorción) a lo largo del ancho del ROI; la
+pendiente es el tilt, en grados y en píxeles de deriva. `TiltResult.edge_std_px` es
+la rectitud del borde (el `edge_flat` del prototipo): si es grande, el borde no es
+una recta y la cifra de tilt no es de fiar, así que la UI lo dice en vez de mostrar
+un número.
+
+El paso ROI llama a `shg` y guarda los números con `RoiModel.set_tilt()`. La
+validación exige que la banda quepa con la deriva por tilt:
 `altura_ROI >= altura_banda + |tilt_px| + márgenes`. El tilt y la orientación de
-cámara se guardan en `session_meta.json` para el post-proceso.
+cámara se guardan en `session_meta.json` para el post-proceso, y el último valor
+medido queda en el INI como pista para la sesión siguiente.
 
-### 3.2 Perfil y configuración (ADR-003)
+### 3.2 Perfil y configuración (ADR-003, ADR-024): `solarscribe/config/`
 
-- **INI** heredado de `nightscribe-scan` (mismas claves) + claves nuevas de ROI y
-  de sesión, todas con valor por defecto.
-- **Perfil JSON v2** con los datos del telescopio y los **presets de ROI** por
-  cámara + óptica:
+Tres módulos y una frontera clara:
+
+- `config/schema.py`: la **tabla** de claves (`SCHEMA`, una tupla de `Key`) y los
+  **tipos de valor** (`Profile`, `TelescopeData`, `CameraData`, `RoiPreset`,
+  `SessionState`, `StepState`, `StepStatus`, `SESSION_STEPS`) más los nombres de
+  fichero (`CONFIG_FILE`, `PROFILE_FILE`, `SESSION_STATE_FILE`,
+  `SCAN_LOG_FILE`, `SCAN_STATS_FILE`, `SESSION_META_FILE`).
+- `config/store.py`: la **lectura y la escritura** (`Settings`, `Profile`,
+  `SessionState`) y el **nombre de cada sesión y de cada barrido**. Es un
+  algoritmo y por eso no vive en el módulo de contrato (ADR-023).
+- `config/paths.py`: las **carpetas por plataforma** con `platformdirs`.
+
+Ninguna capa de arriba decide una ruta: pide `paths.settings_path()`,
+`paths.profile_path()`, `paths.default_session_base()` o las funciones de
+`store.py`. Y este módulo fija **nombres de fichero, nunca carpetas**: dónde
+viven es cosa de la aplicación y del empaquetado (ADR-004, ADR-017).
+
+**INI heredado.** Las secciones `[optics]`, `[scan]`, `[fps]`, `[limb]`, `[dec]`,
+`[mosaic]`, `[exposure]`, `[calibration]` y `[logging]` son las de
+`nightscribe-scan`, con su **ortografía, sección y default exactos**: 66 claves.
+El contenido de un `nightscribe-scan.cfg` existente se reconoce sin cambios; se
+copia al `config.ini` de SolarScribe, porque la ubicación del fichero es la de la
+plataforma, no la del script. La reconciliación contra el prototipo la resolvió
+ADR-024, con una sola excepción de default: `scan.num_cycles` vale 3 porque
+DESIGN.md §6 y §7 piden tres ciclos por sesión, y el ADR lo deja escrito. Las
+claves nuevas de SolarScribe (ROI, montura, sesión, polar, límites de captura,
+observatorio y cámara) se **añaden** con `origin="new"`; nunca se renombra una
+heredada.
+
+**Una verdad por comportamiento (ADR-024).** Antes de la reconciliación el
+esquema tenía claves propias que repetían una heredada. Se conservan como
+**alias heredados** en `LEGACY_KEYS`, con el nombre heredado como canónico:
+
+| Nombre SolarScribe | Nombre canónico heredado |
+| --- | --- |
+| `scan.cycles` | `scan.num_cycles` |
+| `scan.padding_s` | `scan.padded_duration` |
+| `scan.preload_s` | `scan.scan_preload_seconds` |
+| `scan.adaptive_stop` | `scan.trailing_limb_stop` |
+| `capture.stall_timeout_s` | `fps.capture_stall_seconds` |
+| `capture.min_free_disk_gb` | `fps.capture_min_free_gb` |
+| `camera.auto_exposure` | `scan.enable_auto_exp` |
+
+Reglas, para que no haya dos verdades en un fichero:
+
+- `load_settings()` lee el alias **solo** cuando el canónico no está en el
+  fichero, y después refleja el valor resuelto en los dos nombres, así que un
+  consumidor antiguo sigue leyendo la verdad.
+- `save_settings()` escribe **solo** el nombre canónico: tras guardar, el
+  fichero no contiene dos claves que signifiquen lo mismo.
+- `keys_of(section)` oculta los alias por defecto; el diálogo de ajustes muestra
+  un control por comportamiento. `keys_of(section, include_legacy=True)` los
+  devuelve para una herramienta de migración.
+
+Se **retiraron** tres claves que duplicaban un control sin poder ser alias
+porque su tipo o su significado no coincidía: `general.dry_run` (es
+`scan.enable_capture = false`), `scan.mode` (es `scan.enable_mosaic`) y
+`camera.auto_exposure_target` (el bloque heredado `[exposure]` manda el
+percentil, no la media). No había código consumiéndolas.
+
+**Lectura tolerante (ADR-003).**
+
+- Falta el fichero, falta una clave o el número no se puede leer: **default del
+  esquema**. La app siempre arranca.
+- Codificación: UTF-8 y, si falla, Latin-1, como el prototipo; un acento perdido
+  en un comentario no invalida el fichero.
+- Comentarios `#` y `;`; separador `=` o `:`; secciones y claves sin distinguir
+  mayúsculas.
+- Booleanos con vocabulario **fijo**: `1`, `true`, `yes`, `on` y sus negativos.
+  Cualquier otra palabra deja el default; no se adivina.
+- Una clave que no está en el esquema no rompe nada, pero se devuelve en
+  `Settings.unknown`, para que el diálogo de ajustes avise de la errata en vez de
+  ignorarla en silencio.
+- `Settings` es un `dataclass` **completo** (una entrada por clave) que devuelve
+  `load_settings()`; `Settings.get(section, name)` lanza `KeyError` ante una
+  clave fuera del esquema, igual que `default_value()`, para que una errata no se
+  lea como un cero.
+
+**INI frente a perfil: quién manda.** El **INI es la verdad de la sesión**; el
+perfil es una **instantánea con nombre** del instrumento y sus presets de ROI.
+Seleccionar un perfil en Ajustes escribe sus datos en el INI; no hay una fusión
+automática ni dos fuentes que puedan discrepar. Es lo que hacía el panel del
+prototipo: elegir un perfil copiaba su configuración al formulario. Por eso los
+datos físicos (`optics.focal_length`, `optics.pixel_size`,
+`mosaic.mosaic_slit_length_mm`) y los del perfil (`TelescopeData`,
+`CameraData`) tienen los mismos defaults: mientras no se aplique un perfil, el
+INI manda y no cambia nada.
+
+**Perfil JSON v2** con los datos del telescopio y los **presets de ROI** por
+cámara + óptica, como `dataclass` (`Profile`, `TelescopeData`, `CameraData`,
+`RoiPreset`):
 
 ```jsonc
 {
   "version": 2,
-  "telescope": { "focal_length": 714, "aperture": 80, "...": "..." },
-  "camera":    { "model": "...", "pixel_size": 2, "binning": 1 },
+  "telescope": { "focal_length_mm": 714, "aperture_mm": 80, "slit_length_mm": 7 },
+  "camera":    { "model": "...", "pixel_size_um": 2, "binning": 1 },
   "roi_presets": [
     { "name": "default", "capture": [0, 0, 3480, 248], "band": [0, 40, 3480, 160] }
   ]
 }
 ```
+
+La cifra de la rendija es su **longitud**, y la geometría dice por qué es esa: 7 mm
+a 714 mm de focal subtienden `7/714 rad = 33.7'`, justo por encima del diámetro solar
+(unos 32'), así que una sola fila del barrido puede cubrir todo el disco. El
+**ancho** de la rendija (la resolución espectral) no se guarda: la captura no lo
+necesita e inventar una cifra sería peor que omitirla.
+
+`load_profile()` es **tolerante** y migra lo que encuentra:
+
+- v2 escrito a mano: números como texto, una sección ausente, una clave
+  desconocida o un preset en forma de mapa nombre -> rectángulos se aceptan; lo
+  que no se puede leer cae a su default.
+- v1 de `nightscribe-scan` (`{version: 1, profiles: {...}}` con `meta` y
+  `config`, o un `config` plano): se traducen `FOCAL_LENGTH`, `PIXEL_SIZE`,
+  `MOSAIC_SLIT_LENGTH_MM` y `meta.camera`/`meta.aperture_mm`, que son los datos
+  del instrumento. El resto de claves v1 pertenece al INI y allí sigue.
+- JSON truncado o un fichero ausente: defaults, para que el siguiente guardado
+  lo reescriba.
+- Al guardar se pierden las claves que esta versión no conoce: un fichero de una
+  versión futura lo debe guardar la versión futura.
+
+`save_settings()`, `save_profile()` y `save_session_state()` escriben a un
+temporal en la misma carpeta y lo mueven sobre el destino (`os.replace`), de modo
+que un cierre a mitad de escritura deja el fichero bueno anterior, no medio
+fichero.
+
+**Carpetas y nombres de sesión (DESIGN.md §10).** `config/paths.py` resuelve:
+
+- `config_dir()`: `%LOCALAPPDATA%\SolarScribe` en Windows;
+  `$XDG_CONFIG_HOME/SolarScribe` (o `~/.config/SolarScribe`) en Linux; ahí viven
+  `config.ini` y `profile.json`.
+- `data_dir()`: `%LOCALAPPDATA%\SolarScribe` en Windows;
+  `$XDG_DATA_HOME/SolarScribe` (o `~/.local/share/SolarScribe`) en Linux.
+- `log_dir()`: la carpeta de logs de la plataforma (XDG state en Linux,
+  `%LOCALAPPDATA%\SolarScribe\Logs` en Windows); el visor de logs la lee
+  (DESIGN.md §11).
+- `default_session_base()`: `data_dir()/sessions`, el valor que se usa cuando
+  `[session] session_dir` está vacío.
+- Las funciones solo **resuelven** rutas; no crean carpetas. `store.py` crea la
+  carpeta padre cuando de verdad escribe, y solo la carpeta de sesión cuando
+  empieza la sesión.
+- Nada se escribe junto al ejecutable: en Windows `Program Files` es de solo
+  lectura y en Linux `/usr` también (ADR-004).
+
+`config/store.py` es el **único dueño** de los nombres de sesión, para que
+ninguna capa los invente (DESIGN.md §10):
+
+- `session_folder(base_dir, when) -> Path`: crea y devuelve la carpeta de la
+  sesión, nombrada `YYYYMMDD_HHMM` con la hora local. Dos sesiones en el mismo
+  minuto no comparten carpeta: la segunda recibe `_2`, `_3`...
+- `scan_ser_path(session_dir, base_name, when, scan) -> Path`: el fichero
+  `sun_YYYYMMDD_HHMM_scanNN.ser` de un barrido concreto. `NN` va a dos dígitos
+  para que los ficheros ordenen; `scan` empieza en 1 y un 0 lanza `ValueError`.
+- `scan_log_path(session_dir, configured)`, `scan_stats_path(...)` y
+  `session_meta_path(...)`: los tres registros de ADR-018. `configured` es el
+  valor de su clave `[logging]`; vacío significa la carpeta de la sesión, y una
+  ruta relativa se resuelve contra ella (no contra el directorio de trabajo, que
+  cambia según cómo se arranque la app).
+- `session_state_path(session_dir)`: el `session_state.json`, siempre en la
+  carpeta de la sesión; no se configura.
+
+Los tres registros de ADR-018 son **uno por sesión**, como en el prototipo; el
+SER es **uno por barrido**, como pide el mosaico. Las claves heredadas
+`[logging]` pueden sustituir la ruta de los registros; vacías significan la
+carpeta de la sesión, que es donde el post-proceso los busca.
+
+La UI llama a estas funciones al abrir la sesión y el adaptador de `RowRecorder`
+usa `scan_ser_path()` para la ruta de cada fila: nombrar ficheros es persistencia,
+no lógica de negocio de la interfaz.
 
 ### 3.3 Registros (ADR-018)
 
@@ -224,6 +507,31 @@ cámara se guardan en `session_meta.json` para el post-proceso.
 columnas** que `nightscribe-scan`; se **añaden** (nunca se quitan) columnas para
 el ROI y el presupuesto de rendimiento. `session_meta.json` incluye el `RoiModel`
 efectivo, la versión de la app y los contadores de frames perdidos.
+
+Son **tres ficheros por sesión**, como en el prototipo, no uno por barrido: el
+SER es el que se repite por fila del mosaico (`scanNN`). La ruta la decide
+`config/store.py` (§3.2): la carpeta de la sesión, salvo que las claves heredadas
+`[logging]` digan otra cosa. Una ruta configurada absoluta se usa tal cual; una
+relativa se resuelve contra la carpeta de la sesión.
+
+La materia prima de esos registros son los tipos de valor ya fijados:
+`WriterCounters` y `StreamCounters` (captura) y `ScanResult` (shg).
+
+**Los tres ficheros los escribe `shg`**, que es de donde los porta el prototipo
+(DESIGN.md §7), y con lo que ya recibe por contrato, sin importar `capture`:
+
+- el ROI, la banda y el tilt, por `ScanConfig`;
+- la contabilidad de cada fila (escritos, perdidos por cola y por SDK, huecos de
+  secuencia y profundidad máxima de la cola), por `RowRecorder.stop_row()`, que
+  devuelve el `RowCounters` que `shg` declara y el adaptador de la UI rellena desde
+  `WriterCounters` y `StreamCounters`;
+- el plan, la tasa y el resultado, por `ScanPlan` y `ScanResult`;
+- la versión de la app, del paquete raíz (`solarscribe.__version__`, que no es una
+  capa).
+
+Así los tres registros los escribe una sola capa y con datos que ya le llegan por
+contrato: la interfaz no escribe ficheros de registro ni inventa columnas. Las
+columnas nuevas se anuncian en el CHANGELOG y en ADR-018.
 
 ---
 
@@ -242,11 +550,20 @@ hilo de captura: get frame (el backend copia y sella), nada más
 ```
 
 - **Nunca** se bloquea el hilo de captura.
-- El **DisplayBridge** descarta frames de vídeo si la GUI va lenta; no los
-  acumula.
+- Los consumidores en línea se registran con `CaptureEngine.on_frame(cb)` y
+  `on_stats(cb)`: se les llama **en el hilo de captura** y su presupuesto es el
+  intervalo de frame (8,3 ms a 120 fps, ADR-013). Lo que no quepa ahí va a un hilo
+  propio.
+- El **DisplayBridge** vive en `ui` (toca Qt) y es un buzón del último fotograma:
+  una GUI lenta descarta fotogramas de vídeo, no los acumula. Recibe los frames por
+  `on_frame`.
+- El motor `shg` recibe los frames por su **puerto** `FrameSource`, que
+  `CaptureEngine` cumple estructuralmente (§2.3): los dos motores no se importan.
 - Los **timestamps** se toman al recibir el frame, no al escribir.
-- Los **frames perdidos** se cuentan en los tres sitios: dentro del SDK, por
-  desborde de la cola y por huecos de `sequence`.
+- Los **frames perdidos** se cuentan en los tres sitios: dentro del SDK
+  (`Camera.dropped_frames()`), por desborde de la cola
+  (`WriterCounters.frames_dropped_queue`) y por huecos de `sequence`
+  (`StreamCounters.sequence_gaps`).
 
 ---
 
@@ -254,7 +571,12 @@ hilo de captura: get frame (el backend copia y sella), nada más
 
 - Contadores vivos: fps real, frames escritos, perdidos por SDK, perdidos por
   cola, huecos de secuencia, profundidad máxima de la cola, MB/s de disco.
-- Un **panel de salud** en la UI muestra esos contadores en lenguaje llano.
+- Salen de dos tipos y de ninguno más: `CaptureEngine.counters() ->
+  StreamCounters` (fps, pérdidas del SDK, huecos, MB/s) y
+  `CaptureEngine.stop_recording() -> WriterCounters` (escritos, pérdidas por cola,
+  profundidad máxima). El panel de salud y la barra de estado los leen de ahí.
+- Un **panel de salud** en la UI muestra esos contadores en lenguaje llano: cada
+  cifra dice qué significa y contra qué presupuesto se compara (ADR-013).
 - `scan_stats.jsonl` guarda una muestra por barrido; `session_meta.json` el
   resumen. Los contadores son la materia prima del gate G3 (ADR-013).
 

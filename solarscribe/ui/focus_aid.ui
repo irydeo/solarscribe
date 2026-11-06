@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FocusAidDialog</class>
+ <widget class="QWidget" name="FocusAidDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>520</width>
+    <height>420</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Focus aid</string>
+  </property>
+  <layout class="QVBoxLayout" name="focusLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>14</number>
+   </property>
+   <property name="topMargin">
+    <number>12</number>
+   </property>
+   <property name="rightMargin">
+    <number>14</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="focusTitle">
+     <property name="role" stdset="0">
+      <string>title</string>
+     </property>
+     <property name="text">
+      <string>Focus aid</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="focusWhy">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>A sharp image has more contrast: the spectrum's dark lines are deeper and the edge is crisper. These two numbers follow the live frame, so turn the focuser until the standard deviation stops rising.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="focusBox">
+     <property name="title">
+      <string>Live frame</string>
+     </property>
+     <layout class="QGridLayout" name="focusGrid">
+      <item row="0" column="0">
+       <widget class="QLabel" name="focusMeanCaption">
+        <property name="text">
+         <string>Mean level</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="focusMeanValue">
+        <property name="role" stdset="0">
+         <string>number</string>
+        </property>
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Average brightness of the frame, as a fraction of the maximum. Around a quarter of the range fills the histogram without clipping.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="focusStdCaption">
+        <property name="text">
+         <string>Contrast</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="focusStdValue">
+        <property name="role" stdset="0">
+         <string>number</string>
+        </property>
+        <property name="text">
+         <string>--</string>
+        </property>
+        <property name="toolTip">
+         <string>Standard deviation of the frame, as a fraction of the maximum. Higher means more contrast, which is what correct focus produces.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="focusCaveat">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>This is a live indicator, not a measurement: seeing moves it. Judge the trend over several seconds, not a single reading, and do not touch the focus while a scan is running.</string>
+     </property>
+    </widget>
+    </item>
+   <item>
+    <spacer name="focusSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="focusButtonRow">
+     <item>
+      <spacer name="focusButtonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="focusCloseButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -15,9 +15,9 @@ ingleses; añadir i18n después es caro.
 - **i18n desde el día 1**: toda cadena visible pasa por `self.tr()`; catálogos
   `.ts` ES/EN (Qt Linguist) mantenidos con `lupdate`/`lrelease`. Al tocar cadenas,
   se regeneran los catálogos y se exige **0 sin traducir** en ambos idiomas.
-- **Documentación bilingüe**: la guía de usuario en `solarscribe/docs/`, en
-  español e inglés; el diseño interno en `design/`. Los ADRs son bilingües y el
-  índice `design/adr/README.md` se mantiene al día.
+- **Documentación bilingüe**: la guía de usuario en `docs/`, en español e
+  inglés; el diseño interno en `design/`. Los ADRs son bilingües y el índice
+  `design/adr/README.md` se mantiene al día.
 - **CHANGELOG bilingüe** (`CHANGELOG.md` / `CHANGELOG.es.md`).
 - **Lenguaje llano**: la interfaz nunca muestra una cifra sin explicar qué
   significa y por qué importa.
@@ -42,8 +42,8 @@ English speakers; adding i18n later is expensive.
   `.ts` catalogues (Qt Linguist) maintained with `lupdate`/`lrelease`. When strings
   change, the catalogues are regenerated and **0 untranslated** is required in both
   languages.
-- **Bilingual documentation**: the user guide in `solarscribe/docs/`, in Spanish
-  and English; the internal design in `design/`. ADRs are bilingual and the
+- **Bilingual documentation**: the user guide in `docs/`, in Spanish and English;
+  the internal design in `design/`. ADRs are bilingual and the
   `design/adr/README.md` index is kept current.
 - **Bilingual CHANGELOG** (`CHANGELOG.md` / `CHANGELOG.es.md`).
 - **Plain language**: the interface never shows a figure without explaining what it

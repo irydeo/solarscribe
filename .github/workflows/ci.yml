@@ -1,0 +1,436 @@
+# SolarScribe - continuous integration and release matrix
+#
+# Windows and Linux are both first class (ADR-004, ADR-017). A tag is not
+# released until the unit suite, the frozen smoke test and the installers are
+# green on both. The Linux .deb is installed and started again after it is
+# built, and the Windows installer is run silently and started, because
+# "compiles" is not the same as "installs".
+#
+# The camera SDKs are not downloaded by CI by default: two of the four have no
+# redistribution grant, so a release without them is the correct default. The
+# licence gate is documented in installer/README.md; a maintainer who has the
+# verdict changes it in installer/sdk-manifest.json, not in this file.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  QT_QPA_PLATFORM: offscreen
+
+jobs:
+  # Resolve the version once, so every installer carries the same string.
+  meta:
+    name: Resolve version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      suffix: ${{ steps.ver.outputs.suffix }}
+      label: ${{ steps.ver.outputs.label }}
+    steps:
+      - name: Checkout (full history for setuptools-scm)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the package without runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-deps .
+
+      - name: Resolve the version
+        id: ver
+        run: |
+          v=$(python -c "from importlib.metadata import version; print(version('solarscribe'))")
+          if [ "$v" = "0.0.0" ]; then
+            echo "::error::setuptools-scm fell back to 0.0.0; the build would log a lie"
+            exit 1
+          fi
+          sha7=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          # Keep the PEP 440 string for metadata; only the file-name label
+          # swaps '+' for '-', where '+' is legal but awkward on GitHub.
+          label="${v//+/-}-ci.$sha7"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "suffix=-ci.$sha7" >> "$GITHUB_OUTPUT"
+          echo "label=$label" >> "$GITHUB_OUTPUT"
+          echo "version: $v / label: $label"
+
+  linux-tests:
+    name: Unit tests (Linux)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Qt runtime libraries
+        # PySide6's wheel links a few system libraries the headless runner
+        # does not carry. Without them the GUI modules fail to import at all
+        # ("libEGL.so.1: cannot open shared object file").
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libdbus-1-3 \
+            libfontconfig1 libglib2.0-0 libxcb-cursor0 libxcb-icccm4 \
+            libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
+            desktop-file-utils appstream udev shellcheck
+
+      - name: Install the package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev]"
+
+      - name: Unit tests
+        timeout-minutes: 30
+        run: python -m pytest tests/unit -n auto --dist loadfile -q
+
+      - name: Smoke test the source package
+        run: |
+          python installer/smoke_test.py --module --gui
+          python -m compileall -q installer
+
+      - name: Validate the packaging metadata
+        run: |
+          shellcheck installer/*.sh
+          udevadm verify installer/udev/*.rules
+          desktop-file-validate installer/*.desktop
+          appstreamcli validate --no-net installer/*.metainfo.xml
+
+  windows-tests:
+    name: Unit tests (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev]"
+
+      - name: Unit tests
+        timeout-minutes: 30
+        run: python -m pytest tests/unit -n auto --dist loadfile -q
+
+      - name: Smoke test the source package
+        run: |
+          python installer/smoke_test.py --module --gui
+          python -m compileall -q installer
+
+  linux-package:
+    name: Build .deb (amd64)
+    needs: [meta, linux-tests]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends dpkg-dev
+
+      - name: Install the package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev]"
+
+      - name: Prepare the licence-approved bundle
+        # No SDKs are fetched in CI, so this produces an empty but valid
+        # bundle and the package degrades gracefully. A release with approved
+        # SDKs runs fetch_deps.py first and passes the same command.
+        run: python installer/prepare_vendor.py --platform linux
+
+      - name: Build with PyInstaller
+        run: python -m PyInstaller installer/solarscribe.spec --clean --noconfirm
+
+      - name: Smoke test the frozen binary
+        run: python installer/smoke_test.py --frozen dist/solarscribe/solarscribe
+
+      - name: Build the .deb
+        run: |
+          python installer/build_deb.py \
+            --version "${{ needs.meta.outputs.version }}" \
+            --bundle installer/vendor/bundle/linux \
+            --out dist
+          dpkg-deb -f dist/*.deb Package Version Architecture Depends Recommends
+          dpkg-deb -c dist/*.deb | head -40
+
+      - name: Upload the .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: dist/*.deb
+
+  linux-rpm:
+    name: Build .rpm (x86_64)
+    needs: [meta, linux-tests]
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Install build tools
+        run: |
+          dnf install -y git tar gzip rpm-build python3 appstream
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare the licence-approved bundle
+        run: python3 installer/prepare_vendor.py --platform linux
+
+      - name: Validate the AppStream metadata
+        run: appstreamcli validate --no-net installer/io.github.irydeo.solarscribe.metainfo.xml
+
+      - name: Build the .rpm
+        run: |
+          ver="${{ needs.meta.outputs.version }}"
+          top="$PWD/rpmbuild"
+          mkdir -p "$top"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          tar czf "$top/SOURCES/solarscribe-$ver.tar.gz" \
+            --exclude=.venv --exclude=.git --exclude=dist --exclude=rpmbuild \
+            --transform "s,^\.,solarscribe-$ver," .
+          # A licensed fetch leaves SDK folders in the bundle; a plain CI run
+          # leaves the empty MANIFEST. Pass the macros only when they exist so
+          # the no-SDK package stays noarch.
+          sdk_flags=""
+          if [ -n "$(find installer/vendor/bundle/linux -mindepth 1 -maxdepth 1 -type d ! -name firmware 2>/dev/null)" ]; then
+            sdk_flags="$sdk_flags --define '_with_sdk 1'"
+          fi
+          if [ -d installer/vendor/bundle/linux/firmware/qhy ]; then
+            sdk_flags="$sdk_flags --define '_with_firmware 1'"
+          fi
+          set +e
+          # shellcheck disable=SC2086
+          rpmbuild -bb --define "_version $ver" --define "_topdir $top" \
+            $sdk_flags installer/rpm/solarscribe.spec > rpm.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then
+            tail -15 rpm.log
+            exit $code
+          fi
+          mkdir -p dist
+          find "$top/RPMS" -name '*.rpm' -exec cp {} dist/ \;
+          ls -la dist
+
+      - name: Upload the .rpm
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm
+          path: dist/*.rpm
+
+  deb-smoke:
+    name: Install and start the .deb
+    needs: linux-package
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the .deb
+        uses: actions/download-artifact@v4
+        with:
+          name: deb
+          path: dist
+
+      - name: Install Qt and the Python runtime the package expects
+        # The package depends on the distribution's PySide6, which Ubuntu
+        # 24.04 does not ship yet. Install the Python libraries with pip so
+        # the INSTALL of the .deb can be tested here; the supported floor for
+        # a real system install is Debian 13 / Ubuntu 25.10 (installer/README).
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            python3-pip libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 \
+            libdbus-1-3 libfontconfig1 libglib2.0-0 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+            libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1
+          python3 -m pip install --break-system-packages numpy platformdirs PySide6
+
+      - name: Install the package
+        run: sudo dpkg -i --force-depends dist/*.deb
+
+      - name: Start it
+        run: |
+          /usr/bin/solarscribe --version
+          python3 installer/smoke_test.py --module --gui || \
+            (echo "the installed package did not start"; exit 1)
+        env:
+          PYTHONPATH: /usr/lib/python3/dist-packages
+
+  rpm-smoke:
+    name: Install and start the .rpm
+    needs: linux-rpm
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the .rpm
+        uses: actions/download-artifact@v4
+        with:
+          name: rpm
+          path: dist
+
+      - name: Install it
+        run: |
+          dnf install -y ./dist/*.rpm
+          solarscribe --version
+
+  windows-package:
+    name: Build Windows installer
+    needs: [meta, windows-tests]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev]"
+
+      - name: Prepare the licence-approved bundle
+        run: python installer/prepare_vendor.py --platform windows
+
+      - name: Build with PyInstaller
+        run: python -m PyInstaller installer/solarscribe.spec --clean --noconfirm
+
+      - name: Smoke test the frozen binary
+        run: python installer/smoke_test.py --frozen dist\solarscribe\solarscribe.exe
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Compile the installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DAppVersion=${{ needs.meta.outputs.version }} `
+            /DAppSuffix=${{ needs.meta.outputs.suffix }} `
+            installer\solarscribe.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install it silently and start it
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\SolarScribeSetup-*.exe | Select-Object -First 1
+          Write-Host "installing $($setup.FullName)"
+          $p = Start-Process -FilePath $setup.FullName `
+            -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' `
+            -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "installer exited $($p.ExitCode)" }
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\SolarScribe\solarscribe.exe'
+          if (-not (Test-Path $exe)) { throw "installed exe not found: $exe" }
+          & $exe --version
+          if ($LASTEXITCODE -ne 0) { throw "installed exe did not start" }
+          # Leave the runner clean; the uninstaller also exercises the
+          # previous-version path the next run depends on.
+          $key = Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' |
+            Where-Object { $_.PSChildName -like '*f1610f28-fe64-43cf-acdc-a43fa06c83cd*' } |
+            Select-Object -First 1
+          if ($key) {
+            $cmd = (Get-ItemProperty $key.PSPath).UninstallString
+            $cmd = $cmd.Trim('"')
+            Start-Process -FilePath $cmd `
+              -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+          }
+
+      - name: Upload the Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          # Only the installer: the frozen tree is smoke-tested in place and
+          # would add hundreds of MB to the release for no gain.
+          path: dist/SolarScribeSetup-*.exe
+
+  release:
+    name: Publish the release
+    needs: [meta, linux-tests, windows-tests, linux-package, linux-rpm, deb-smoke, rpm-smoke, windows-package]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect the installers
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish on GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -la dist
+          # The release body is bilingual: the two CHANGELOG files are the
+          # source docs owns, and printing both keeps the installer list and
+          # the "unsigned Windows build" warning next to them.
+          {
+            echo "Windows and Linux installers, built and smoke-tested by the CI matrix."
+            echo "Instaladores para Windows y Linux, construidos y probados por la matriz de CI."
+            echo
+            echo "The Windows installer is unsigned, so SmartScreen may warn: choose More info, then Run anyway."
+            echo "El instalador de Windows no está firmado: SmartScreen puede avisar; elige Más información y Ejecutar de todas formas."
+            echo
+            echo "## English"
+            echo
+            cat CHANGELOG.md
+            echo
+            echo "---"
+            echo
+            echo "## Español"
+            echo
+            cat CHANGELOG.es.md
+          } > release-notes.md
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "SolarScribe ${{ needs.meta.outputs.version }}" \
+            --notes-file release-notes.md dist/*

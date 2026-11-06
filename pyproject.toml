@@ -35,6 +35,7 @@ dev = [
     "pytest>=8.0",
     "pytest-xdist>=3.5",
     "pyinstaller>=6.0",
+    "build>=1.2",
 ]
 
 [project.scripts]
@@ -43,16 +44,26 @@ solarscribe = "solarscribe.__main__:main"
 [project.urls]
 Homepage = "https://www.irydeo.com"
 Repository = "https://github.com/irydeo/solarscribe"
+Issues = "https://github.com/irydeo/solarscribe/issues"
+Changelog = "https://github.com/irydeo/solarscribe/blob/main/CHANGELOG.md"
+Releases = "https://github.com/irydeo/solarscribe/releases"
 
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 fallback_version = "0.0.0"
 
+[tool.setuptools]
+# The .ui files, the compiled .qm translations and the icons are package data,
+# not modules: a plain `pip install .` has to carry them or the packaged app
+# opens without its interface (ADR-009, ADR-016).
+include-package-data = true
+
 [tool.setuptools.packages.find]
 include = ["solarscribe*"]
 
 [tool.setuptools.package-data]
-"solarscribe.ui" = ["*.ui", "i18n/*.qm"]
+"solarscribe" = ["assets/*"]
+"solarscribe.ui" = ["*.ui", "i18n/*.qm", "icons/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "updated": "2026-11-06",
+  "notes": "Redistribution verdict for every runtime SDK SolarScribe can load. Only an SDK with redistributable=true is copied into a release bundle by prepare_vendor.py. Changing a verdict is a legal decision: update the matching file under installer/licenses/ as well.",
+  "sdks": {
+    "asi": {
+      "name": "ZWO ASI Camera SDK",
+      "vendor": "ZWO",
+      "license": "MIT",
+      "license_file": "licenses/zwo-asi.md",
+      "redistributable": true,
+      "reviewed": "2026-11-06",
+      "evidence": "ASI_Camera_SDK/ASI_Windows_SDK_V1.41.zip and ASI_Camera_SDK/ASI_linux_mac_SDK_V1.41.tar.bz2 both contain license.txt: MIT text with Copyright (c) 2015, ZWO Company. The notice must travel with the binaries.",
+      "homepage": "https://www.zwoastro.com/software/product-sdk",
+      "artifacts": {
+        "windows": ["lib/x64/ASICamera2.dll"],
+        "linux": ["lib/x64/libASICamera2.so", "lib/x64/libASICamera2.so.1.41"]
+      }
+    },
+    "playerone": {
+      "name": "Player One Camera SDK",
+      "vendor": "Player One Astronomy",
+      "license": "Player One SDK licence (permission to use and redistribute with notice)",
+      "license_file": "licenses/playerone.md",
+      "redistributable": true,
+      "reviewed": "2026-11-06",
+      "evidence": "PlayerOne_Camera_SDK_Linux_V3.10.1/license.txt says the SDK may be used to develop any products without restrictions, provided the copyright notice and permission notice are included in all copies.",
+      "homepage": "https://player-one-astronomy.com/service/software/",
+      "artifacts": {
+        "windows": ["lib/x64/PlayerOneCamera.dll"],
+        "linux": [
+          "lib/x64/libPlayerOneCamera.so",
+          "lib/x64/libPlayerOneCamera.so.3",
+          "lib/x64/libPlayerOneCamera.so.3.10",
+          "lib/x64/libPlayerOneCamera.so.3.10.1"
+        ]
+      }
+    },
+    "qhy": {
+      "name": "QHYCCD Camera SDK and firmware",
+      "vendor": "QHYCCD",
+      "license": "No licence file and no written redistribution grant found",
+      "license_file": "licenses/qhy.md",
+      "redistributable": false,
+      "reviewed": "2026-11-06",
+      "evidence": "The Linux SDK archive qhyccdsdk-v2.0.11-Linux-Debian-Ubuntu-x86_64.tar.gz contains no LICENSE or COPYING file, and the GitHub delivery repository carries no licence. Default position for software with no written grant is all rights reserved.",
+      "homepage": "https://www.qhyccd.com/download",
+      "artifacts": {
+        "windows": ["x64/qhyccd.dll", "qhyccd.dll"],
+        "linux": ["lib/libqhyccd.so", "lib/libqhyccd.so.2", "lib/libqhyccd.so.2.0.11"]
+      },
+      "firmware": {
+        "linux": "firmware"
+      }
+    },
+    "toupcam": {
+      "name": "ToupTek ToupCam SDK",
+      "vendor": "ToupTek Photonics",
+      "license": "No licence file and no written redistribution grant found",
+      "license_file": "licenses/touptek.md",
+      "redistributable": false,
+      "reviewed": "2026-11-06",
+      "evidence": "toupcamsdk.20261024.zip contains no LICENSE or COPYING file in any directory; toupcam.h carries no copyright notice. The SDK is proprietary and the archive grants no redistribution right.",
+      "homepage": "https://www.touptekphotonics.com/download/",
+      "artifacts": {
+        "windows": ["win/x64/toupcam.dll"],
+        "linux": [
+          "linux/x64/libtoupcam.so",
+          "linux/x64/libnncam.so",
+          "linux/x64/libaltaircam.so",
+          "linux/x64/libogmacam.so",
+          "linux/x64/libomegonprocam.so",
+          "linux/x64/libbressercam.so",
+          "linux/x64/libmallincam.so",
+          "linux/x64/libmeadecam.so",
+          "linux/x64/libtscam.so",
+          "linux/x64/libmicam.so"
+        ]
+      }
+    }
+  },
+  "prerequisites": {
+    "ascom": {
+      "name": "ASCOM Platform",
+      "bundled": false,
+      "license_file": "licenses/ascom-platform.md",
+      "why": "Windows mount backend. It is a separate installation, not redistributed. The installer detects it and the app degrades to the mount simulator when it is absent."
+    },
+    "indiserver": {
+      "name": "INDI (indiserver)",
+      "bundled": false,
+      "license_file": "licenses/indi.md",
+      "why": "Linux mount backend. It is a distribution package (LGPL-2.1-or-later / GPL-2.0-or-later), not redistributed. The installer recommends indi-bin and the app says what is missing."
+    },
+    "dotnet": {
+      "name": ".NET runtime required by the ASCOM Platform",
+      "bundled": false,
+      "license_file": "licenses/ascom-platform.md",
+      "why": "Part of the ASCOM Platform prerequisite on Windows; SolarScribe does not redistribute it."
+    }
+  }
+}

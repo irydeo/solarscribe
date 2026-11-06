@@ -28,3 +28,6 @@
 | [020](ADR-020-session-result-and-visualization.md) | Resultado de la sesión, visualización del barrido y recon rápido / Session result, scan visualisation and quick recon |
 | [021](ADR-021-network-and-ephemeris.md) | Política de red y efemérides locales / Network policy and local ephemerides |
 | [022](ADR-022-tilt-measurement.md) | Medición de tilt del espectro/rendija / Spectral/slit tilt measurement |
+| [023](ADR-023-contract-modules-and-roi-home.md) | Módulos de contrato y hogar del modelo de ROI / Contract modules and the home of the ROI model |
+| [024](ADR-024-config-reconciliation-and-store.md) | Reconciliación del INI con nightscribe-scan y contrato de configuración / INI reconciliation with nightscribe-scan and configuration contract |
+| [025](ADR-025-solar-polar-alignment-guidance-erratum.md) | Corrección de la guía de alineación polar solar / Solar polar alignment guidance erratum |

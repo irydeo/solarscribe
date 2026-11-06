@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LogsViewer</class>
+ <widget class="QWidget" name="LogsViewer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>620</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Logs</string>
+  </property>
+  <layout class="QVBoxLayout" name="logsLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>14</number>
+   </property>
+   <property name="topMargin">
+    <number>12</number>
+   </property>
+   <property name="rightMargin">
+    <number>14</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="logsTitle">
+     <property name="role" stdset="0">
+      <string>title</string>
+     </property>
+     <property name="text">
+      <string>Logs</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="logsWhy">
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>The session log records what the app and the devices did. When something fails, the last lines say which device and which step, and that is what makes a diagnosis possible.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="logsToolRow">
+     <item>
+      <widget class="QLabel" name="logsPathLabel">
+       <property name="role" stdset="0">
+        <string>hint</string>
+       </property>
+       <property name="text">
+        <string>No log file yet.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="logsToolSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="logsFilterCaption">
+       <property name="text">
+        <string>Show</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="logsFilterCombo">
+       <property name="toolTip">
+        <string>Filters lines by level. Errors and warnings are the useful ones when looking for a failure.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="logsFollowCheck">
+       <property name="text">
+        <string>Follow</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>Scrolls to the newest line when the file grows, so the live tail stays visible.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="logView">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="lineWrapMode">
+      <enum>QPlainTextEdit::NoWrap</enum>
+     </property>
+     <property name="placeholderText">
+      <string>No log has been written yet. Start a session and the app begins recording here.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="logsButtonRow">
+     <item>
+      <widget class="QPushButton" name="reloadButton">
+       <property name="text">
+        <string>Reload</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="openFolderButton">
+       <property name="text">
+        <string>Open folder</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="logsButtonSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="logsCloseButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

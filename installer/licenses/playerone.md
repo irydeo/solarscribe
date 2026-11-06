@@ -1,0 +1,41 @@
+# Player One Camera SDK
+
+- **Vendor**: Player One Astronomy Co., Ltd.
+- **Files shipped on Windows**: `PlayerOneCamera.dll`
+- **Files shipped on Linux**: `libPlayerOneCamera.so`, `libPlayerOneCamera.so.3`, `libPlayerOneCamera.so.3.10`, `libPlayerOneCamera.so.3.10.1`
+- **Verdict**: redistributable, bundled with the notice below
+- **Reviewed**: 2026-11-06
+- **Source**: <https://player-one-astronomy.com/service/software/>
+
+## Evidence
+
+`PlayerOne_Camera_SDK_Linux_V3.10.1.tar.gz` contains `license.txt`. It grants
+permission to use the products and the SDK to develop any products without
+restrictions, and requires the copyright notice and the permission notice to
+be included in all copies or substantial portions of the software.
+
+## Licence text
+
+```
+This software is the secondary software development kit (SDK) for
+ the astronomy cameras made by Player One Astronomy Co., Ltd.
+Player One Astronomy Co., Ltd (hereinafter referred to as "the company") owns its copyright.
+This SDK is only used for the secondary development of our company's cameras or other equipment.
+You can use our company's products and this SDK to develop any products without any restrictions.
+This software may use third-party software or technology (including open source code and public domain code that this software may use),
+and such use complies with their open source license or has obtained legal authorization.
+If you have any questions, please contact us: support@player-one-astronomy.com
+
+ Copyright (C) Player One Astronomy Co., Ltd. All rights reserved.
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
