@@ -18,7 +18,6 @@ scan_log.csv
 scan_stats.jsonl
 session_meta.json
 
-# Internal design: never in the public repository
-design/
-AGENTS.md
-.opencode/
+# Scratch
+input.md
+*.swp
