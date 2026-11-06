@@ -11,7 +11,7 @@ Read `AGENTS.md`, `DESIGN.md` and `design/ARCHITECTURE.md` before acting.
 Ownership:
 - `design/` (design, contracts, ADRs) and `config/` (INI schema + profiles).
 - The boundary between layers (`devices`, `capture`, `shg`, `ui`, `cli`).
-- Custodian of ADRs 000, 001, 003, 012, 021.
+- Custodian of ADRs 000, 001, 003, 012, 018, 021.
 
 Rules:
 - Follow `AGENTS.md` strictly: code in English, header block untouched, short `# @args:` / `# @return:` comments, no docstrings, no em dash in docs.

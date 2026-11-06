@@ -32,6 +32,22 @@ versión legible.
   usabilidad, G5 empaquetado.
 - **Hecho**: tests verdes, presupuesto cumplido, ADR actualizado e i18n al día.
 
+#### 2.1 Simuladores: los implementa `video`, los revisa `qe`
+
+ADR-005 hace de la cámara y de la montura simuladas un **backend de primera
+clase**, no un apaño de pruebas. Viven en `devices/sim/`, implementan los
+protocolos `Camera` y `Mount` y se cargan por el mismo registro que un driver
+real. Por eso la propiedad es de `video`: es el único agente que toca `devices/`,
+y tener el simulador en otra capa habría obligado a `qe` a escribir producto,
+algo que ADR-015 le prohíbe. `qe` conserva la custodia de ADR-005 y ADR-015,
+escribe las pruebas que los usan, los revisa y puede bloquear un cambio: la
+decisión de que existan y de que no toquen hardware es suya; el código del
+simulador es de `video`.
+
+Esta es la desviación consciente respecto a la tabla original, que asignaba los
+simuladores a `qe`: se corrigió la tabla para que refleje la realidad y la regla
+de dependencias.
+
 ### 3. Los siete agentes
 
 #### 3.1 `lead`: arquitectura e integración
@@ -40,7 +56,7 @@ versión legible.
   vez; guardar la regla de dependencias.
 - **Propiedad**: `design/` (diseño, contratos, ADRs) y `config/`; la frontera entre
   capas.
-- **Custodia**: ADR-000, 001, 003, 012, 021.
+- **Custodia**: ADR-000, 001, 003, 012, 018, 021.
 - **Entradas**: propuestas de contrato, conflictos entre agentes, dudas de
   diseño, cambios de esquema de configuración.
 - **Salidas**: `design/ARCHITECTURE.md`, ADRs nuevos, índice de ADRs al día.
@@ -55,8 +71,9 @@ versión legible.
 - **Misión**: que la app hable con cámara y montura y que el stream no pierda
   frames. Es la ruta crítica del proyecto.
 - **Propiedad**: `devices/` (interfaces + drivers: nativos ASI/QHY/Player One/
-  Touptek, simulador, montura **ASCOM COM** en Windows e **INDI** en Linux) y
-  `capture/` (stream, stats, SER). El ROI de captura.
+  Touptek, el simulador de cámara y montura en `devices/sim/`, montura **ASCOM
+  COM** en Windows e **INDI** en Linux) y `capture/` (stream, stats, SER). El ROI
+  de captura.
 - **Custodia**: ADR-002, 008, 010, 013, 019.
 - **Entradas**: contratos de `design/ARCHITECTURE.md`, presupuesto de ADR-013,
   vídeos reales como fixtures.
@@ -103,11 +120,12 @@ versión legible.
 
 - **Misión**: la red de seguridad. No escribe producto: escribe pruebas y **puede
   bloquear**.
-- **Propiedad**: `tests/` (unit, funcional, rendimiento), los simuladores y los
-  fixtures (vídeos reales del usuario).
+- **Propiedad**: `tests/` (unit, funcional, rendimiento) y los fixtures (vídeos
+  reales del usuario); consume y revisa los simuladores de `devices/sim/`, que
+  implementa `video`.
 - **Custodia**: ADR-005, 015.
-- **Entradas**: cada cambio de los demás agentes; vídeos/SER reales (ruta
-  externa).
+- **Entradas**: cada cambio de los demás agentes; los simuladores de
+  `devices/sim/` como material de prueba; vídeos/SER reales (ruta externa).
 - **Salidas**: suites de pruebas, catálogo de fixtures, banco de rendimiento,
   informe de gate por cambio.
 - **Cuándo invocarlo**: antes de dar por hecho cualquier cambio; TDD; rendimiento;
@@ -183,11 +201,11 @@ python3 -m venv --system-site-packages .venv
 
 | Agente | Posee | Custodia | Modelo |
 | --- | --- | --- | --- |
-| `lead` | `design/`, `config/`, frontera | 000, 001, 003, 012, 021 | qwen3p8-max |
-| `video` | `devices/`, `capture/`, ROI de captura | 002, 008, 010, 013, 019 | qwen3p8-max |
+| `lead` | `design/`, `config/`, frontera | 000, 001, 003, 012, 018, 021 | qwen3p8-max |
+| `video` | `devices/` (con `sim/`), `capture/`, ROI de captura | 002, 008, 010, 013, 019 | qwen3p8-max |
 | `shg` | `shg/` | 006, 007, 022 | kimi-k3 |
 | `ux` | `ui/` | 009, 011, 020 | qwen3p8-max |
-| `qe` | `tests/`, simuladores, fixtures | 005, 015 | qwen3p8-2p4t-a95b |
+| `qe` | `tests/`, fixtures, banco de rendimiento | 005, 015 | qwen3p8-2p4t-a95b |
 | `packaging` | `installer/`, CI, `pyproject.toml` | 004, 017 | glm-5p3 |
 | `docs` | `design/`, `solarscribe/docs/`, `.ts`, CHANGELOG | 000, 016 | glm-5p3-flash |
 
@@ -218,6 +236,21 @@ readable version.
   G5 packaging.
 - **Done**: tests green, budget met, ADR updated and i18n current.
 
+#### 2.1 Simulators: `video` implements them, `qe` reviews them
+
+ADR-005 makes the simulated camera and mount a **first-class backend**, not a
+test hack. They live in `devices/sim/`, implement the `Camera` and `Mount`
+protocols and are loaded through the same registry as a real driver. Ownership
+therefore belongs to `video`: it is the only agent that touches `devices/`, and
+putting the simulator in another layer would have forced `qe` to write product,
+which ADR-015 forbids. `qe` keeps the custody of ADR-005 and ADR-015, writes the
+tests that use them, reviews them and can block a change: the decision that they
+exist and touch no hardware is theirs; the simulator code is `video`'s.
+
+This is the conscious deviation from the original table, which assigned the
+simulators to `qe`: the table was corrected so it reflects the reality and the
+dependency rule.
+
 ### 3. The seven agents
 
 #### 3.1 `lead`: architecture and integration
@@ -226,7 +259,7 @@ readable version.
   dependency rule.
 - **Ownership**: `design/` (design, contracts, ADRs) and `config/`; the layer
   boundary.
-- **Custody**: ADR-000, 001, 003, 012, 021.
+- **Custody**: ADR-000, 001, 003, 012, 018, 021.
 - **Inputs**: contract proposals, conflicts between agents, design questions,
   config schema changes.
 - **Outputs**: `design/ARCHITECTURE.md`, new ADRs, a current ADR index.
@@ -240,8 +273,9 @@ readable version.
 - **Mission**: that the app talks to camera and mount and the stream loses no
   frames. It is the project's critical path.
 - **Ownership**: `devices/` (interfaces + drivers: native ASI/QHY/Player One/
-  Touptek, simulator, mount **ASCOM COM** on Windows and **INDI** on Linux) and
-  `capture/` (stream, stats, SER). The capture ROI.
+  Touptek, the camera and mount simulator in `devices/sim/`, mount **ASCOM COM**
+  on Windows and **INDI** on Linux) and `capture/` (stream, stats, SER). The
+  capture ROI.
 - **Custody**: ADR-002, 008, 010, 013, 019.
 - **Inputs**: contracts from `design/ARCHITECTURE.md`, the ADR-013 budget, real
   videos as fixtures.
@@ -287,10 +321,12 @@ readable version.
 
 - **Mission**: the safety net. It does not write product: it writes tests and **can
   block**.
-- **Ownership**: `tests/` (unit, functional, performance), the simulators and the
-  fixtures (the user's real videos).
+- **Ownership**: `tests/` (unit, functional, performance) and the fixtures (the
+  user's real videos); it consumes and reviews the simulators in `devices/sim/`,
+  which `video` implements.
 - **Custody**: ADR-005, 015.
-- **Inputs**: every change by the other agents; real videos/SER (external path).
+- **Inputs**: every change by the other agents; the simulators in `devices/sim/`
+  as test material; real videos/SER (external path).
 - **Outputs**: test suites, fixture catalogue, performance bench, gate report per
   change.
 - **When to invoke**: before declaring any change done; TDD; performance;
@@ -364,10 +400,10 @@ python3 -m venv --system-site-packages .venv
 
 | Agent | Owns | Custody | Model |
 | --- | --- | --- | --- |
-| `lead` | `design/`, `config/`, boundary | 000, 001, 003, 012, 021 | qwen3p8-max |
-| `video` | `devices/`, `capture/`, capture ROI | 002, 008, 010, 013, 019 | qwen3p8-max |
+| `lead` | `design/`, `config/`, boundary | 000, 001, 003, 012, 018, 021 | qwen3p8-max |
+| `video` | `devices/` (with `sim/`), `capture/`, capture ROI | 002, 008, 010, 013, 019 | qwen3p8-max |
 | `shg` | `shg/` | 006, 007, 022 | kimi-k3 |
 | `ux` | `ui/` | 009, 011, 020 | qwen3p8-max |
-| `qe` | `tests/`, simulators, fixtures | 005, 015 | qwen3p8-2p4t-a95b |
+| `qe` | `tests/`, fixtures, performance bench | 005, 015 | qwen3p8-2p4t-a95b |
 | `packaging` | `installer/`, CI, `pyproject.toml` | 004, 017 | glm-5p3 |
 | `docs` | `design/`, `solarscribe/docs/`, `.ts`, CHANGELOG | 000, 016 | glm-5p3-flash |

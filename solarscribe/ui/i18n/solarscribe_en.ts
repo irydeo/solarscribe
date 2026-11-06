@@ -2581,6 +2581,564 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
     </message>
 </context>
 <context>
+    <name>Settings</name>
+    <message>
+        <location filename="../settings_text.py" line="+32"/>
+        <source>Empty means the system language; write &apos;es&apos; or &apos;en&apos; to force one (ADR-016).</source>
+        <translation>Empty means the system language; write &apos;es&apos; or &apos;en&apos; to force one (ADR-016).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Observatory latitude in degrees, north positive. Needed to compute where the Sun is (ADR-021).</source>
+        <translation>Observatory latitude in degrees, north positive. Needed to compute where the Sun is (ADR-021).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Observatory longitude in degrees, east positive.</source>
+        <translation>Observatory longitude in degrees, east positive.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Observatory elevation in metres. Small effect on the ephemeris, but free to store.</source>
+        <translation>Observatory elevation in metres. Small effect on the ephemeris, but free to store.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Effective focal length at the sensor, in mm. It sets the arcsec per pixel along the scan axis and therefore the scan rate. Measure it on the native recon, not on a resampled stack.</source>
+        <translation>Effective focal length at the sensor, in mm. It sets the arcsec per pixel along the scan axis and therefore the scan rate. Measure it on the native recon, not on a resampled stack.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Camera pixel size in micrometres. With the focal length it turns pixels into arcseconds.</source>
+        <translation>Camera pixel size in micrometres. With the focal length it turns pixels into arcseconds.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Arcseconds per second per sidereal multiplier unit (the ASCOM standard is 15.04). The mount rate is expressed in these units.</source>
+        <translation>Arcseconds per second per sidereal multiplier unit (the ASCOM standard is 15.04). The mount rate is expressed in these units.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Compute the solar diameter from the date: the ephemeris is local and about 0.01% accurate (ADR-021), which beats any fixed figure.</source>
+        <translation>Compute the solar diameter from the date: the ephemeris is local and about 0.01% accurate (ADR-021), which beats any fixed figure.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Force the solar diameter in arcseconds; 0 means use the ephemeris. A wrong figure skews the reconstructed disk, so only set it to test.</source>
+        <translation>Force the solar diameter in arcseconds; 0 means use the ephemeris. A wrong figure skews the reconstructed disk, so only set it to test.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fallback solar diameter in arcseconds when no ephemeris is available. 1920&quot; is the mean apparent diameter, about 32&apos;.</source>
+        <translation>Fallback solar diameter in arcseconds when no ephemeris is available. 1920&quot; is the mean apparent diameter, about 32&apos;.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: the first camera found. Otherwise the id reported by discovery, &apos;&lt;backend&gt;:&lt;serial or index&gt;&apos;.</source>
+        <translation>Empty: the first camera found. Otherwise the id reported by discovery, &apos;&lt;backend&gt;:&lt;serial or index&gt;&apos;.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Exposure in microseconds, the native unit of every SDK we drive. At 120 fps the exposure cannot exceed 8300 us, which is why the ROI step shows the rate limit.</source>
+        <translation>Exposure in microseconds, the native unit of every SDK we drive. At 120 fps the exposure cannot exceed 8300 us, which is why the ROI step shows the rate limit.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Gain as the SDK&apos;s own index, not dB. Each brand scales it differently, so the value travels with the camera model in the profile.</source>
+        <translation>Gain as the SDK&apos;s own index, not dB. Each brand scales it differently, so the value travels with the camera model in the profile.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Offset (black level pedestal) as the SDK&apos;s index. Keeps the sky above zero so the reconstruction has no clipped blacks.</source>
+        <translation>Offset (black level pedestal) as the SDK&apos;s index. Keeps the sky above zero so the reconstruction has no clipped blacks.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Binning factor. 1x1 by default: the SHG needs the full spatial resolution along the slit (DESIGN.md 6).</source>
+        <translation>Binning factor. 1x1 by default: the SHG needs the full spatial resolution along the slit (DESIGN.md 6).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bits per pixel written to the SER. 16 is the contract with the post-processing (ADR-018).</source>
+        <translation>Bits per pixel written to the SER. 16 is the contract with the post-processing (ADR-018).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Readout / USB traffic control in SDK units (ZWO: USB traffic %, Touptek: speed index). 0 leaves the SDK default.</source>
+        <translation>Readout / USB traffic control in SDK units (ZWO: USB traffic %, Touptek: speed index). 0 leaves the SDK default.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.enable_auto_exp; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for scan.enable_auto_exp; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name of the profile preset to restore when the camera connects.</source>
+        <translation>Name of the profile preset to restore when the camera connects.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Left edge of the capture ROI on the sensor, in binned pixels.</source>
+        <translation>Left edge of the capture ROI on the sensor, in binned pixels.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Top edge of the capture ROI on the sensor, in binned pixels.</source>
+        <translation>Top edge of the capture ROI on the sensor, in binned pixels.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Width of the capture ROI. It sets the frame rate and the SER size: 3480x248 is the reference strip that reaches 120 fps (ADR-013).</source>
+        <translation>Width of the capture ROI. It sets the frame rate and the SER size: 3480x248 is the reference strip that reaches 120 fps (ADR-013).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Height of the capture ROI. It must hold the spectral band plus the tilt drift plus a margin (ADR-022).</source>
+        <translation>Height of the capture ROI. It must hold the spectral band plus the tilt drift plus a margin (ADR-022).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Left edge of the spectral band inside the frame, in frame pixels.</source>
+        <translation>Left edge of the spectral band inside the frame, in frame pixels.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Top edge of the spectral band inside the frame, in frame pixels.</source>
+        <translation>Top edge of the spectral band inside the frame, in frame pixels.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Width of the spectral band, the useful strip of the dispersed spectrum.</source>
+        <translation>Width of the spectral band, the useful strip of the dispersed spectrum.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Height of the spectral band. If it does not fit in the capture ROI the order is clipped and the ROI step says so.</source>
+        <translation>Height of the spectral band. If it does not fit in the capture ROI the order is clipped and the ROI step says so.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Last measured tilt of the spectral line, in degrees. A hint for the next session; session_meta.json holds the authoritative value.</source>
+        <translation>Last measured tilt of the spectral line, in degrees. A hint for the next session; session_meta.json holds the authoritative value.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Last measured tilt drift across the ROI width, in pixels.</source>
+        <translation>Last measured tilt drift across the ROI width, in pixels.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Tilt above which the ROI step warns: a tilted line skews the reconstruction and forces a taller ROI (ADR-022).</source>
+        <translation>Tilt above which the ROI step warns: a tilted line skews the reconstruction and forces a taller ROI (ADR-022).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: the platform default, ASCOM COM on Windows and INDI on Linux (ADR-019).</source>
+        <translation>Empty: the platform default, ASCOM COM on Windows and INDI on Linux (ADR-019).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: the first mount found. Otherwise the id reported by discovery.</source>
+        <translation>Empty: the first mount found. Otherwise the id reported by discovery.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Track while the session runs. The scan is a rate movement on top of the sidereal tracking, so tracking off means a smeared disk.</source>
+        <translation>Track while the session runs. The scan is a rate movement on top of the sidereal tracking, so tracking off means a smeared disk.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Default rate of the N/S/E/W buttons, in arcsec/s. 0 uses the backend&apos;s own default; the panel&apos;s selector overrides it.</source>
+        <translation>Default rate of the N/S/E/W buttons, in arcsec/s. 0 uses the backend&apos;s own default; the panel&apos;s selector overrides it.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Write SER files. False is the dry run: the mount moves and the engine measures, but nothing reaches the disk.</source>
+        <translation>Write SER files. False is the dry run: the mount moves and the engine measures, but nothing reaches the disk.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Run the auto-exposure loop before and during the scan. The Sun&apos;s brightness changes with seeing and with the filter.</source>
+        <translation>Run the auto-exposure loop before and during the scan. The Sun&apos;s brightness changes with seeing and with the filter.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scans per session. Inherited spelling; the default is 3 because DESIGN asks for three cycles, enough to reject a bad one without doubling the time (ADR-024).</source>
+        <translation>Scans per session. Inherited spelling; the default is 3 because DESIGN asks for three cycles, enough to reject a bad one without doubling the time (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds of sky recorded on each side of the disk, used only when padded_arcsec is 0. Keeps background in the reconstruction.</source>
+        <translation>Seconds of sky recorded on each side of the disk, used only when padded_arcsec is 0. Keeps background in the reconstruction.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fixed arcsec of sky padding per side; 0 falls back to padded_duration. A fixed angular padding does not depend on the frame rate, so repeated scans are more repeatable.</source>
+        <translation>Fixed arcsec of sky padding per side; 0 falls back to padded_duration. A fixed angular padding does not depend on the frame rate, so repeated scans are more repeatable.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Forward pre-load in seconds before recording starts: it takes up the RA backlash left by the reverse backup, so the first recorded frames are already at rate. 0 disables it.</source>
+        <translation>Forward pre-load in seconds before recording starts: it takes up the RA backlash left by the reverse backup, so the first recorded frames are already at rate. 0 disables it.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stop recording shortly after the trailing limb leaves the slit (stddev drop) instead of always writing the full trailing padding.</source>
+        <translation>Stop recording shortly after the trailing limb leaves the slit (stddev drop) instead of always writing the full trailing padding.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sky kept after the trailing limb, in arcseconds. Too little and the reconstruction has no background on that edge.</source>
+        <translation>Sky kept after the trailing limb, in arcseconds. Too little and the reconstruction has no background on that edge.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Trailing threshold as a fraction of the peak stddev. It is what decides that the Sun has left the slit.</source>
+        <translation>Trailing threshold as a fraction of the peak stddev. It is what decides that the Sun has left the slit.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the fast slew back to the start. 32x is about 481 arcsec/s, fast enough to make repositioning negligible without exceeding most mount limits.</source>
+        <translation>Sidereal multiplier for the fast slew back to the start. 32x is about 481 arcsec/s, fast enough to make repositioning negligible without exceeding most mount limits.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.num_cycles; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for scan.num_cycles; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.padded_duration; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for scan.padded_duration; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.scan_preload_seconds; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for scan.scan_preload_seconds; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.trailing_limb_stop; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for scan.trailing_limb_stop; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&apos;auto&apos;, &apos;symmetry&apos; or &apos;chord&apos;: which fine Dec centring to use when enable_dec_centering is on (ADR-006). &apos;auto&apos; picks by the disk fit.</source>
+        <translation>&apos;auto&apos;, &apos;symmetry&apos; or &apos;chord&apos;: which fine Dec centring to use when enable_dec_centering is on (ADR-006). &apos;auto&apos; picks by the disk fit.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sweep rate in arcsec/s. 0 means the engine calibrates it, which is what the prototype taught us to trust; a non-zero value forces the rate and skips calibration.</source>
+        <translation>Sweep rate in arcsec/s. 0 means the engine calibrates it, which is what the prototype taught us to trust; a non-zero value forces the rate and skips calibration.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rows of a mosaic the observer asks for. One row is a simple scan; with enable_mosaic on, the planner uses it as a minimum and recomputes from the slit geometry.</source>
+        <translation>Rows of a mosaic the observer asks for. One row is a simple scan; with enable_mosaic on, the planner uses it as a minimum and recomputes from the slit geometry.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Dec step between mosaic rows, in arcseconds. 0 steps one effective slit height minus the overlap, so the rows tile without a gap.</source>
+        <translation>Dec step between mosaic rows, in arcseconds. 0 steps one effective slit height minus the overlap, so the rows tile without a gap.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Force the capture frame rate; 0 measures it after auto-exposure. The rate is read after the exposure is final because auto-exposure changes it: reading it at start made the prototype scan 27% too fast.</source>
+        <translation>Force the capture frame rate; 0 measures it after auto-exposure. The rate is read after the exposure is final because auto-exposure changes it: reading it at start made the prototype scan 27% too fast.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Readings of the camera&apos;s reported rate to median. The median rejects the one-off low reading that a slow frame produces.</source>
+        <translation>Readings of the camera&apos;s reported rate to median. The median rejects the one-off low reading that a slow frame produces.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds between those readings. At 0.2 s five samples span a second, long enough to see a stall and short enough not to delay the scan.</source>
+        <translation>Seconds between those readings. At 0.2 s five samples span a second, long enough to see a stall and short enough not to delay the scan.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Additionally measure the real rate from a real capture of this many seconds (it writes a small SER labelled fpsprobe); 0 uses the reported rate.</source>
+        <translation>Additionally measure the real rate from a real capture of this many seconds (it writes a small SER labelled fpsprobe); 0 uses the reported rate.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to wait for the capture to actually start before giving up. Starting the scan before the file records loses the leading limb.</source>
+        <translation>Seconds to wait for the capture to actually start before giving up. Starting the scan before the file records loses the leading limb.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to settle after the first frame before the mount moves, so the first recorded frame is not a stationary duplicate.</source>
+        <translation>Seconds to settle after the first frame before the mount moves, so the first recorded frame is not a stationary duplicate.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Abort the scan if no frames are written for this long; 0 disables the check. A stalled writer means a lost take, not a slow one (ADR-014).</source>
+        <translation>Abort the scan if no frames are written for this long; 0 disables the check. A stalled writer means a lost take, not a slow one (ADR-014).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warn when the frames written fall more than this fraction below the expected rate times duration. A short scan means dropped frames.</source>
+        <translation>Warn when the frames written fall more than this fraction below the expected rate times duration. A short scan means dropped frames.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Free disk below which a scan does not start, in GB. A full disk mid-scan loses the take (ADR-014).</source>
+        <translation>Free disk below which a scan does not start, in GB. A full disk mid-scan loses the take (ADR-014).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the limb search. Fast enough to find the Sun in a frame or two, slow enough not to overshoot the slit.</source>
+        <translation>Sidereal multiplier for the limb search. Fast enough to find the Sun in a frame or two, slow enough not to overshoot the slit.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds between limb samples. 50 ms resolves the limb crossing well below the scan rate.</source>
+        <translation>Seconds between limb samples. 50 ms resolves the limb crossing well below the scan rate.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds before giving up the limb search. Two minutes is long enough for a manual nudge and short enough to surface a wrong GOTO.</source>
+        <translation>Seconds before giving up the limb search. Two minutes is long enough for a manual nudge and short enough to surface a wrong GOTO.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Minimum stddev to call it on-disk. On a MONO16 sensor the dark noise stddev is about 20 to 100 and the disk is usually above 10000.</source>
+        <translation>Minimum stddev to call it on-disk. On a MONO16 sensor the dark noise stddev is about 20 to 100 and the disk is usually above 10000.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stddev that clearly means on-disk. Above it the engine decides it does not need to back off before searching.</source>
+        <translation>Stddev that clearly means on-disk. Above it the engine decides it does not need to back off before searching.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The detection threshold is the observed dark stddev times this. It adapts to the sensor instead of trusting an absolute figure.</source>
+        <translation>The detection threshold is the observed dark stddev times this. It adapts to the sensor instead of trusting an absolute figure.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Use the left/right Dec centring loop. Turn it off when the disk does not fit along the slit: the metric loses its zero crossing and the loop can push the Sun out of the slit.</source>
+        <translation>Use the left/right Dec centring loop. Turn it off when the disk does not fit along the slit: the metric loses its zero crossing and the loop can push the Sun out of the slit.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Re-centre Dec every N cycles. Recentring is cheap but not free, and drift between adjacent cycles is small.</source>
+        <translation>Re-centre Dec every N cycles. Recentring is cheap but not free, and drift between adjacent cycles is small.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Centred when |L-R|/(L+R) is below this. 3% is inside the noise of the left/right measurement on a real disk.</source>
+        <translation>Centred when |L-R|/(L+R) is below this. 3% is inside the noise of the left/right measurement on a real disk.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Maximum Dec nudges per centring. Without a cap a bad metric oscillates forever.</source>
+        <translation>Maximum Dec nudges per centring. Without a cap a bad metric oscillates forever.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier of a Dec nudge. 3x is about 45 arcsec/s, fine enough for a small correction.</source>
+        <translation>Sidereal multiplier of a Dec nudge. 3x is about 45 arcsec/s, fine enough for a small correction.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to settle after a nudge before measuring again. The mount reports the target before it has arrived.</source>
+        <translation>Seconds to settle after a nudge before measuring again. The mount reports the target before it has arrived.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Re-centre Dec between scans of a row when it drifts more than this. Ten arcseconds is well below the slit height.</source>
+        <translation>Re-centre Dec between scans of a row when it drifts more than this. Ten arcseconds is well below the slit height.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>True runs a multi-row mosaic; false runs a single scan. The switch also decides which Dec centring path the scan uses.</source>
+        <translation>True runs a multi-row mosaic; false runs a single scan. The switch also decides which Dec centring path the scan uses.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Physical slit length in mm. It is the hard limit on the spatial axis, not the sensor: 7 mm at 714 mm focal subtends 33.7&apos;, just over the solar diameter, so one row can cover the whole disk.</source>
+        <translation>Physical slit length in mm. It is the hard limit on the spatial axis, not the sensor: 7 mm at 714 mm focal subtends 33.7&apos;, just over the solar diameter, so one row can cover the whole disk.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sensor pixels per millimetre of slit, the spectrograph re-imaging magnification. Set it to slit_pixels * pixel_size / (slit_mm * 1000) when the slit does not image 1:1, or the row step is off by that ratio.</source>
+        <translation>Sensor pixels per millimetre of slit, the spectrograph re-imaging magnification. Set it to slit_pixels * pixel_size / (slit_mm * 1000) when the slit does not image 1:1, or the row step is off by that ratio.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fractional overlap between adjacent rows. 15% hides a small pointing error without wasting rows.</source>
+        <translation>Fractional overlap between adjacent rows. 15% hides a small pointing error without wasting rows.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Extra sky above and below the disk, in arcseconds, so the poles are not at the row edge.</source>
+        <translation>Extra sky above and below the disk, in arcseconds, so the poles are not at the row edge.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scans per row, each one a separate SER. More scans let the post-processing reject the bad ones.</source>
+        <translation>Scans per row, each one a separate SER. More scans let the post-processing reject the bad ones.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Centre Dec automatically by chords. The chord method works even when the disk overfills the slit, which is where the left/right metric fails.</source>
+        <translation>Centre Dec automatically by chords. The chord method works even when the disk overfills the slit, which is where the left/right metric fails.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Chord centring measurement and correction rounds. Three converge on a real disk; more mostly chase noise.</source>
+        <translation>Chord centring measurement and correction rounds. Three converge on a real disk; more mostly chase noise.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Residual assumed after the chord centring, in arcseconds. It is added to the plan margin so a small error does not clip a pole.</source>
+        <translation>Residual assumed after the chord centring, in arcseconds. It is added to the plan margin so a small error does not clip a pole.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the Dec move between rows.</source>
+        <translation>Sidereal multiplier for the Dec move between rows.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Backlash taken up before each final approach, in arcseconds. Without it the row lands short by the gear slack.</source>
+        <translation>Backlash taken up before each final approach, in arcseconds. Without it the row lands short by the gear slack.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to settle after a Dec move before the row starts.</source>
+        <translation>Seconds to settle after a Dec move before the row starts.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the chord and calibration traverses. Fast traverses keep the centring short.</source>
+        <translation>Sidereal multiplier for the chord and calibration traverses. Fast traverses keep the centring short.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Histogram percentile the loop targets. 0.995 ignores a few hot pixels that would otherwise drive the exposure down.</source>
+        <translation>Histogram percentile the loop targets. 0.995 ignores a few hot pixels that would otherwise drive the exposure down.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Target level of that percentile as a fraction of full scale. 0.88 leaves headroom for the continuum peak, which must not clip.</source>
+        <translation>Target level of that percentile as a fraction of full scale. 0.88 leaves headroom for the continuum peak, which must not clip.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Convergence window as a fraction of full scale. Inside it the loop stops instead of hunting.</source>
+        <translation>Convergence window as a fraction of full scale. Inside it the loop stops instead of hunting.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Maximum auto-exposure iterations. After six the light is not changing and more attempts only delay the scan.</source>
+        <translation>Maximum auto-exposure iterations. After six the light is not changing and more attempts only delay the scan.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Self-calibrate the scan rate at session start from the measured limb-crossing time and the solar diameter. It removes the dependence on trusting the focal length and the reported frame rate.</source>
+        <translation>Self-calibrate the scan rate at session start from the measured limb-crossing time and the solar diameter. It removes the dependence on trusting the focal length and the reported frame rate.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Calibration traverses to average. One is usually enough; more trades time for a steadier rate.</source>
+        <translation>Calibration traverses to average. One is usually enough; more trades time for a steadier rate.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warn when the X/Y scale drifts more than this fraction between scans. A drift means the rate or the pixel scale changed.</source>
+        <translation>Warn when the X/Y scale drifts more than this fraction between scans. A drift means the rate or the pixel scale changed.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warn when the slit extent drifts more than this fraction between scans. It catches a focus or pointing change.</source>
+        <translation>Warn when the slit extent drifts more than this fraction between scans. It catches a focus or pointing change.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Retries of a scan that failed (stall, short, limb lost). The failed attempt stays in the log with a problem tag.</source>
+        <translation>Retries of a scan that failed (stall, short, limb lost). The failed attempt stays in the log with a problem tag.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Apply the 1/cos(Dec) RA-rate correction in both modes, so the X scale is the same at any declination.</source>
+        <translation>Apply the 1/cos(Dec) RA-rate correction in both modes, so the X scale is the same at any declination.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Measure the illuminated extent along the slit in the live frame. It estimates the slit-axis plate scale and flags a scan that missed the disk.</source>
+        <translation>Measure the illuminated extent along the slit in the live frame. It estimates the slit-axis plate scale and flags a scan that missed the disk.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bands of the slit extent profile. Enough to see the disk edge, few enough to stay cheap per frame.</source>
+        <translation>Bands of the slit extent profile. Enough to see the disk edge, few enough to stay cheap per frame.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ceiling of the recording queue. Bounded on purpose: a slow disk costs counted frames, never a stalled capture thread.</source>
+        <translation>Ceiling of the recording queue. Bounded on purpose: a slow disk costs counted frames, never a stalled capture thread.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sustained rate the ROI must reach (ADR-013). The ROI step estimates the rate of the chosen strip and warns below this figure.</source>
+        <translation>Sustained rate the ROI must reach (ADR-013). The ROI step estimates the rate of the chosen strip and warns below this figure.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for fps.capture_stall_seconds; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for fps.capture_stall_seconds; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for fps.capture_min_free_gb; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Legacy SolarScribe name for fps.capture_min_free_gb; kept so an old INI still reads, the inherited key wins (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Base folder for the session folders. Empty uses the platform default (config/paths.py). One folder per session, named with its date and time (DESIGN.md 10).</source>
+        <translation>Base folder for the session folders. Empty uses the platform default (config/paths.py). One folder per session, named with its date and time (DESIGN.md 10).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Prefix of the files: sun_YYYYMMDD_HHMM_scanNN.ser with its .csv and .jsonl (DESIGN.md 10).</source>
+        <translation>Prefix of the files: sun_YYYYMMDD_HHMM_scanNN.ser with its .csv and .jsonl (DESIGN.md 10).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Save the step state silently after every change, so a crash or a closed laptop loses nothing (ADR-011).</source>
+        <translation>Save the step state silently after every change, so a crash or a closed laptop loses nothing (ADR-011).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>CSV with one row per scan. Empty means the session folder, which is where the post-processing looks (ADR-018).</source>
+        <translation>CSV with one row per scan. Empty means the session folder, which is where the post-processing looks (ADR-018).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>JSON lines with one sample per scan. Empty means the session folder.</source>
+        <translation>JSON lines with one sample per scan. Empty means the session folder.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>JSON with the effective configuration and the plan, for reproducing the session. Empty means the session folder.</source>
+        <translation>JSON with the effective configuration and the plan, for reproducing the session. Empty means the session folder.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds between two samples of the Sun&apos;s Dec. Shorter samples do not help: the drift is slow and the measurement noise dominates.</source>
+        <translation>Seconds between two samples of the Sun&apos;s Dec. Shorter samples do not help: the drift is slow and the measurement noise dominates.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>How long the assistant spreads its samples. 20 to 40 minutes is what separates the azimuth error from the altitude error (ADR-007).</source>
+        <translation>How long the assistant spreads its samples. 20 to 40 minutes is what separates the azimuth error from the altitude error (ADR-007).</translation>
+    </message>
+</context>
+<context>
     <name>SettingsDialog</name>
     <message>
         <location filename="../settings_dialog.ui" line="+14"/>
@@ -2634,7 +3192,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Save settings</translation>
     </message>
     <message>
-        <location filename="../settings_dialog.py" line="+149"/>
+        <location filename="../settings_dialog.py" line="+161"/>
         <source>General</source>
         <translation>General</translation>
     </message>

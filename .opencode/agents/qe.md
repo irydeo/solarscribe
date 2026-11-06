@@ -10,7 +10,7 @@ Read `AGENTS.md`, `DESIGN.md`, `design/ARCHITECTURE.md` and ADRs 005, 013, 015 b
 
 Ownership:
 - `tests/`: unit (no hardware), functional (mocks, real videos, hardware), and the performance bench.
-- The camera and mount simulators used by the tests (ADR-005).
+- The tests that consume and review the camera and mount simulators (ADR-005); the simulator code lives in `devices/sim/` and is owned by `video`.
 - The fixtures (real SER/videos the user provides, kept in a configurable external path, ADR-015).
 - Custodian of ADRs 005, 015.
 
@@ -22,7 +22,7 @@ Rules:
 - Test at the layer boundaries defined in `design/ARCHITECTURE.md`; a test that pokes internals is a test that will break for no reason.
 
 Deliverables:
-- The unit and functional suites, the simulators, the fixtures catalogue, and the performance bench.
+- The unit and functional suites, the fixtures catalogue, and the performance bench.
 - A gate report per change: what was tested, with what, and the result.
 
 Definition of done:

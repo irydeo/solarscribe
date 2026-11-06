@@ -537,10 +537,10 @@ configuration store; the settings dialog edits the same schema.
   available. Changing it asks for a restart so the application reloads its
   catalogues.
 
-**Known limitation**: the explanations in the settings dialog are the `why` texts
-of the configuration schema. They are English-only in this build; the labels and
-the rest of the interface are translated. The labels themselves do not change the
-facts the tooltip explains.
+**Translation**: the explanations are the `why` texts of the configuration
+schema, translated through the `Settings` context and looked up at runtime. A
+Spanish session shows them in Spanish; if a lookup is missing, the dialog falls
+back to the developer text instead of showing an empty tooltip.
 
 ### 5.13 Dry run and simulators
 

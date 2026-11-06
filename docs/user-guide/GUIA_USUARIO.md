@@ -552,10 +552,11 @@ configuración; el diálogo de ajustes edita el mismo esquema.
 - **Idioma**: el del sistema por defecto, con español e inglés disponibles.
   Cambiarlo pide reiniciar la aplicación para que recargue sus catálogos.
 
-**Limitación conocida**: las explicaciones del diálogo de ajustes son los textos
-`why` del esquema de configuración. En esta compilación están solo en inglés; las
-etiquetas y el resto de la interfaz están traducidos. Las etiquetas no cambian
-los hechos que explica el tooltip.
+**Traducción**: las explicaciones son los textos `why` del esquema de
+configuración, traducidos a través del contexto `Settings` y consultados en
+tiempo de ejecución. Una sesión en español los muestra en español; si falta una
+traducción, el diálogo recurre al texto de desarrollo en vez de mostrar un
+tooltip vacío.
 
 ### 5.13 Modo seco y simuladores
 

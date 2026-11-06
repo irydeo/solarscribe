@@ -2581,6 +2581,564 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
 </context>
 <context>
+    <name>Settings</name>
+    <message>
+        <location filename="../settings_text.py" line="+32"/>
+        <source>Empty means the system language; write &apos;es&apos; or &apos;en&apos; to force one (ADR-016).</source>
+        <translation>Vacío significa el idioma del sistema; escribe &apos;es&apos; o &apos;en&apos; para forzar uno (ADR-016).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Observatory latitude in degrees, north positive. Needed to compute where the Sun is (ADR-021).</source>
+        <translation>Latitud del observatorio en grados, norte positivo. Necesaria para calcular dónde está el Sol (ADR-021).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Observatory longitude in degrees, east positive.</source>
+        <translation>Longitud del observatorio en grados, este positivo.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Observatory elevation in metres. Small effect on the ephemeris, but free to store.</source>
+        <translation>Altitud del observatorio en metros. Afecta poco a la efeméride, pero es gratis guardarla.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Effective focal length at the sensor, in mm. It sets the arcsec per pixel along the scan axis and therefore the scan rate. Measure it on the native recon, not on a resampled stack.</source>
+        <translation>Focal efectiva en el sensor, en mm. Fija los arcosegundos por píxel en el eje de barrido y, por tanto, la tasa de barrido. Mídela sobre el recon nativo, no sobre un apilado remuestreado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Camera pixel size in micrometres. With the focal length it turns pixels into arcseconds.</source>
+        <translation>Tamaño de píxel de la cámara en micrómetros. Con la focal convierte píxeles en arcosegundos.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Arcseconds per second per sidereal multiplier unit (the ASCOM standard is 15.04). The mount rate is expressed in these units.</source>
+        <translation>Arcosegundos por segundo por unidad de multiplicador sidéreo (el estándar ASCOM es 15,04). La tasa de la montura se expresa en estas unidades.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Compute the solar diameter from the date: the ephemeris is local and about 0.01% accurate (ADR-021), which beats any fixed figure.</source>
+        <translation>Calcula el diámetro solar a partir de la fecha: la efeméride es local y tiene una precisión de unos 0,01% (ADR-021), mejor que cualquier cifra fija.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Force the solar diameter in arcseconds; 0 means use the ephemeris. A wrong figure skews the reconstructed disk, so only set it to test.</source>
+        <translation>Fuerza el diámetro solar en arcosegundos; 0 significa usar la efeméride. Una cifra equivocada sesga el disco reconstruido, así que solo debería ponerse para probar.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fallback solar diameter in arcseconds when no ephemeris is available. 1920&quot; is the mean apparent diameter, about 32&apos;.</source>
+        <translation>Diámetro solar de respaldo en arcosegundos cuando no hay efeméride. 1920&quot; es el diámetro aparente medio, unos 32&apos;.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: the first camera found. Otherwise the id reported by discovery, &apos;&lt;backend&gt;:&lt;serial or index&gt;&apos;.</source>
+        <translation>Vacío: la primera cámara encontrada. Si no, el id que informa el descubrimiento, &apos;&lt;backend&gt;:&lt;serie o índice&gt;&apos;.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Exposure in microseconds, the native unit of every SDK we drive. At 120 fps the exposure cannot exceed 8300 us, which is why the ROI step shows the rate limit.</source>
+        <translation>Exposición en microsegundos, la unidad nativa de todos los SDK que manejamos. A 120 fps la exposición no puede pasar de 8300 us, y por eso el paso ROI muestra el límite de tasa.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Gain as the SDK&apos;s own index, not dB. Each brand scales it differently, so the value travels with the camera model in the profile.</source>
+        <translation>Ganancia como índice del propio SDK, no en dB. Cada marca la escala distinto, así que el valor viaja con el modelo de cámara en el perfil.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Offset (black level pedestal) as the SDK&apos;s index. Keeps the sky above zero so the reconstruction has no clipped blacks.</source>
+        <translation>Offset (pedestal de negro) como índice del SDK. Mantiene el cielo por encima de cero para que la reconstrucción no tenga negros recortados.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Binning factor. 1x1 by default: the SHG needs the full spatial resolution along the slit (DESIGN.md 6).</source>
+        <translation>Factor de binning. 1x1 por defecto: el SHG necesita la resolución espacial completa a lo largo de la rendija (DESIGN.md 6).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bits per pixel written to the SER. 16 is the contract with the post-processing (ADR-018).</source>
+        <translation>Bits por píxel escritos al SER. 16 es el contrato con el post-proceso (ADR-018).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Readout / USB traffic control in SDK units (ZWO: USB traffic %, Touptek: speed index). 0 leaves the SDK default.</source>
+        <translation>Control de lectura / tráfico USB en unidades del SDK (ZWO: % de tráfico USB; Touptek: índice de velocidad). 0 deja el valor por defecto del SDK.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.enable_auto_exp; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para scan.enable_auto_exp; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name of the profile preset to restore when the camera connects.</source>
+        <translation>Nombre del preset de perfil que se restaura al conectar la cámara.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Left edge of the capture ROI on the sensor, in binned pixels.</source>
+        <translation>Borde izquierdo del ROI de captura en el sensor, en píxeles bineados.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Top edge of the capture ROI on the sensor, in binned pixels.</source>
+        <translation>Borde superior del ROI de captura en el sensor, en píxeles bineados.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Width of the capture ROI. It sets the frame rate and the SER size: 3480x248 is the reference strip that reaches 120 fps (ADR-013).</source>
+        <translation>Ancho del ROI de captura. Fija la tasa de fotogramas y el tamaño del SER: 3480x248 es la franja de referencia que alcanza 120 fps (ADR-013).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Height of the capture ROI. It must hold the spectral band plus the tilt drift plus a margin (ADR-022).</source>
+        <translation>Alto del ROI de captura. Debe contener la banda espectral más la deriva por tilt más un margen (ADR-022).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Left edge of the spectral band inside the frame, in frame pixels.</source>
+        <translation>Borde izquierdo de la banda espectral dentro del fotograma, en píxeles de frame.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Top edge of the spectral band inside the frame, in frame pixels.</source>
+        <translation>Borde superior de la banda espectral dentro del fotograma, en píxeles de frame.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Width of the spectral band, the useful strip of the dispersed spectrum.</source>
+        <translation>Ancho de la banda espectral, la franja útil del espectro dispersado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Height of the spectral band. If it does not fit in the capture ROI the order is clipped and the ROI step says so.</source>
+        <translation>Alto de la banda espectral. Si no cabe en el ROI de captura, el orden se recorta y el paso ROI lo dice.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Last measured tilt of the spectral line, in degrees. A hint for the next session; session_meta.json holds the authoritative value.</source>
+        <translation>Último tilt medido de la línea espectral, en grados. Es una pista para la sesión siguiente; session_meta.json guarda el valor autoritativo.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Last measured tilt drift across the ROI width, in pixels.</source>
+        <translation>Última deriva de tilt medida a lo ancho del ROI, en píxeles.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Tilt above which the ROI step warns: a tilted line skews the reconstruction and forces a taller ROI (ADR-022).</source>
+        <translation>Tilt por encima del cual avisa el paso ROI: una línea inclinada sesga la reconstrucción y obliga a un ROI más alto (ADR-022).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: the platform default, ASCOM COM on Windows and INDI on Linux (ADR-019).</source>
+        <translation>Vacío: el valor por defecto de la plataforma, ASCOM COM en Windows e INDI en Linux (ADR-019).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: the first mount found. Otherwise the id reported by discovery.</source>
+        <translation>Vacío: la primera montura encontrada. Si no, el id que informa el descubrimiento.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Track while the session runs. The scan is a rate movement on top of the sidereal tracking, so tracking off means a smeared disk.</source>
+        <translation>Sigue mientras corre la sesión. El barrido es un movimiento por tasa encima del seguimiento sidéreo, así que sin seguimiento el disco sale emborronado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Default rate of the N/S/E/W buttons, in arcsec/s. 0 uses the backend&apos;s own default; the panel&apos;s selector overrides it.</source>
+        <translation>Tasa por defecto de los botones N/S/E/O, en arcosegundos/s. 0 usa el valor del backend; el selector del panel la sustituye.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Write SER files. False is the dry run: the mount moves and the engine measures, but nothing reaches the disk.</source>
+        <translation>Escribe ficheros SER. Falso es el modo seco: la montura se mueve y el motor mide, pero nada llega al disco.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Run the auto-exposure loop before and during the scan. The Sun&apos;s brightness changes with seeing and with the filter.</source>
+        <translation>Ejecuta el bucle de autoexposición antes y durante el barrido. El brillo del Sol cambia con el seeing y con el filtro.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scans per session. Inherited spelling; the default is 3 because DESIGN asks for three cycles, enough to reject a bad one without doubling the time (ADR-024).</source>
+        <translation>Barridos por sesión. Ortografía heredada; el valor por defecto es 3 porque DESIGN pide tres ciclos, suficientes para descartar uno malo sin doblar el tiempo (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds of sky recorded on each side of the disk, used only when padded_arcsec is 0. Keeps background in the reconstruction.</source>
+        <translation>Segundos de cielo grabados a cada lado del disco, usados solo cuando padded_arcsec es 0. Mantiene fondo en la reconstrucción.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fixed arcsec of sky padding per side; 0 falls back to padded_duration. A fixed angular padding does not depend on the frame rate, so repeated scans are more repeatable.</source>
+        <translation>Arcosegundos fijos de margen de cielo por lado; 0 recurre a padded_duration. Un margen angular fijo no depende de la tasa de fotogramas, así que los barridos repetidos son más reproducibles.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Forward pre-load in seconds before recording starts: it takes up the RA backlash left by the reverse backup, so the first recorded frames are already at rate. 0 disables it.</source>
+        <translation>Precarga hacia delante en segundos antes de empezar a grabar: absorbe el juego en AR que deja el retroceso, así que los primeros fotogramas grabados ya están a tasa. 0 la desactiva.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stop recording shortly after the trailing limb leaves the slit (stddev drop) instead of always writing the full trailing padding.</source>
+        <translation>Para de grabar poco después de que el limbo de salida deje la rendija (caída de la desviación típica) en vez de escribir siempre el margen de salida completo.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sky kept after the trailing limb, in arcseconds. Too little and the reconstruction has no background on that edge.</source>
+        <translation>Cielo conservado tras el limbo de salida, en arcosegundos. Demasiado poco y la reconstrucción no tiene fondo en ese borde.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Trailing threshold as a fraction of the peak stddev. It is what decides that the Sun has left the slit.</source>
+        <translation>Umbral de salida como fracción de la desviación típica máxima. Es lo que decide que el Sol ha dejado la rendija.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the fast slew back to the start. 32x is about 481 arcsec/s, fast enough to make repositioning negligible without exceeding most mount limits.</source>
+        <translation>Multiplicador sidéreo para el giro rápido de vuelta al inicio. 32x son unos 481 arcosegundos/s, bastante rápido para que el reposicionamiento sea despreciable sin superar los límites de la mayoría de monturas.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.num_cycles; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para scan.num_cycles; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.padded_duration; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para scan.padded_duration; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.scan_preload_seconds; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para scan.scan_preload_seconds; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for scan.trailing_limb_stop; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para scan.trailing_limb_stop; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&apos;auto&apos;, &apos;symmetry&apos; or &apos;chord&apos;: which fine Dec centring to use when enable_dec_centering is on (ADR-006). &apos;auto&apos; picks by the disk fit.</source>
+        <translation>&apos;auto&apos;, &apos;symmetry&apos; o &apos;chord&apos;: qué centrado fino en Dec usar cuando enable_dec_centering está activo (ADR-006). &apos;auto&apos; elige según el encaje del disco.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sweep rate in arcsec/s. 0 means the engine calibrates it, which is what the prototype taught us to trust; a non-zero value forces the rate and skips calibration.</source>
+        <translation>Tasa de barrido en arcosegundos/s. 0 significa que la calibra el motor, que es lo que el prototipo nos enseñó a fiarnos; un valor distinto de cero fuerza la tasa y salta la calibración.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rows of a mosaic the observer asks for. One row is a simple scan; with enable_mosaic on, the planner uses it as a minimum and recomputes from the slit geometry.</source>
+        <translation>Filas de mosaico que pide el observador. Una fila es un barrido simple; con enable_mosaic activo, el planificador la usa como mínimo y recalcula desde la geometría de la rendija.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Dec step between mosaic rows, in arcseconds. 0 steps one effective slit height minus the overlap, so the rows tile without a gap.</source>
+        <translation>Paso en Dec entre filas del mosaico, en arcosegundos. 0 avanza una altura efectiva de rendija menos el solape, así que las filas encajan sin hueco.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Force the capture frame rate; 0 measures it after auto-exposure. The rate is read after the exposure is final because auto-exposure changes it: reading it at start made the prototype scan 27% too fast.</source>
+        <translation>Fuerza la tasa de captura; 0 la mide tras la autoexposición. La tasa se lee cuando la exposición ya es final porque la autoexposición la cambia: leerla al principio hacía que el prototipo barriera un 27% demasiado rápido.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Readings of the camera&apos;s reported rate to median. The median rejects the one-off low reading that a slow frame produces.</source>
+        <translation>Lecturas de la tasa que informa la cámara que se promedian. La mediana rechaza la lectura baja puntual que produce un fotograma lento.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds between those readings. At 0.2 s five samples span a second, long enough to see a stall and short enough not to delay the scan.</source>
+        <translation>Segundos entre esas lecturas. A 0,2 s cinco muestras abarcan un segundo, suficiente para ver un stall y poco para retrasar el barrido.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Additionally measure the real rate from a real capture of this many seconds (it writes a small SER labelled fpsprobe); 0 uses the reported rate.</source>
+        <translation>Mide además la tasa real con una captura real de estos segundos (escribe un SER pequeño etiquetado fpsprobe); 0 usa la tasa informada.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to wait for the capture to actually start before giving up. Starting the scan before the file records loses the leading limb.</source>
+        <translation>Segundos de espera a que la captura arranque de verdad antes de rendirse. Empezar el barrido antes de que el fichero grabe pierde el limbo de entrada.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to settle after the first frame before the mount moves, so the first recorded frame is not a stationary duplicate.</source>
+        <translation>Segundos de asentamiento tras el primer fotograma antes de que se mueva la montura, para que el primer fotograma grabado no sea un duplicado quieto.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Abort the scan if no frames are written for this long; 0 disables the check. A stalled writer means a lost take, not a slow one (ADR-014).</source>
+        <translation>Aborta el barrido si no se escriben fotogramas durante este tiempo; 0 desactiva la comprobación. Un escritor atascado significa una toma perdida, no una lenta (ADR-014).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warn when the frames written fall more than this fraction below the expected rate times duration. A short scan means dropped frames.</source>
+        <translation>Avisa cuando los fotogramas escritos caen más de esta fracción por debajo de la tasa esperada por la duración. Un barrido corto significa fotogramas perdidos.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Free disk below which a scan does not start, in GB. A full disk mid-scan loses the take (ADR-014).</source>
+        <translation>Espacio libre por debajo del cual no empieza un barrido, en GB. Un disco lleno a mitad de barrido pierde la toma (ADR-014).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the limb search. Fast enough to find the Sun in a frame or two, slow enough not to overshoot the slit.</source>
+        <translation>Multiplicador sidéreo para la búsqueda del limbo. Bastante rápido para encontrar el Sol en uno o dos fotogramas, bastante lento para no pasarse de la rendija.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds between limb samples. 50 ms resolves the limb crossing well below the scan rate.</source>
+        <translation>Segundos entre muestras del limbo. 50 ms resuelven el cruce del limbo muy por debajo de la tasa de barrido.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds before giving up the limb search. Two minutes is long enough for a manual nudge and short enough to surface a wrong GOTO.</source>
+        <translation>Segundos antes de abandonar la búsqueda del limbo. Dos minutos bastan para un empujón manual y sobran para destapar un GOTO equivocado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Minimum stddev to call it on-disk. On a MONO16 sensor the dark noise stddev is about 20 to 100 and the disk is usually above 10000.</source>
+        <translation>Desviación típica mínima para considerarlo sobre el disco. En un sensor MONO16 la desviación del ruido de oscuro está entre unos 20 y 100, y el disco suele pasar de 10000.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stddev that clearly means on-disk. Above it the engine decides it does not need to back off before searching.</source>
+        <translation>Desviación típica que claramente significa sobre el disco. Por encima, el motor decide que no necesita retroceder antes de buscar.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The detection threshold is the observed dark stddev times this. It adapts to the sensor instead of trusting an absolute figure.</source>
+        <translation>El umbral de detección es la desviación de oscuro observada multiplicada por esto. Se adapta al sensor en vez de fiarse de una cifra absoluta.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Use the left/right Dec centring loop. Turn it off when the disk does not fit along the slit: the metric loses its zero crossing and the loop can push the Sun out of the slit.</source>
+        <translation>Usa el bucle de centrado izquierda/derecha en Dec. Desactívalo cuando el disco no cabe a lo largo de la rendija: la métrica pierde su cruce por cero y el bucle puede empujar el Sol fuera de la rendija.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Re-centre Dec every N cycles. Recentring is cheap but not free, and drift between adjacent cycles is small.</source>
+        <translation>Recentra la Dec cada N ciclos. Recentrar es barato pero no gratis, y la deriva entre ciclos contiguos es pequeña.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Centred when |L-R|/(L+R) is below this. 3% is inside the noise of the left/right measurement on a real disk.</source>
+        <translation>Centrado cuando |L-R|/(L+R) está por debajo de esto. 3% está dentro del ruido de la medida izquierda/derecha en un disco real.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Maximum Dec nudges per centring. Without a cap a bad metric oscillates forever.</source>
+        <translation>Máximo de empujones en Dec por centrado. Sin un tope, una métrica mala oscila para siempre.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier of a Dec nudge. 3x is about 45 arcsec/s, fine enough for a small correction.</source>
+        <translation>Multiplicador sidéreo de un empujón en Dec. 3x son unos 45 arcosegundos/s, suficientemente fino para una corrección pequeña.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to settle after a nudge before measuring again. The mount reports the target before it has arrived.</source>
+        <translation>Segundos de asentamiento tras un empujón antes de volver a medir. La montura informa del objetivo antes de haber llegado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Re-centre Dec between scans of a row when it drifts more than this. Ten arcseconds is well below the slit height.</source>
+        <translation>Recentra la Dec entre barridos de una fila cuando derive más que esto. Diez arcosegundos están muy por debajo de la altura de rendija.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>True runs a multi-row mosaic; false runs a single scan. The switch also decides which Dec centring path the scan uses.</source>
+        <translation>Verdadero ejecuta un mosaico multífila; falso ejecuta un barrido simple. El interruptor también decide qué camino de centrado en Dec usa el barrido.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Physical slit length in mm. It is the hard limit on the spatial axis, not the sensor: 7 mm at 714 mm focal subtends 33.7&apos;, just over the solar diameter, so one row can cover the whole disk.</source>
+        <translation>Longitud física de la rendija en mm. Es el límite duro del eje espacial, no el sensor: 7 mm a 714 mm de focal subtienden 33,7&apos;, justo por encima del diámetro solar, así que una fila puede cubrir todo el disco.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sensor pixels per millimetre of slit, the spectrograph re-imaging magnification. Set it to slit_pixels * pixel_size / (slit_mm * 1000) when the slit does not image 1:1, or the row step is off by that ratio.</source>
+        <translation>Píxeles de sensor por milímetro de rendija, la magnificación de la imagen de la rendija. Ponla a slit_pixels * pixel_size / (slit_mm * 1000) cuando la rendija no se image a 1:1, o el paso entre filas se desvía en esa proporción.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fractional overlap between adjacent rows. 15% hides a small pointing error without wasting rows.</source>
+        <translation>Solape fraccional entre filas contiguas. 15% tapa un pequeño error de apuntado sin desperdiciar filas.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Extra sky above and below the disk, in arcseconds, so the poles are not at the row edge.</source>
+        <translation>Cielo extra por encima y por debajo del disco, en arcosegundos, para que los polos no queden en el borde de la fila.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Scans per row, each one a separate SER. More scans let the post-processing reject the bad ones.</source>
+        <translation>Barridos por fila, cada uno un SER distinto. Más barridos permiten al post-proceso descartar los malos.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Centre Dec automatically by chords. The chord method works even when the disk overfills the slit, which is where the left/right metric fails.</source>
+        <translation>Centra la Dec automáticamente por cuerdas. El método de la cuerda funciona aunque el disco desborde la rendija, que es donde falla la métrica izquierda/derecha.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Chord centring measurement and correction rounds. Three converge on a real disk; more mostly chase noise.</source>
+        <translation>Rondas de medida y corrección del centrado por cuerda. Tres convergen en un disco real; más solo persiguen ruido.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Residual assumed after the chord centring, in arcseconds. It is added to the plan margin so a small error does not clip a pole.</source>
+        <translation>Residuo asumido tras el centrado por cuerda, en arcosegundos. Se suma al margen del plan para que un pequeño error no recorte un polo.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the Dec move between rows.</source>
+        <translation>Multiplicador sidéreo del movimiento en Dec entre filas.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Backlash taken up before each final approach, in arcseconds. Without it the row lands short by the gear slack.</source>
+        <translation>Juego absorbido antes de cada aproximación final, en arcosegundos. Sin él, la fila se queda corta por la holgura del engranaje.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds to settle after a Dec move before the row starts.</source>
+        <translation>Segundos de asentamiento tras un movimiento en Dec antes de que empiece la fila.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal multiplier for the chord and calibration traverses. Fast traverses keep the centring short.</source>
+        <translation>Multiplicador sidéreo para los recorridos de cuerda y calibración. Los recorridos rápidos acortan el centrado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Histogram percentile the loop targets. 0.995 ignores a few hot pixels that would otherwise drive the exposure down.</source>
+        <translation>Percentil del histograma al que apunta el bucle. 0,995 ignora unos pocos píxeles calientes que si no bajarían la exposición.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Target level of that percentile as a fraction of full scale. 0.88 leaves headroom for the continuum peak, which must not clip.</source>
+        <translation>Nivel objetivo de ese percentil como fracción del fondo de escala. 0,88 deja margen para el pico del continuo, que no debe saturar.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Convergence window as a fraction of full scale. Inside it the loop stops instead of hunting.</source>
+        <translation>Ventana de convergencia como fracción del fondo de escala. Dentro de ella el bucle para en vez de cazar.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Maximum auto-exposure iterations. After six the light is not changing and more attempts only delay the scan.</source>
+        <translation>Máximo de iteraciones de autoexposición. Tras seis, la luz ya no cambia y más intentos solo retrasan el barrido.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Self-calibrate the scan rate at session start from the measured limb-crossing time and the solar diameter. It removes the dependence on trusting the focal length and the reported frame rate.</source>
+        <translation>Autocalibra la tasa de barrido al inicio de la sesión con el tiempo de cruce del limbo medido y el diámetro solar. Elimina la dependencia de fiarse de la focal y de la tasa de fotogramas informada.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Calibration traverses to average. One is usually enough; more trades time for a steadier rate.</source>
+        <translation>Recorridos de calibración que se promedian. Uno suele bastar; más cambian tiempo por una tasa más estable.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warn when the X/Y scale drifts more than this fraction between scans. A drift means the rate or the pixel scale changed.</source>
+        <translation>Avisa cuando la escala X/Y derive más de esta fracción entre barridos. Una deriva significa que cambiaron la tasa o la escala de píxel.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warn when the slit extent drifts more than this fraction between scans. It catches a focus or pointing change.</source>
+        <translation>Avisa cuando la extensión de rendija derive más de esta fracción entre barridos. Detecta un cambio de enfoque o de apuntado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Retries of a scan that failed (stall, short, limb lost). The failed attempt stays in the log with a problem tag.</source>
+        <translation>Reintentos de un barrido fallido (stall, corto, limbo perdido). El intento fallido se queda en el registro con una etiqueta de problema.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Apply the 1/cos(Dec) RA-rate correction in both modes, so the X scale is the same at any declination.</source>
+        <translation>Aplica la corrección 1/cos(Dec) de la tasa de AR en los dos modos, para que la escala X sea la misma en cualquier declinación.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Measure the illuminated extent along the slit in the live frame. It estimates the slit-axis plate scale and flags a scan that missed the disk.</source>
+        <translation>Mide la extensión iluminada a lo largo de la rendija en el fotograma vivo. Estima la escala de placa del eje de rendija y señala un barrido que se perdió el disco.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bands of the slit extent profile. Enough to see the disk edge, few enough to stay cheap per frame.</source>
+        <translation>Bandas del perfil de extensión de rendija. Bastantes para ver el borde del disco, pocas para seguir siendo baratas por fotograma.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ceiling of the recording queue. Bounded on purpose: a slow disk costs counted frames, never a stalled capture thread.</source>
+        <translation>Techo de la cola de grabación. Acotada a propósito: un disco lento cuesta fotogramas contados, nunca un hilo de captura bloqueado.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sustained rate the ROI must reach (ADR-013). The ROI step estimates the rate of the chosen strip and warns below this figure.</source>
+        <translation>Tasa sostenida que debe alcanzar el ROI (ADR-013). El paso ROI estima la tasa de la franja elegida y avisa por debajo de esta cifra.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for fps.capture_stall_seconds; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para fps.capture_stall_seconds; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Legacy SolarScribe name for fps.capture_min_free_gb; kept so an old INI still reads, the inherited key wins (ADR-024).</source>
+        <translation>Nombre antiguo de SolarScribe para fps.capture_min_free_gb; se conserva para que un INI viejo siga leyéndose, y gana la clave heredada (ADR-024).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Base folder for the session folders. Empty uses the platform default (config/paths.py). One folder per session, named with its date and time (DESIGN.md 10).</source>
+        <translation>Carpeta base de las carpetas de sesión. Vacío usa el valor por defecto de la plataforma (config/paths.py). Una carpeta por sesión, nombrada con su fecha y hora (DESIGN.md 10).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Prefix of the files: sun_YYYYMMDD_HHMM_scanNN.ser with its .csv and .jsonl (DESIGN.md 10).</source>
+        <translation>Prefijo de los ficheros: sun_YYYYMMDD_HHMM_scanNN.ser con su .csv y .jsonl (DESIGN.md 10).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Save the step state silently after every change, so a crash or a closed laptop loses nothing (ADR-011).</source>
+        <translation>Guarda el estado de los pasos en silencio tras cada cambio, para que un cierre o un portátil apagado no pierda nada (ADR-011).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>CSV with one row per scan. Empty means the session folder, which is where the post-processing looks (ADR-018).</source>
+        <translation>CSV con una fila por barrido. Vacío significa la carpeta de la sesión, que es donde mira el post-proceso (ADR-018).</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>JSON lines with one sample per scan. Empty means the session folder.</source>
+        <translation>Líneas JSON con una muestra por barrido. Vacío significa la carpeta de la sesión.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>JSON with the effective configuration and the plan, for reproducing the session. Empty means the session folder.</source>
+        <translation>JSON con la configuración efectiva y el plan, para reproducir la sesión. Vacío significa la carpeta de la sesión.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seconds between two samples of the Sun&apos;s Dec. Shorter samples do not help: the drift is slow and the measurement noise dominates.</source>
+        <translation>Segundos entre dos muestras de la Dec del Sol. Muestras más cortas no ayudan: la deriva es lenta y manda el ruido de medida.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>How long the assistant spreads its samples. 20 to 40 minutes is what separates the azimuth error from the altitude error (ADR-007).</source>
+        <translation>Cuánto reparte el asistente sus muestras. 20 a 40 minutos es lo que separa el error de azimut del de altitud (ADR-007).</translation>
+    </message>
+</context>
+<context>
     <name>SettingsDialog</name>
     <message>
         <location filename="../settings_dialog.ui" line="+14"/>
@@ -2634,7 +3192,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Guardar ajustes</translation>
     </message>
     <message>
-        <location filename="../settings_dialog.py" line="+149"/>
+        <location filename="../settings_dialog.py" line="+161"/>
         <source>General</source>
         <translation>General</translation>
     </message>

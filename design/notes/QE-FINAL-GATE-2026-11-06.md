@@ -5,7 +5,9 @@ Complementa a `QE-GATE-REPORT-2026-11-06.md` (contratos y banco) con la pasada
 final sobre el árbol integrado.
 
 Resultado: **GATE VERDE en captura, centrado, barrido, registros y rendimiento;
-una salvedad de integración en el recon de la ventana**. No se ha hecho commit.
+una salvedad de integración en el recon de la ventana**. Las 22 filas de paridad
+tienen módulo y prueba, incluidas las tres que estaban a medias. No se ha hecho
+commit.
 
 ---
 
@@ -14,8 +16,11 @@ una salvedad de integración en el recon de la ventana**. No se ha hecho commit.
 ### 1. Comandos y resultados
 
 ```
+.venv/bin/python -m pytest tests/unit -q
+496 passed in 40.15s
+
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests -q
-511 passed, 20 skipped in 64.88s
+522 passed, 20 skipped in 54.99s
 
 SOLARSCRIBE_PERF=1 .venv/bin/python -m pytest tests/perf -q
 22 passed in 8.52s
@@ -101,7 +106,7 @@ menos una prueba. Tabla de comprobación:
 | 1 | `shg/calibration.py` | `test_shg_calibration.py::test_factor_normalises_by_the_measurement_speed` |
 | 2 | `shg/ephemeris.py` | `test_shg_ephemeris.py::test_solar_position_matches_jpl_horizons` |
 | 3 | `shg/geometry.py` | `test_shg_geometry.py::test_slit_image_scale_is_the_ratio_of_the_two_axes` |
-| 4 | `capture/engine.py`, `shg/engine.py` | `test_capture_engine.py::test_watchdog_aborts_a_stalled_stream`, `test_queue_budget_drops_are_counted_and_never_block_capture` |
+| 4 | `capture/engine.py`, `shg/engine.py` | `test_shg_engine_retry_preload.py::test_a_stalled_first_row_is_retried_once_and_the_second_outcome_wins`, `test_capture_engine.py::test_watchdog_aborts_a_stalled_stream` |
 | 5 | `shg/engine.py` | `test_shg_engine.py::test_consistency_flags_a_scale_or_extent_drift` |
 | 6 | `shg/logs.py` | `test_shg_logs.py::test_scan_log_keeps_the_prototype_columns_in_order` |
 | 7 | `ui/` | `test_ui_camera.py::test_apply_roi_calls_the_real_capture_engine`, `test_ui_main_window.py::test_the_three_menus_exist_with_their_tools` |
@@ -110,8 +115,8 @@ menos una prueba. Tabla de comprobación:
 | 10 | `capture/auto_exposure.py` | `test_capture_auto_exposure.py::test_loop_converges_to_the_target_exposure` |
 | 11 | `shg/centering.py` | `test_shg_centering.py::test_sun_centering_symmetry_end_to_end_and_progress` |
 | 12 | `shg/mosaic.py` | `test_shg_mosaic.py::test_plan_step_and_centring_match_the_prototype` |
-| 13 | `shg/engine.py` | `test_shg_engine.py::test_run_adaptive_stop_ends_before_the_planned_duration` |
-| 14 | `shg/geometry.py` | `test_shg_geometry.py::test_cos_dec_factor_is_the_spherical_correction` |
+| 13 | `shg/engine.py` | `test_shg_engine_retry_preload.py::test_preload_moves_the_mount_back_before_recording_starts`, `test_preload_zero_skips_the_extra_move` |
+| 14 | `shg/geometry.py` | `test_shg_geometry.py::test_cos_dec_factor_is_the_spherical_correction`, `test_shg_geometry_alias.py::test_cos_dec_correction_alias_is_the_astronomical_factor` |
 | 15 | `shg/limb.py` | `test_shg_limb.py::test_detector_reports_the_trailing_limb_after_two_dark_samples` |
 | 16 | `shg/analysis.py` | `test_shg_analysis.py::test_slit_extent_matches_the_prototype_threshold_rule` |
 | 17 | `config/store.py` | `test_config_store.py::test_profile_round_trip_keeps_telescope_camera_and_presets` |
@@ -121,17 +126,23 @@ menos una prueba. Tabla de comprobación:
 | 21 | `shg/centering.py`, `ui/` | `test_shg_centering.py::test_coarse_hill_climb_stops_inside_the_dead_zone`, `test_ui_telescope_panel.py::test_goto_sun_uses_the_provider` |
 | 22 | `capture/engine.py`, `capture/ser.py` | `test_capture_engine.py::test_recording_writes_a_readable_ser_and_counts`, `test_capture_ser.py::test_header_has_the_standard_fields` |
 
-**Cobertura parcial dentro de dos filas, no filas sin prueba:**
+**Cobertura completa.** Las tres lagunas de detalle que quedaban están cerradas
+con pruebas dedicadas, todas en las fronteras públicas (`ScanEngineImpl` +
+`FrameSource` + `Mount` + `RowRecorder`, y la función pública de geometría):
 
-- Fila 4: el reintento único (`SCAN_RETRIES = 1` en `shg/engine.py`) no tiene
-  una prueba dedicada; aborto, stall, guarda de disco y contabilidad sí.
-- Fila 13: la precarga de AR (`preload_s > 0`) no se ejercita en ninguna prueba
-  de `run`; la parada adaptativa y el padding sí.
-- Fila 14: `cos_dec_correction` es un alias de `cos_dec_factor`, y la prueba
-  cubre el factor; el alias no se llama por su nombre.
+- Fila 4: `test_a_stalled_first_row_is_retried_once_and_the_second_outcome_wins`
+  fuerza una primera fila parada por el guardián de stall, comprueba que se
+  reintenta una vez y que el resultado reportado es el segundo; el registro
+  ADR-018 conserva las dos filas (`stalled` y completada).
+- Fila 13: `test_preload_moves_the_mount_back_before_recording_starts` y
+  `test_preload_zero_skips_the_extra_move` comprueban, en el instante exacto en
+  que `RowRecorder.start_row` recibe la fila, que la precarga movió la montura
+  antes de grabar y que `preload_s = 0` no lo hace.
+- Fila 14: `test_cos_dec_correction_alias_is_the_astronomical_factor` llama al
+  alias por su nombre, comprueba que es el mismo factor, respeta el suelo de
+  0.5 y alimenta las dos conversiones de tasa públicas.
 
-Ninguna fila queda sin módulo ni sin prueba. Los tres puntos anteriores son
-huecos de cobertura de detalle, no de paridad funcional.
+Ninguna fila queda sin módulo ni sin prueba.
 
 ### 5. Verificado y no verificado
 
@@ -156,15 +167,16 @@ huecos de cobertura de detalle, no de paridad funcional.
 
 ### 6. Bloqueos y salvedades
 
-- **Sin bloqueo numérico**: suite completa 511 passed / 20 skipped, rendimiento
-  22 passed, GUI self-test 0.
+- **Sin bloqueo numérico**: suite completa 522 passed / 20 skipped, unitaria
+  496 passed, rendimiento 22 passed, GUI self-test 0.
 - **Salvedad de integración**: el recon de la ventana sigue siendo el
   placeholder de banda submuestreada; `shg.recon.quick_recon` está probado y se
   usa en el test de integración, pero `ui/engines.py` no lo llama. Se reporta a
   `ux`/`shg`; no se corrige desde QE.
 - **Observación**: `SolarScene` sobre `SimCamera(pattern="flat")` en la ventana
   frente a `SimCamera(pattern="solar")` en pruebas y banco.
-- **Cobertura parcial**: reintento de fila y precarga de AR, ver §4.
+- **Cobertura de paridad completa**: reintento de fila, precarga de AR y alias
+  de 1/cos(Dec) con pruebas dedicadas, ver §4.
 - No se ha hecho commit.
 
 ---
@@ -174,8 +186,11 @@ huecos de cobertura de detalle, no de paridad funcional.
 ### 1. Commands and results
 
 ```
+.venv/bin/python -m pytest tests/unit -q
+496 passed in 40.15s
+
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests -q
-511 passed, 20 skipped in 64.88s
+522 passed, 20 skipped in 54.99s
 
 SOLARSCRIBE_PERF=1 .venv/bin/python -m pytest tests/perf -q
 22 passed in 8.52s
@@ -257,11 +272,10 @@ least one test. The check table is in the Spanish section (same rows); the
 summary is:
 
 - Every row has a module under `solarscribe/` and a named test in `tests/`.
-- Partial coverage **inside** two rows, not rows without a test: the single row
-  retry (`SCAN_RETRIES = 1`) has no dedicated test; the RA preload
-  (`preload_s > 0`) is not exercised by any `run` test. `cos_dec_correction` is
-  covered through its `cos_dec_factor` alias.
-- No parity row is missing a module or a test.
+- The three previously partial spots now have dedicated tests:
+  `test_shg_engine_retry_preload.py` (row 4 retry, row 13 preload) and
+  `test_shg_geometry_alias.py` (row 14 alias). No parity row is missing a
+  module or a test.
 
 ### 5. Verified and unverified
 
@@ -286,15 +300,16 @@ summary is:
 
 ### 6. Blockers and caveats
 
-- **No numeric blocker**: full suite 511 passed / 20 skipped, performance
-  22 passed, GUI self-test 0.
+- **No numeric blocker**: full suite 522 passed / 20 skipped, unit 496 passed,
+  performance 22 passed, GUI self-test 0.
 - **Integration caveat**: the window recon is still the downsampled-band
   placeholder; `shg.recon.quick_recon` is tested and used by the integration
   test, but `ui/engines.py` does not call it. Reported to `ux`/`shg`; not fixed
   from QE.
 - **Observation**: `SolarScene` over `SimCamera(pattern="flat")` in the window
   versus `SimCamera(pattern="solar")` in tests and bench.
-- **Partial coverage**: row retry and RA preload, see §4.
+- **Parity coverage complete**: row retry, RA preload and the 1/cos(Dec) alias
+  now have dedicated tests, see §4.
 - No commit.
 
 ---
@@ -302,6 +317,8 @@ summary is:
 ## Archivos de esta pasada / Files in this pass
 
 - `tests/functional/test_integration_sim.py` (new end-to-end functional test)
+- `tests/unit/test_shg_engine_retry_preload.py` (row 4 retry and row 13 preload)
+- `tests/unit/test_shg_geometry_alias.py` (row 14 alias)
 - `design/notes/QE-FINAL-GATE-2026-11-06.md` (this note)
 - `design/notes/QE-GATE-REPORT-2026-11-06.md` (earlier contract and bench
   report; unchanged except the pointer)

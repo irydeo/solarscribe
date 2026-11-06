@@ -104,11 +104,11 @@ legible en [`design/AGENTS.md`](design/AGENTS.md).
 
 | Agente | Misión | Propiedad | Custodia |
 | --- | --- | --- | --- |
-| **lead** | Contratos entre capas, ADRs, revisión cruzada, resolver conflictos | `design/`, `config/`, frontera entre capas | 000, 001, 003, 012, 021 |
-| **video** | Que la app hable con cámara y montura y que el stream no pierda frames | `devices/`, `capture/`, ROI de captura | 002, 008, 010, 013, 019 |
+| **lead** | Contratos entre capas, ADRs, revisión cruzada, resolver conflictos | `design/`, `config/`, frontera entre capas | 000, 001, 003, 012, 018, 021 |
+| **video** | Que la app hable con cámara y montura y que el stream no pierda frames | `devices/` (con `devices/sim/`), `capture/`, ROI de captura | 002, 008, 010, 013, 019 |
 | **shg** | Que el cálculo sea correcto: limbo, tasa, centrado, mosaico, polar, tilt | `shg/` | 006, 007, 022 |
 | **ux** | Que escanear sea fácil para cualquiera | `ui/`, editor de ROI (UI) | 009, 011, 020 |
-| **qe** | La red de seguridad: unitaria (TDD), funcional (mocks/vídeos) y rendimiento | `tests/`, simuladores, fixtures, gates | 005, 015 |
+| **qe** | La red de seguridad: unitaria (TDD), funcional (mocks/vídeos) y rendimiento | `tests/`, fixtures, banco de rendimiento, gates | 005, 015 |
 | **packaging** | Windows y Linux funcionales de serie, CI, licencias, versionado | `installer/`, CI, `pyproject.toml` | 004, 017 |
 | **docs** | Documentación bilingüe y traducción `.ts` ES/EN | `design/`, `solarscribe/docs/`, `.ts`, CHANGELOG | 000, 016 |
 
@@ -227,11 +227,11 @@ operational details live in `.opencode/agents/*.md` and their readable version i
 
 | Agent | Mission | Ownership | Custody |
 | --- | --- | --- | --- |
-| **lead** | Layer contracts, ADRs, cross review, resolve conflicts | `design/`, `config/`, layer boundary | 000, 001, 003, 012, 021 |
-| **video** | That the app talks to camera and mount and the stream loses no frames | `devices/`, `capture/`, capture ROI | 002, 008, 010, 013, 019 |
+| **lead** | Layer contracts, ADRs, cross review, resolve conflicts | `design/`, `config/`, layer boundary | 000, 001, 003, 012, 018, 021 |
+| **video** | That the app talks to camera and mount and the stream loses no frames | `devices/` (including `devices/sim/`), `capture/`, capture ROI | 002, 008, 010, 013, 019 |
 | **shg** | That the maths is correct: limb, rate, centring, mosaic, polar, tilt | `shg/` | 006, 007, 022 |
 | **ux** | That scanning is easy for anybody | `ui/`, ROI editor (UI) | 009, 011, 020 |
-| **qe** | The safety net: unit (TDD), functional (mocks/videos) and performance | `tests/`, simulators, fixtures, gates | 005, 015 |
+| **qe** | The safety net: unit (TDD), functional (mocks/videos) and performance | `tests/`, fixtures, performance bench, gates | 005, 015 |
 | **packaging** | Windows and Linux functional out of the box, CI, licences, versioning | `installer/`, CI, `pyproject.toml` | 004, 017 |
 | **docs** | Bilingual documentation and ES/EN `.ts` translation | `design/`, `solarscribe/docs/`, `.ts`, CHANGELOG | 000, 016 |
 

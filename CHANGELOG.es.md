@@ -56,6 +56,11 @@ Todos los cambios notables de SolarScribe se documentan aquí. El formato sigue
 - **Versión**: `solarscribe.__version__` lee los metadatos de la distribución
   instalada, así que la ventana, la CLI y `session_meta.json` coinciden con la
   versión del paquete; un árbol de fuentes que nunca se instaló vuelve a `0.0.0`.
+- **Tooltips de ajustes traducidos**: los 111 textos `why` pasaron a
+  `solarscribe/ui/settings_text.py`, marcados con
+  `QT_TRANSLATE_NOOP("Settings", ...)` y consultados con
+  `QCoreApplication.translate("Settings", ...)`. Los catálogos ES/EN los cubren,
+  así que un diálogo de ajustes en español ya no recurre al inglés.
 - **i18n**: los contextos nuevos `CameraPanel` y `Session` y las cadenas nuevas de
   MainWindow, calendario del cielo y recon rápido están traducidas, 0 sin traducir
   en ES y EN.
@@ -85,6 +90,3 @@ de dependencias, los catálogos y las guías bilingües.
 - Los catálogos ES/EN cubren todo lo que `lupdate` puede extraer de la interfaz,
   con 0 cadenas sin traducir. Son una foto del momento: vuelve a ejecutar
   `lupdate` tras cualquier cambio en un `.ui` o en un `self.tr()`.
-- Las explicaciones de los ajustes en `config/schema.py` son prosa en inglés y
-  `lupdate` no las extrae; necesitan una estrategia de traducción antes de que se
-  publique el diálogo de ajustes.

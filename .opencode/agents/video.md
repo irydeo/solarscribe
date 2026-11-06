@@ -9,7 +9,7 @@ You are a senior real-time/systems engineer for SolarScribe (PySide6 capture app
 Read `AGENTS.md`, `DESIGN.md` (§5, §6, §6.1), `design/ARCHITECTURE.md` and ADR-013 (performance budget) before acting.
 
 Ownership:
-- `devices/` (camera and mount interfaces + drivers: native ASI/QHY/Player One/Touptek, sim, and the mount backends **ASCOM COM on Windows** and **INDI on Linux**, ADR-019) and `capture/` (stream, stats, SER writer). The reference camera is the **Touptek G3M678M** (no temperature control in the MVP).
+- `devices/` (camera and mount interfaces + drivers: native ASI/QHY/Player One/Touptek, `devices/sim/` with the camera and mount simulators, and the mount backends **ASCOM COM on Windows** and **INDI on Linux**, ADR-019) and `capture/` (stream, stats, SER writer). The reference camera is the **Touptek G3M678M** (no temperature control in the MVP).
 - The capture ROI (ADR-010).
 - Custodian of ADRs 002, 008, 010, 013, 019.
 

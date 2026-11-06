@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -40,6 +41,7 @@ from PySide6.QtWidgets import (
 from solarscribe.config.schema import SCHEMA, Key, default_value
 from solarscribe.config.store import Settings, default_settings
 
+from .settings_text import SETTINGS_WHY
 from .ui_loader import load_ui
 
 __all__ = ["SettingsDialog"]
@@ -95,7 +97,7 @@ class SettingsDialog(QDialog):
             # tooltip, so a hand-edited file is still easy to map to the field.
             label = QLabel(key.name.replace("_", " ").strip().capitalize(), row)
             label.setMinimumWidth(190)
-            label.setToolTip(f"{key.name}\n\n{key.why}")
+            label.setToolTip(f"{key.name}\n\n{self._why_text(key)}")
             row_layout.addWidget(label, 0)
             row_layout.addWidget(editor, 1)
             if key.kind is str:
@@ -123,7 +125,7 @@ class SettingsDialog(QDialog):
         else:
             editor = QLineEdit(parent)
             editor.setText(str(value))
-        editor.setToolTip(key.why)
+        editor.setToolTip(self._why_text(key))
         self._editors[(key.section, key.name)] = editor
         return editor
 
@@ -141,6 +143,16 @@ class SettingsDialog(QDialog):
             restore.clicked.connect(self.restore_defaults)
         if filter_edit is not None:
             filter_edit.textChanged.connect(self._apply_filter)
+
+    # @args: key - a schema key
+    # @return: the translated why text, or the schema's developer text when the
+    #          generated table missed it. The context is "Settings", the same
+    #          one the generated QT_TRANSLATE_NOOP table marks
+    def _why_text(self, key: Key) -> str:
+        source = SETTINGS_WHY.get((key.section, key.name))
+        if source is None:
+            return key.why
+        return QCoreApplication.translate("Settings", source)
 
     # @args: section - the schema section
     # @return: its visible name
@@ -240,7 +252,8 @@ class SettingsDialog(QDialog):
         needle = text.strip().lower()
         visible_groups: dict[str, bool] = {}
         for key, row, box in self._rows:
-            haystack = f"{key.section} {key.name} {key.why}".lower()
+            haystack = (f"{key.section} {key.name} {key.why} "
+                        f"{self._why_text(key)}").lower()
             visible = needle in haystack
             row.setVisible(visible)
             visible_groups[box.title()] = visible_groups.get(box.title(), False) or visible
