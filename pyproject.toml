@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solarscribe"
+dynamic = ["version"]
+description = "Capture application for a solar spectroheliograph (SHG). Cross-platform, SHG-only, no post-processing."
+readme = "README.md"
+license = {text = "GPL-3.0-only"}
+authors = [
+    {name = "Francisco José Calvo Fernández", email = "irydeo@irydeo.com"},
+]
+keywords = ["astronomy", "solar", "spectroheliograph", "SHG", "observatory"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "PySide6>=6.6",
+    "platformdirs>=4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-xdist>=3.5",
+    "pyinstaller>=6.0",
+]
+
+[project.scripts]
+solarscribe = "solarscribe.__main__:main"
+
+[project.urls]
+Homepage = "https://www.irydeo.com"
+Repository = "https://github.com/irydeo/solarscribe"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+fallback_version = "0.0.0"
+
+[tool.setuptools.packages.find]
+include = ["solarscribe*"]
+
+[tool.setuptools.package-data]
+"solarscribe.ui" = ["*.ui", "i18n/*.qm"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "hardware: tests that need real hardware",
+    "network: tests that hit live external services",
+]
+# A hung test must name itself instead of eating the gate's whole budget.
+faulthandler_timeout = 120

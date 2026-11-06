@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Local captures and logs
+*.ser
+*.tif
+*.tiff
+*.fits
+*.fit
+captures/
+scan_log.csv
+scan_stats.jsonl
+session_meta.json
+
+# Internal design: never in the public repository
+design/
+AGENTS.md
+.opencode/
