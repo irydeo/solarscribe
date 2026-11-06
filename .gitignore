@@ -21,3 +21,4 @@ session_meta.json
 # Scratch
 input.md
 *.swp
+*.kate-swp
