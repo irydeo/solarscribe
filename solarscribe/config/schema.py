@@ -12,7 +12,7 @@
 ############################################################
 
 # Schema of the configuration and the data model of the profile
-# (design/ARCHITECTURE.md 3.2 and 2.4, ADR-003, ADR-012, ADR-024).
+# (design/ARCHITECTURE.md 3.2 and 2.4, ADR-003, ADR-012, ADR-024, ADR-027).
 #
 # config is a support leaf: it imports devices (for the ROI alias only) and
 # nothing else from the application, so every layer above can read a setting or
@@ -20,12 +20,17 @@
 # and no engine import.
 #
 # Two kinds of type, as everywhere in the contract modules (ADR-023):
-#   - value types: the schema table, Settings, the profile dataclasses and the
-#     session state. Concrete, because everybody must agree on their fields.
-#   - behaviour: none here. Reading and writing the INI, the profile and the
+#   - value types: the schema table, the profile dataclasses and the session
+#     state. Concrete, because everybody must agree on their fields. Settings
+#     and ProfileStore are declared with their reader in store.py, because this
+#     module holds no behaviour.
+#   - behaviour: none here. Reading and writing the INI, the profiles and the
 #     session state are algorithms and live in config/store.py:
 #       load_settings(path) / save_settings(settings, path)
-#       load_profile(path) / save_profile(profile, path)
+#       load_profile(path) / save_profile(profile, path)      (one profile)
+#       load_profiles(path, legacy_path=...) / save_profiles(store, path)
+#       profile_names / active_profile / set_active_profile
+#       save_named_profile / rename_profile / delete_profile  (ADR-027)
 #       load_session_state(path) / save_session_state(state, path)
 #     store.py parses the INI booleans with a fixed vocabulary ("true", "yes",
 #     "1", "on" and their negatives) so a hand-edited file behaves the same on
@@ -65,6 +70,8 @@ __all__ = [
     "LEGACY_KEYS",
     "PROFILE_FILE",
     "PROFILE_VERSION",
+    "PROFILES_FILE",
+    "PROFILES_VERSION",
     "Profile",
     "SCAN_LOG_FILE",
     "SCAN_STATS_FILE",
@@ -85,6 +92,10 @@ __all__ = [
 # File names, resolved by the app inside its per-platform config directory.
 CONFIG_FILE = "config.ini"
 PROFILE_FILE = "profile.json"
+# Named profiles: one file with every name and the active selection, the shape
+# of nightscribe-scan. It replaced the single profile.json, which is still read
+# and migrated as the "default" profile (ADR-027).
+PROFILES_FILE = "profiles.json"
 
 # The three logs of the post-processing contract (ADR-018). They live inside the
 # SESSION folder; the SER is per scan, these are per session, exactly as the
@@ -101,6 +112,10 @@ SESSION_STATE_FILE = "session_state.json"
 # Profile format. v2 is the JSON shape of ARCHITECTURE 3.2; a file with another
 # version is migrated by store.py, never read as if it matched.
 PROFILE_VERSION = 2
+
+# Version of the named-profile store envelope (profiles.json). It can evolve
+# separately from the body of one profile, which is why it is its own constant.
+PROFILES_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -166,6 +181,40 @@ SCHEMA: tuple[Key, ...] = (
     Key("optics", "solar_diameter", float, 1920.0,
         "Fallback solar diameter in arcseconds when no ephemeris is available. "
         "1920\" is the mean apparent diameter, about 32'.", "scan"),
+
+    # --- spectrum (native line identification, shg/spectrum.py) --------------
+    # A captured spectrum has a scale in angstroms per pixel and the grating is
+    # tuned to one known line. Those two inputs anchor every other dip to a
+    # wavelength; without them the identification cannot start, and with a wrong
+    # one every name slides. These are settings, not science constants, because
+    # they describe the observer's spectrograph and its orientation.
+    Key("spectrum", "target_wavelength_angstrom", float, 6562.81,
+        "Wavelength the grating is tuned to, in angstroms. 6562.81 A is H-alpha "
+        "(Fraunhofer C): a known line anchors the pixel-to-wavelength mapping, "
+        "and if it is wrong every other line name slides with it.", "new"),
+    Key("spectrum", "dispersion_angstrom_px", float, 0.0,
+        "Angstroms per pixel along the dispersion axis. 0 means unknown and "
+        "disables identification: without a scale a pixel distance cannot "
+        "become a wavelength. Measure it from a known line pair or from the "
+        "spectrograph geometry, not from a guess.", "new"),
+    Key("spectrum", "flip", bool, False,
+        "Dispersion direction. True when the wavelength decreases with the "
+        "pixel index, which a mirrored grating or camera produces; an unflagged "
+        "flip names the detected lines backwards.", "new"),
+    Key("spectrum", "line_tolerance_angstrom", float, 0.5,
+        "How close a detected dip must be to a catalog line, in angstroms. "
+        "0.5 A is the scale at which a low-resolution SHG separates neighbours: "
+        "tighter misses a slightly shifted line, looser names the wrong one.",
+        "new"),
+    Key("spectrum", "min_confidence", float, 0.35,
+        "Confidence below which the UI warns that the identification is not "
+        "trustworthy. 0.35 is an F1 score over the strong catalog lines and the "
+        "detected dips; the names are a pattern match, not a wavelength "
+        "calibration, so a low score has to be said out loud.", "new"),
+    Key("spectrum", "anchor_search_px", float, 2.0,
+        "Half-width, in pixels, of the search that refines the anchor line. It "
+        "absorbs a wavelength calibration error of a couple of pixels without "
+        "jumping to a neighbouring line; 0 disables the refinement.", "new"),
 
     # --- camera --------------------------------------------------------------
     # The prototype got exposure and gain from SharpCap; SolarScribe owns them,
@@ -605,9 +654,11 @@ class RoiPreset:
 
 @dataclass(frozen=True)
 class Profile:
-    # The single profile (DESIGN.md 10): telescope data, camera data and the ROI
-    # presets. JSON v2, the shape of ARCHITECTURE 3.2, so a hand-written file is
-    # as valid as one the app saved.
+    # One named profile (DESIGN.md 10): telescope data, camera data and the ROI
+    # presets. The named store keeps several of these in profiles.json; the old
+    # single profile.json is still read and becomes the "default" profile.
+    # JSON v2, the shape of ARCHITECTURE 3.2, so a hand-written file is as valid
+    # as one the app saved.
     version: int = PROFILE_VERSION
     telescope: TelescopeData = field(default_factory=TelescopeData)
     camera: CameraData = field(default_factory=CameraData)
@@ -632,10 +683,11 @@ class StepStatus(Enum):
     SKIPPED = "skipped"
 
 
-# The four steps, in rail order (ADR-011): find the Sun, polar alignment, ROI and
+# The five steps, in rail order (ADR-011, ADR-028): find the Sun, polar
+# alignment, focus (the three focusers and the slit-to-Dec tilt), ROI and
 # scanning. The spellings are the keys of SessionState.steps and of the saved
 # JSON, so they never change without a migration.
-SESSION_STEPS: tuple[str, ...] = ("find_sun", "polar", "roi", "scan")
+SESSION_STEPS: tuple[str, ...] = ("find_sun", "polar", "focus", "roi", "scan")
 
 
 @dataclass
@@ -660,7 +712,7 @@ def new_steps() -> dict[str, StepState]:
 
 @dataclass
 class SessionState:
-    # Persistent state of the four steps, saved in the session folder as
+    # Persistent state of the five steps, saved in the session folder as
     # session_state.json and restored silently (ADR-011: auto-save and "reopen
     # step").
     #

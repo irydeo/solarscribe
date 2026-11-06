@@ -6,7 +6,7 @@ Esta guía cubre los sistemas admitidos, los requisitos y las dos formas de
 conseguir SolarScribe: los instaladores empaquetados y la instalación desde el
 código fuente.
 
-> **Estado (2026-11-06)**: los instaladores empaquetados están **previstos**, no
+> **Estado (2026-11-07)**: los instaladores empaquetados están **previstos**, no
 > publicados. La instalación desde el código fuente funciona y la ventana
 > principal arranca con el simulador; la captura con cámara y montura reales
 > todavía no está validada. Los instaladores descritos en las secciones 2 y 3 son
@@ -238,17 +238,18 @@ usuario.
 
 | Contenido | Windows | Linux |
 | --- | --- | --- |
-| Ajustes (`config.ini`) y perfil (`profile.json`) | `%LOCALAPPDATA%\SolarScribe\` | `~/.config/SolarScribe/` |
-| Carpetas de sesión, ficheros SER y registros | `%LOCALAPPDATA%\SolarScribe\sessions\` por defecto, configurable | `~/.local/share/SolarScribe/sessions/` por defecto, configurable |
+| Ajustes (`config.ini`) y perfiles (`profiles.json`; un `profile.json` antiguo se lee como `default`) | `%LOCALAPPDATA%\SolarScribe\` | `~/.config/SolarScribe/` |
+| Carpetas de datos (carpetas de sesión), ficheros SER y registros | `%LOCALAPPDATA%\SolarScribe\sessions\` por defecto, configurable | `~/.local/share/SolarScribe/sessions/` por defecto, configurable |
 
-La carpeta base de sesiones se configura en los ajustes. Windows usa
-`%LOCALAPPDATA%` y no el perfil móvil a propósito: una carpeta de sesión de varios
-gigabytes no tiene sitio en un perfil móvil.
+La carpeta base de datos se configura en los ajustes; el diseño y los registros la
+llaman base de sesiones. Windows usa `%LOCALAPPDATA%` y no el perfil móvil a
+propósito: una carpeta de datos de varios gigabytes no tiene sitio en un perfil
+móvil.
 
-La carpeta de sesión se crea por sesión y se nombra con su fecha y hora. Los
+La carpeta de datos se crea por tanda y se nombra con su fecha y hora. Los
 ficheros de dentro siguen el patrón `sun_AAAAMMDD_HHMM_scanNN`.
 
-**Importante**: la carpeta de sesión es **tuya**. La aplicación nunca borra un SER
+**Importante**: la carpeta de datos es **tuya**. La aplicación nunca borra un SER
 ni un registro. Desinstalar el programa no elimina tus capturas, así que cópialas
 antes de borrar la carpeta de datos a mano.
 
@@ -315,7 +316,7 @@ desarrollo.
 | La montura conecta pero no se mueve | El driver no declara tasas, o la montura está aparcada | Desaparca, revisa el selector de tasa, prueba un movimiento pequeño con el panel de telescopio |
 | La aplicación arranca pero no aparece la ventana desde el código fuente | `solarscribe.ui.app` todavía no existe | Es lo esperado en esta etapa; usa la versión y las pruebas unitarias para validar la instalación |
 | SmartScreen bloquea el instalador de Windows | El instalador no está firmado | Comprueba la página de Releases y usa **Más información → Ejecutar de todas formas** |
-| Un barrido se niega a empezar por falta de disco | Se alcanzó el mínimo de espacio libre (1 GB por defecto) | Libera espacio o apunta la carpeta de sesión a otro disco |
+| Un barrido se niega a empezar por falta de disco | Se alcanzó el mínimo de espacio libre (1 GB por defecto) | Libera espacio o apunta la carpeta de datos a otro disco |
 | La interfaz sigue en inglés en un sistema en español | El ajuste de idioma está forzado, o falta el `.qm` | Cambia el idioma en los ajustes; en desarrollo, regenera los catálogos |
 | Un perfil escrito a mano impide arrancar | Un error de sintaxis o una versión desconocida | La aplicación debe volver a los valores por defecto; si no lo hace, es un fallo, notifícalo con el fichero |
 

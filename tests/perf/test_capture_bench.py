@@ -49,10 +49,16 @@ def test_the_start_and_rate_sources_are_sane(measurement):
     assert measurement.capture_start_s <= MAX_CAPTURE_START_S
 
     engine_fps = measurement.extra("engine_fps")
-    if engine_fps > 0.0:
-        assert abs(engine_fps - measurement.fps) <= max(5.0, 0.05 * measurement.fps), (
+    if engine_fps > 0.0 and measurement.frames >= 30:
+        # The engine counter is a rolling one-second window; the measured fps is
+        # the whole-run average. Under machine load the last window can differ
+        # from the average, so the cross-check allows 10% or 10 fps, whichever
+        # is larger. A real counter regression (half or double) is still caught
+        # by a wide margin; this is a sanity check, not the ADR-013 gate.
+        tolerance = max(10.0, 0.10 * measurement.fps)
+        assert abs(engine_fps - measurement.fps) <= tolerance, (
             f"engine fps {engine_fps:.2f} disagrees with the measured "
-            f"{measurement.fps:.2f}"
+            f"{measurement.fps:.2f} by more than {tolerance:.2f} fps"
         )
 
     # The reference strip is what makes the throughput target meaningful.

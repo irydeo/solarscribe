@@ -58,7 +58,7 @@ DEPENDS = [
 # The mount backend is external on purpose (ADR-019): the app degrades to the
 # simulator without a running indiserver. fxload is what the QHY firmware rule
 # calls; it is harmless when there is no QHY camera.
-RECOMMENDS = ["indi-bin", "fxload"]
+RECOMMENDS = ["indi-bin", "python3-serial", "fxload"]
 
 
 def _write(path, text, mode=None):

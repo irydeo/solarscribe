@@ -35,11 +35,13 @@ installer/
 python3 -m venv .venv
 .venv/bin/pip install ".[dev]"
 .venv/bin/python -m pytest tests/unit
-.venv/bin/python installer/smoke_test.py --module
+.venv/bin/python installer/smoke_test.py --module --gui
+.venv/bin/python -m solarscribe gui --self-test
 
 # 2. PyInstaller (used for the smoke test and the portable tree)
 .venv/bin/python -m PyInstaller installer/solarscribe.spec --clean --noconfirm
-.venv/bin/python installer/smoke_test.py --frozen dist/solarscribe/solarscribe
+.venv/bin/python installer/smoke_test.py --frozen dist/solarscribe/solarscribe --gui
+dist/solarscribe/solarscribe gui --self-test
 
 # 3. .deb and .rpm (add --bundle / --define _with_sdk 1 after a licensed fetch)
 .venv/bin/python installer/build_deb.py --version 0.1.0 --out dist
@@ -63,9 +65,11 @@ Older releases install manually from the wheel.
 ```powershell
 py -3.12 -m pip install ".[dev]"
 py -3.12 -m pytest tests/unit
-py -3.12 installer\smoke_test.py --module
+py -3.12 installer\smoke_test.py --module --gui
+py -3.12 -m solarscribe gui --self-test
 py -3.12 -m PyInstaller installer\solarscribe.spec --clean --noconfirm
-py -3.12 installer\smoke_test.py --frozen dist\solarscribe\solarscribe.exe
+py -3.12 installer\smoke_test.py --frozen dist\solarscribe\solarscribe.exe --gui
+dist\solarscribe\solarscribe.exe gui --self-test
 
 # Inno Setup 6 must be installed and ISCC.exe on PATH (CI uses choco).
 & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
@@ -117,10 +121,13 @@ package with no SDKs still installs, starts and passes the smoke test.
 
 - **Windows**: ASCOM Platform 7 (and the .NET runtime it needs) for the mount.
   It is detected from the registry; the installer explains it when absent.
-  The camera SDKs that may be redistributed are inside the package.
+  The Windows build includes `pywin32`, so the ASCOM COM bridge is present;
+  the ASCOM Platform itself is still a separate installation. The camera SDKs
+  that may be redistributed are inside the package.
 - **Linux**: a running `indiserver` for the mount. The `.deb` recommends
   `indi-bin` and the RPM recommends `indi`; neither is required to install.
-  `fxload` is needed only for the QHY firmware loader.
+  `python3-serial` / `python3-pyserial` is recommended for the direct
+  LX200/OnStep fallback. `fxload` is needed only for the QHY firmware loader.
 
 ## Platform paths
 
@@ -170,10 +177,9 @@ both files in the GitHub Release body.
   `shellcheck` and `sh -n`, the udev rules pass `udevadm verify`, the desktop
   entry and AppStream metadata validate, `pip install -e .` works, the
   PyInstaller Linux build and its smoke test run, and `build_deb.py` produces
-  a `.deb` whose contents and control fields were inspected with `dpkg-deb`,
-  and the staged `.deb` tree was run with the GUI offscreen (`python -m
-  solarscribe gui` stays alive). The unit suite is run in CI; packaging does
-  not add tests to it.
+  a `.deb` whose contents and control fields were inspected with `dpkg-deb`;
+  the source, frozen and staged package all pass `gui --self-test` offscreen.
+  The unit suite is run in CI; packaging does not add tests to it.
   The fetch and prepare steps were run against the real ZWO, Player One, QHY
   and ToupTek archives: the archive paths, the nested ZWO archives, the
   x86_64 selection and the QHY firmware tree were all exercised.

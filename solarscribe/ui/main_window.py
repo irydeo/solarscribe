@@ -11,9 +11,10 @@
 #
 ############################################################
 
-# The window of DESIGN.md 9 and ADR-009: step rail on top, the active step's
-# options on the left, the video in the middle, the telescope and the stream
-# health on the right, and the status bar at the bottom.
+# The window of DESIGN.md 9, ADR-009, ADR-011 and ADR-026: a slim step indicator
+# on top, the active step's compact card on the left, the video taking the centre,
+# the telescope and the stream health in collapsible docks on the right, a folded
+# histogram and scan strip under the video, and the status bar at the bottom.
 #
 # The window is deliberately thin. It paints what the Session holds, forwards
 # clicks to the Session or to the simulator, and opens the dialogs. It owns no
@@ -29,10 +30,18 @@
 #   - The status bar always carries the numbers that say whether the take is
 #     safe: rate against budget, drops against budget, the devices and the
 #     free disk. Each has a tooltip with its meaning (AGENTS.md).
+#
+# ADR-026 removed the visible session ceremony and the spectrum magnifier: the
+# session folder is still there for the SER and the logs, but the observer opens
+# a camera, points at the Sun, sets the ROI and scans. It also made Focus a
+# first-class step: the three focusers and the slit tilt are measured live from
+# the capture frames, and the UI only explains the figures.
 
 from __future__ import annotations
 
+import math
 import platform
+import time
 from pathlib import Path
 
 import PySide6
@@ -41,6 +50,7 @@ from PySide6.QtGui import QAction, QDesktopServices
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QDialog,
     QDockWidget,
     QFileDialog,
     QFrame,
@@ -52,13 +62,18 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSpinBox,
     QStackedWidget,
+    QToolButton,
+    QVBoxLayout,
     QWidget,
 )
 
 import solarscribe
 from solarscribe.capture.abc import StreamCounters
+from solarscribe.capture.roi import TILT_MARGIN_PX
 from solarscribe.shg.ephemeris import solar_position_now
+from solarscribe.shg.focus import FocusWatcher, compute_metrics, frame_grid
 from solarscribe.shg.geometry import pixel_scale_arcsec_px
+from solarscribe.shg.spectrum import dispersion_profile
 from solarscribe.config import paths, store
 from solarscribe.config.schema import SESSION_STEPS, StepStatus
 from solarscribe.devices.manager import DeviceManagerImpl
@@ -67,16 +82,18 @@ from solarscribe.devices.sim.backend import SimCameraBackend
 from solarscribe.devices.sim.frame import SolarPattern
 
 from .camera_panel import CameraPanel
-from .focus_aid import FocusAidDialog
 from .health_panel import HealthPanel
 from .histogram import HistogramWidget
 from .live_viewer import LiveViewer
 from .logs_viewer import LogsViewer
 from .roi_editor import RoiEditor
+from .profile_manager import ProfileManagerDialog
+from .profiles import ProfileAdapter, ProfileStoreError
 from .roi_manager import RoiManagerDialog
 from .scan_view import ScanVisualisation
 from .session import Session
 from .sky_calendar import SkyCalendarDialog
+from .spectrum_panel import LineIdentifierWorker, SpectrumPanel
 from .step_rail import StepRail
 from .sun_disc import QuickRecon
 from .telescope_panel import TelescopePanel
@@ -86,6 +103,19 @@ from .ui_loader import load_ui, replace_widget
 from .welcome import WelcomeBanner
 
 __all__ = ["MainWindow"]
+
+# Focus step (ADR-026). The three focusers are a judgement; the tilt is the
+# objective part. 0.5 deg is the point where the drift across the reference
+# 3480 px band is about 30 px, already too much to ignore. The edge is trusted
+# only if the fitted line's residual is small, the same rule the ROI editor uses.
+FOCUS_TILT_TOLERANCE_DEG = 0.5
+FOCUS_EDGE_STD_MAX_PX = 1.5
+FOCUS_REFRESH_S = 0.25
+
+# The line identification is a reference, not a measurement: twice a second is
+# enough to follow a focuser or a grating change, and the profile is copied on
+# the GUI thread while the match runs in the worker (never on the capture path).
+IDENTIFY_REFRESH_MS = 500
 
 class MainWindow(QMainWindow):
     # @args: session - the live session, or None for a demo one;
@@ -99,10 +129,40 @@ class MainWindow(QMainWindow):
         self._adopt_shell()
         self.setWindowIcon(sun_icon(64))
         self._last_counters: StreamCounters | None = None
-        self._focus_dialog: FocusAidDialog | None = None
         self._logs_dialog: LogsViewer | None = None
         self._calendar_dialog: SkyCalendarDialog | None = None
         self._roi_manager_dialog: RoiManagerDialog | None = None
+        self._profile_manager_dialog: ProfileManagerDialog | None = None
+        # The active named profile is loaded before the solar pattern is built:
+        # its optics set the slit scale of the simulator and of the engine.
+        # profiles.json is the sibling of the old profile.json (ADR-027), which
+        # in production is exactly paths.profiles_path().
+        profile_file = self.session.profile_file()
+        profiles_path = (Path(profile_file).with_name("profiles.json")
+                         if profile_file is not None else paths.profiles_path())
+        self._profiles = ProfileAdapter(
+            profiles_path=profiles_path,
+            legacy_path=profile_file,
+            fallback_profile=self.session.profile)
+        self._active_profile = self._profiles.active()
+        if self._active_profile:
+            try:
+                active = self._profiles.load(self._active_profile)
+                if active is not None:
+                    self.session.set_profile(active)
+                else:
+                    # A hand-edited active name that does not exist: show no
+                    # active profile instead of saving back to a ghost.
+                    self._active_profile = ""
+            except (ProfileStoreError, OSError):
+                self._active_profile = ""
+        # The ROI preset save goes through the named store when ADR-027 is
+        # available; the fallback keeps the old single file.
+        if self._profiles.available:
+            self.session.profile_saver = self._persist_active_profile
+        self._focus_watcher = FocusWatcher()
+        self._last_focus_s = 0.0
+        self._identify_generation = 0
         self._busy_scan = False
         self._busy_center = False
         self._prepared = False
@@ -145,6 +205,7 @@ class MainWindow(QMainWindow):
         self._wire_menus()
         self._wire_steps()
         self._wire_controls()
+        self._wire_profile()
         self._wire_session()
         self._wire_harness()
         self._initial_fill()
@@ -156,10 +217,19 @@ class MainWindow(QMainWindow):
         self._health_timer.setInterval(1000)
         self._health_timer.timeout.connect(self._update_health)
         self._health_timer.start()
+        # The identification worker is created once and kept idle until the
+        # observer checks "Identify lines"; its timer drops the rate to 2 Hz.
+        self._identify_worker = LineIdentifierWorker(self)
+        self._identify_worker.resultReady.connect(self._on_identification)
+        self._identify_worker.start()
+        self._identify_timer = QTimer(self)
+        self._identify_timer.setInterval(IDENTIFY_REFRESH_MS)
+        self._identify_timer.timeout.connect(self._identify_now)
 
         self._refresh_from_session()
         self._update_recommendation()
-        self.resize(1360, 860)
+        self._update_histogram_saturation()
+        self.resize(1280, 820)
 
     # --------------------------------------------------------------- shell
 
@@ -176,18 +246,28 @@ class MainWindow(QMainWindow):
         status = shell.statusBar()
         if status is not None:
             self.setStatusBar(status)
-        docks = []
-        for name in ("telescopeDock", "cameraDock", "healthDock"):
-            dock = shell.findChild(QDockWidget, name)
-            if dock is not None:
-                self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
-                docks.append(dock)
-        if len(docks) >= 3:
+        self.telescope_dock = shell.findChild(QDockWidget, "telescopeDock")
+        self.camera_dock = shell.findChild(QDockWidget, "cameraDock")
+        self.health_dock = shell.findChild(QDockWidget, "healthDock")
+        self._docks = [dock for dock in (self.telescope_dock, self.camera_dock,
+                                         self.health_dock) if dock is not None]
+        for dock in self._docks:
+            self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
+        if self.camera_dock is not None and self.health_dock is not None:
             # Camera and health share the lower tab: the camera is chosen once
             # per session, the health panel is watched continuously, so neither
             # may push the telescope out of the column.
-            self.tabifyDockWidget(docks[1], docks[2])
-            docks[1].raise_()
+            self.tabifyDockWidget(self.camera_dock, self.health_dock)
+            self.camera_dock.raise_()
+        # The right band is capped hard: the image is the point. 210 px holds
+        # the compact telescope, camera and health content, and the spectrum
+        # panel (when shown) stays at 220 px inside the video row. The cap is
+        # what stops a maximised window from giving the docks the extra width.
+        for dock in self._docks:
+            dock.setMaximumWidth(210)
+        if self.telescope_dock is not None:
+            self.resizeDocks([self.telescope_dock], [210],
+                             Qt.Orientation.Horizontal)
         # The shell keeps the QAction objects alive; the window is hidden and
         # never shown, so it costs nothing and its actions stay reachable.
         shell.hide()
@@ -209,19 +289,21 @@ class MainWindow(QMainWindow):
         self.viewer = replace_widget(self, "viewerHost", LiveViewer(self))
         self.viewer.setAccessibleName(self.tr("Live video of the spectrum"))
 
-        self.magnifier = LiveViewer(self)
-        self.magnifier.set_show_band(False)
-        self.magnifier.set_editable(False)
-        self.magnifier.set_cross(False)
-        replace_widget(self, "magnifierHost", self.magnifier)
-
-        self.histogram = replace_widget(self, "histogramHost", HistogramWidget(self))
+        self.histogram = replace_widget(self, "histogramHost",
+                                        HistogramWidget(self))
         self.scan_view = replace_widget(self, "scanViewHost",
                                         ScanVisualisation(self))
         self.recon = replace_widget(self, "reconHost", QuickRecon(self))
+        self.spectrum_panel = replace_widget(self, "spectrumHost",
+                                             SpectrumPanel(self))
+        self.spectrum_frame = self._w("spectrumFrame")
+        self.identify_check = self.findChild(QCheckBox, "identifyCheck")
+        self.viewer.setToolTip(self.tr(
+            "Scroll to zoom; drag the ROI band to move it. The histogram "
+            "handles set the stretch."))
 
         mount = self.session.demo_mount()
-        mount_name = self.tr("Simulated mount") if mount is not None else ""
+        mount_name = self.tr("Simulator") if mount is not None else ""
         self.telescope = replace_widget(
             self, "telescopeHost",
             TelescopePanel(self, mount=mount, mount_name=mount_name,
@@ -233,23 +315,36 @@ class MainWindow(QMainWindow):
         self.camera_panel.cameraChosen.connect(self._camera_chosen)
         self.camera_panel.closeRequested.connect(self._camera_close)
 
+        # The position belongs to Settings and to a first-run assistant, not to
+        # the permanent chrome: the old inline block stole 150 px of image and
+        # stretched with the window. The assistant is a non-modal dialog now, so
+        # maximising the main window cannot make it bigger.
         self.welcome = WelcomeBanner(self)
-        replace_widget(self, "welcomeHost", self.welcome)
+        self.welcome_dialog = QDialog(self)
+        self.welcome_dialog.setWindowTitle(self.tr("Welcome to SolarScribe"))
+        self.welcome_dialog.setModal(False)
+        welcome_layout = QVBoxLayout(self.welcome_dialog)
+        welcome_layout.setContentsMargins(0, 0, 0, 0)
+        welcome_layout.addWidget(self.welcome)
+        self.welcome_dialog.resize(640, 300)
         self._fill_welcome()
         if show_welcome is None:
             show_welcome = self._welcome_wanted()
-        self.welcome.setVisible(bool(show_welcome))
+        if show_welcome:
+            self.welcome_dialog.show()
+            self.welcome_dialog.raise_()
 
         self.rail = replace_widget(self, "stepRailHost", StepRail(self))
+        # The placeholder's maximum height does not travel with replace_widget;
+        # pin the real rail to 28 px so the image, not the indicator, gets the
+        # extra height when the window grows (ADR-026).
+        self.rail.setFixedHeight(28)
         stack = self.findChild(QStackedWidget, "sideStack")
         if stack is not None:
             stack.setCurrentIndex(0)
         splitter = self.findChild(QWidget, "mainSplitter")
         if splitter is not None and hasattr(splitter, "setSizes"):
-            splitter.setSizes([380, 980])
-        analysis = self.findChild(QWidget, "analysisSplitter")
-        if analysis is not None and hasattr(analysis, "setSizes"):
-            analysis.setSizes([660, 360])
+            splitter.setSizes([290, 990])
 
         self.roi_editor = RoiEditor(self.session, self.viewer, self)
         self.roi_editor.bind(
@@ -283,6 +378,10 @@ class MainWindow(QMainWindow):
         scroll.setObjectName("sideScroll")
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
+        # The card is sized for its controls; a horizontal bar would mean a
+        # field is cut off, so it is banned and the layouts wrap instead.
+        scroll.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setWidget(stack)
         layout.addWidget(scroll)
 
@@ -328,6 +427,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(
             self.tr("Location saved: latitude {lat:.4f}, longitude {lon:.4f}. "
                     "The GOTO can now find the Sun.").format(lat=lat, lon=lon), 7000)
+        if hasattr(self, "welcome_dialog"):
+            self.welcome_dialog.close()
 
     # @args: dont_ask - whether the banner should stay away
     def _welcome_dismissed(self, dont_ask: bool) -> None:
@@ -337,12 +438,20 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(
                 self.tr("You can set the observatory position any time in "
                         "Tools, Settings."), 6000)
+        if hasattr(self, "welcome_dialog"):
+            self.welcome_dialog.close()
 
     # @args: none. Stores the "do not show again" preference
     def _remember_welcome(self) -> None:
         settings = QSettings("SolarScribe", "SolarScribe")
         settings.setValue("welcome_done", True)
         settings.sync()
+
+    # @args: event - show: keep the first-run assistant on top of the window
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        if hasattr(self, "welcome_dialog") and self.welcome_dialog.isVisible():
+            self.welcome_dialog.raise_()
 
     # --------------------------------------------------------------- status
 
@@ -393,13 +502,11 @@ class MainWindow(QMainWindow):
     def _wire_menus(self) -> None:
         pairs = {
             "actionQuit": self.close,
-            "actionNewSession": self.new_session,
-            "actionOpenSession": self.open_session,
             "actionOpenSessionFolder": self.open_session_folder,
             "actionSettings": self.open_settings,
+            "actionProfiles": self.manage_profiles,
             "actionSkyCalendar": self.open_sky_calendar,
             "actionRoiManager": self.open_roi_manager,
-            "actionFocusAid": self.open_focus_aid,
             "actionDiagnostics": self.show_diagnostics,
             "actionLogs": self.open_logs,
             "actionQuickStart": self.show_quick_start,
@@ -409,6 +516,28 @@ class MainWindow(QMainWindow):
             action = self._action(name)
             if action is not None:
                 action.triggered.connect(slot)
+        # The right band can be collapsed to its title bar or hidden entirely;
+        # the Panels menu is how it comes back, so a closed dock is never a lost
+        # control (ADR-026).
+        for name, dock in (("actionTelescopePanel", self.telescope_dock),
+                           ("actionCameraPanel", self.camera_dock),
+                           ("actionHealthPanel", self.health_dock)):
+            action = self._action(name)
+            if action is None or dock is None:
+                continue
+            action.setChecked(bool(dock.isVisible()))
+            action.toggled.connect(
+                lambda checked, d=dock: d.setVisible(bool(checked)))
+            dock.visibilityChanged.connect(
+                lambda visible, a=action: self._sync_panel_action(a, visible))
+
+    # @args: action - a checkable Panels action; visible - the dock state
+    def _sync_panel_action(self, action: QAction, visible: bool) -> None:
+        if action.isChecked() == bool(visible):
+            return
+        action.blockSignals(True)
+        action.setChecked(bool(visible))
+        action.blockSignals(False)
 
     # ---------------------------------------------------------------- steps
 
@@ -420,6 +549,8 @@ class MainWindow(QMainWindow):
         self._connect("polarStartButton", self.start_polar)
         self._connect("polarSecondButton", self.confirm_polar)
         self._connect("polarStopButton", self.stop_polar)
+        self._connect("focusMeasureButton", self.measure_focus_tilt)
+        self._connect("focusResetButton", self.reset_focus_holds)
         self._connect("roiApplyButton", self.apply_roi)
         self._connect("roiMeasureButton", self.measure_tilt)
         self._connect("roiSavePresetButton", self.save_preset)
@@ -463,6 +594,13 @@ class MainWindow(QMainWindow):
             self._shown_step = step
         self.rail.set_current(step)
         self._update_recommendation()
+        if step == "focus":
+            self._refresh_focus_labels()
+        elif step == "roi" and hasattr(self, "roi_editor"):
+            # The Focus step may have measured the tilt; the ROI card shows it
+            # and uses it to size the strip, even when the observer jumped here.
+            self.roi_editor.refresh_tilt()
+            self.roi_editor.refresh_warnings()
         # Do not reload the ROI fields here: the observer may have typed edits
         # that are not applied yet, and peeking at another step must not throw
         # them away. The model changes reload the editor through roiChanged.
@@ -475,13 +613,12 @@ class MainWindow(QMainWindow):
         statuses = [self.session.status_of(step) for step in SESSION_STEPS]
         if all(status is StepStatus.DONE for status in statuses):
             label.setText(self.tr(
-                "All four steps are done. Reopen any step from the rail to change "
-                "something; nothing is locked."))
+                "All five steps are done. Reopen any step from the rail; nothing "
+                "is locked."))
             return
         step = self.session.recommended_step()
-        label.setText(self.tr(
-            "Recommended next: {step}. You can go to any step at any time."
-        ).format(step=self._step_title(step)))
+        label.setText(self.tr("Next: {step}. Any step is open.").format(
+            step=self._step_title(step)))
 
     # @args: step - a session step
     # @return: its translated name
@@ -490,6 +627,8 @@ class MainWindow(QMainWindow):
             return self.tr("Find the Sun")
         if step == "polar":
             return self.tr("Polar alignment")
+        if step == "focus":
+            return self.tr("Focus")
         if step == "roi":
             return self.tr("ROI")
         return self.tr("Scanning")
@@ -501,13 +640,15 @@ class MainWindow(QMainWindow):
         stretch = self.findChild(QComboBox, "stretchCombo")
         if stretch is not None:
             # The percentiles say what they do: below the low one the picture
-            # is black, above the high one it is white.
+            # is black, above the high one it is white. The last entry is the
+            # manual mode the histogram handles switch to (ADR-026).
             stretch.blockSignals(True)
             stretch.clear()
             stretch.addItem(self.tr("Full range: 0 to 100%"), (0.0, 100.0))
             stretch.addItem(self.tr("Soft: 1 to 99%"), (1.0, 99.0))
             stretch.addItem(self.tr("Normal: 5 to 95%"), (5.0, 95.0))
             stretch.addItem(self.tr("Hard: 25 to 75%"), (25.0, 75.0))
+            stretch.addItem(self.tr("Manual: drag the histogram handles"), None)
             stretch.setCurrentIndex(2)
             stretch.blockSignals(False)
             stretch.currentIndexChanged.connect(self._stretch_changed)
@@ -523,6 +664,11 @@ class MainWindow(QMainWindow):
         self._toggle("crossCheck", self.viewer.set_cross)
         self._toggle("roiCheck", self.viewer.set_show_band)
         self._connect("fitButton", lambda *_: self.viewer.reset_view())
+        self.histogram.stretchChanged.connect(self._histogram_stretch_changed)
+        self._wire_strip("histogramToggle", "histogramBody", True)
+        self._wire_strip("scanStripToggle", "scanBody", False)
+        if self.identify_check is not None:
+            self.identify_check.toggled.connect(self._toggle_identification)
 
         mode = self.findChild(QComboBox, "planModeCombo")
         if mode is not None:
@@ -555,6 +701,58 @@ class MainWindow(QMainWindow):
             check.toggled.connect(slot)
             slot(check.isChecked())
 
+    # @args: button_name, body_name - the strip header and its body; open - start
+    #        folded or open. The header is always visible, so a folded strip is
+    #        discoverable and costs only its 24 px line (ADR-026)
+    def _wire_strip(self, button_name: str, body_name: str, open: bool) -> None:
+        button = self.findChild(QToolButton, button_name)
+        body = self._w(body_name)
+        if button is None or body is None:
+            return
+        button.setChecked(bool(open))
+        body.setVisible(bool(open))
+        self._set_strip_arrow(button, bool(open))
+        button.toggled.connect(
+            lambda checked, b=body, t=button: self._strip_toggled(t, b, checked))
+
+    # @args: button - the strip header; body - the part that folds; open - state
+    def _strip_toggled(self, button: QToolButton, body: QWidget,
+                       open: bool) -> None:
+        body.setVisible(bool(open))
+        self._set_strip_arrow(button, bool(open))
+
+    # @args: button - the strip header; open - whether the body is shown
+    def _set_strip_arrow(self, button: QToolButton, open: bool) -> None:
+        button.setArrowType(Qt.ArrowType.DownArrow if open
+                            else Qt.ArrowType.RightArrow)
+
+    # @args: button_name, body_name - the strip; open - force it open or folded
+    def _set_strip(self, button_name: str, body_name: str, open: bool) -> None:
+        button = self.findChild(QToolButton, button_name)
+        if button is None:
+            return
+        button.blockSignals(True)
+        button.setChecked(bool(open))
+        button.blockSignals(False)
+        body = self._w(body_name)
+        if body is not None:
+            body.setVisible(bool(open))
+            self._set_strip_arrow(button, bool(open))
+
+    # @args: low, high - the percentiles the histogram handles produced
+    def _histogram_stretch_changed(self, low: float, high: float) -> None:
+        self.viewer.set_stretch(low, high)
+        combo = self.findChild(QComboBox, "stretchCombo")
+        if combo is None or combo.count() == 0:
+            return
+        index = combo.count() - 1
+        combo.blockSignals(True)
+        combo.setItemText(index, self.tr(
+            "Manual: black {low:.0f}%, white {high:.0f}%").format(
+                low=low, high=high))
+        combo.setCurrentIndex(index)
+        combo.blockSignals(False)
+
     # @args: index - the stretch preset selected
     def _stretch_changed(self, index: int) -> None:
         combo = self.findChild(QComboBox, "stretchCombo")
@@ -562,6 +760,8 @@ class MainWindow(QMainWindow):
             return
         data = combo.itemData(index)
         if not data:
+            # The manual entry: the histogram handles own the stretch, so the
+            # preset must not snap them back.
             return
         low, high = data
         self.viewer.set_stretch(low, high)
@@ -634,7 +834,177 @@ class MainWindow(QMainWindow):
         self._plan = plan
         self._update_plan_summary()
 
+    # -------------------------------------------------------------- profiles
+
+    # @args: none. Connects the always-visible profile bar
+    def _wire_profile(self) -> None:
+        combo = self.findChild(QComboBox, "profileCombo")
+        if combo is not None:
+            combo.currentIndexChanged.connect(self._profile_selected)
+        for name, slot in (("profileSaveButton", self.save_profile_as),
+                           ("profileManageButton", self.manage_profiles)):
+            button = self.findChild(QToolButton, name)
+            if button is not None:
+                button.clicked.connect(slot)
+        self._fill_profile_combo()
+
+    # @args: none. Shows the active name and the names the store returns
+    def _fill_profile_combo(self) -> None:
+        combo = self.findChild(QComboBox, "profileCombo")
+        if combo is None:
+            return
+        combo.blockSignals(True)
+        combo.clear()
+        names = list(self._profiles.names())
+        if self._active_profile not in names:
+            combo.addItem(self.tr("No active profile"), "")
+        for name in names:
+            combo.addItem(name, name)
+        index = combo.findData(self._active_profile)
+        combo.setCurrentIndex(index if index >= 0 else 0)
+        combo.blockSignals(False)
+
+    # @args: index - the combo row the observer picked
+    def _profile_selected(self, index: int) -> None:
+        combo = self.findChild(QComboBox, "profileCombo")
+        if combo is None or index < 0:
+            return
+        name = str(combo.itemData(index) or "")
+        if name and name != self._active_profile:
+            self.activate_profile(name)
+
+    # @args: name - the profile to load and make active; "" means no active one
+    def activate_profile(self, name: str) -> None:
+        if not name:
+            self._active_profile = ""
+            self._fill_profile_combo()
+            self._sync_profile_manager()
+            self.statusBar().showMessage(self.tr(
+                "No active profile. Choose one in the profile bar or save the "
+                "current setup under a name."), 9000)
+            return
+        try:
+            profile = self._profiles.load(name)
+        except (ProfileStoreError, OSError) as error:
+            self._profile_error(error, name)
+            self._fill_profile_combo()
+            return
+        if profile is None:
+            self.statusBar().showMessage(self.tr(
+                "The profile '{name}' could not be loaded.").format(name=name),
+                9000)
+            self._fill_profile_combo()
+            return
+        try:
+            self._profiles.set_active(name)
+        except (ProfileStoreError, OSError) as error:
+            # If the store cannot remember the switch, do not pretend the
+            # session moved: the bar and the next startup would disagree.
+            self._profile_error(error, name)
+            self._fill_profile_combo()
+            return
+        self.session.set_profile(profile)
+        self._active_profile = name
+        if hasattr(self, "roi_editor"):
+            self.roi_editor.reload_presets()
+            self.roi_editor.refresh_scale()
+            self.roi_editor.refresh_rate()
+        # The plan depends on the optics, so switching a profile invalidates it.
+        self._prepared = False
+        self._plan = None
+        self._update_plan_summary()
+        self._update_scan_enabled()
+        self._fill_profile_combo()
+        self._sync_profile_manager()
+        self.statusBar().showMessage(self.tr(
+            "Profile '{name}' loaded: optics, camera and ROI presets. The camera "
+            "stays as it is; apply a preset if the strip changed.").format(
+                name=name), 9000)
+
+    # @args: none. Saves the current setup under a name and makes it active
+    def save_profile_as(self) -> None:
+        name, accepted = QInputDialog.getText(
+            self, self.tr("Save profile as"), self.tr("Profile name:"),
+            text=self._active_profile or self.tr("New profile"))
+        if not accepted or not name.strip():
+            return
+        name = name.strip()
+        if name in self._profiles.names():
+            answer = QMessageBox.question(
+                self, self.tr("Save profile as"),
+                self.tr("A profile named '{name}' already exists. Replace "
+                        "it?").format(name=name),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No)
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+        try:
+            self._profiles.save(name, self.session.profile, make_active=True)
+        except (ProfileStoreError, OSError) as error:
+            self._profile_error(error, name)
+            return
+        self._active_profile = name
+        self._fill_profile_combo()
+        self._sync_profile_manager()
+        self.statusBar().showMessage(self.tr(
+            "Profile saved as '{name}' and set active.").format(name=name), 9000)
+
+    # @args: none. Opens the list where profiles are renamed or deleted
+    def manage_profiles(self) -> None:
+        if self._profile_manager_dialog is None:
+            self._profile_manager_dialog = ProfileManagerDialog(
+                self._profiles, self.session.profile, self._active_profile, self)
+            self._profile_manager_dialog.profileChosen.connect(self.activate_profile)
+            self._profile_manager_dialog.profilesChanged.connect(
+                self._on_profiles_changed)
+        else:
+            self._profile_manager_dialog.set_data(
+                self._profiles, self.session.profile, self._active_profile)
+        self._profile_manager_dialog.show()
+        self._profile_manager_dialog.raise_()
+
+    # @args: profile - the live profile; writes it through the named store
+    def _persist_active_profile(self, profile) -> None:
+        if not self._active_profile:
+            self.statusBar().showMessage(self.tr(
+                "No active profile: the ROI preset was not saved. Choose or "
+                "save a profile in the top bar."), 9000)
+            return
+        try:
+            self._profiles.save_active(profile)
+        except (ProfileStoreError, OSError) as error:
+            self._profile_error(error, self._active_profile)
+
+    # @args: none. The manager changed the names; refresh the bar
+    def _on_profiles_changed(self) -> None:
+        self._fill_profile_combo()
+        self._sync_profile_manager()
+
+    # @args: none. Keeps an open manager in step with the bar
+    def _sync_profile_manager(self) -> None:
+        dialog = self._profile_manager_dialog
+        if dialog is not None and dialog.isVisible():
+            dialog.set_data(self._profiles, self.session.profile,
+                            self._active_profile)
+
+    # @args: error - a ProfileStoreError or OSError; name - the profile involved
+    def _profile_error(self, error, name: str) -> None:
+        reason = getattr(error, "reason", "")
+        if reason == "named_store_missing":
+            text = self.tr(
+                "Named-profile storage is not available in this build; the "
+                "single profile is used.")
+        elif reason == "no_profile_path":
+            text = self.tr(
+                "The profile file is not configured. Check Settings.")
+        else:
+            text = self.tr(
+                "The profile '{name}' could not be changed. The log has the "
+                "detail.").format(name=name)
+        self.statusBar().showMessage(text, 10000)
+
     # --------------------------------------------------------------- session
+
 
     # @args: none. Connects the Session signals
     def _wire_session(self) -> None:
@@ -656,6 +1026,13 @@ class MainWindow(QMainWindow):
             done = self.session.status_of(self.session.current_step()) is StepStatus.DONE
             reopen.setVisible(done)
         self._sync_camera_panel()
+        if hasattr(self, "roi_editor"):
+            # A tilt measured in the Focus step has to reach the ROI card: it
+            # sizes the strip and the warning, even if the observer is elsewhere.
+            self.roi_editor.refresh_tilt()
+            self.roi_editor.refresh_warnings()
+        if self.session.current_step() == "focus":
+            self._refresh_focus_labels()
 
     # @args: none. The ROI model changed: reload the fields and the overlay
     def _roi_refreshed(self) -> None:
@@ -742,14 +1119,18 @@ class MainWindow(QMainWindow):
     def _camera_close(self) -> None:
         self.session.close_camera()
         self.viewer.clear()
-        self.magnifier.clear()
         self.histogram.clear()
+        self._update_histogram_saturation()
+        self._reset_focus_readings()
+        self._identify_generation += 1
+        if self.identify_check is not None and self.identify_check.isChecked():
+            self.spectrum_panel.show_no_spectrum()
         self._prepared = False
         self._plan = None
         self._update_scan_enabled()
         self._sync_camera_panel()
         self.statusBar().showMessage(self.tr(
-            "Camera closed. The session and the telescope are untouched."), 6000)
+            "Camera closed. The telescope is untouched."), 6000)
 
     # @args: info - the live CameraInfo or None; simulated - scene simulator
     def _on_camera_changed(self, info, simulated: bool) -> None:
@@ -758,8 +1139,12 @@ class MainWindow(QMainWindow):
         self._update_scan_enabled()
         if info is None:
             self.viewer.clear()
-            self.magnifier.clear()
             self.histogram.clear()
+            self._update_histogram_saturation()
+            self._reset_focus_readings()
+            self._identify_generation += 1
+            if self.identify_check is not None and self.identify_check.isChecked():
+                self.spectrum_panel.show_no_spectrum()
 
     # @args: code - a stable engine reason code
     def _on_engine_error(self, code: str) -> None:
@@ -770,6 +1155,7 @@ class MainWindow(QMainWindow):
         self._enable("prepareButton", True)
         self._enable("scanPauseButton", False)
         self._enable("scanAbortButton", False)
+        self._enable("scanStripToggle", True)
         self._update_scan_enabled()
         self.camera_panel.set_current(self.session.camera_info(),
                                       self.session.is_simulated(), False)
@@ -838,47 +1224,42 @@ class MainWindow(QMainWindow):
     # @args: frame - a Frame from the capture thread or the simulator
     def _on_frame(self, frame) -> None:
         self.viewer.set_frame(frame)
-        self.histogram.set_frame(frame)
+        # The histogram reads only the spectral band: the dark rows outside it
+        # would dominate a whole-frame count and hide the exposure that matters
+        # (ADR-026).
         band = None
         try:
             band = frame.cut_roi(self.session.roi.band)
         except (AttributeError, ValueError):
             band = frame
         if band is not None:
-            self.magnifier.set_frame(band)
-        self._update_brightness(frame)
-        if self._focus_dialog is not None and self._focus_dialog.isVisible():
-            self._update_focus(frame)
+            self.histogram.set_frame(band)
+            self._update_histogram_saturation()
+        if self.session.current_step() == "focus":
+            self._update_focus_metrics(frame)
 
-    # @args: frame - the live frame
-    def _update_brightness(self, frame) -> None:
-        try:
-            stats = frame.stats()
-        except (AttributeError, ValueError):
+    # @args: none. Turns the band's saturation fraction into the strip header
+    def _update_histogram_saturation(self) -> None:
+        label = self.findChild(QLabel, "histogramSaturation")
+        if label is None:
             return
-        try:
-            maximum = 65535.0 if int(getattr(frame.dtype, "itemsize", 2)) > 1 else 255.0
-        except (TypeError, ValueError):
-            maximum = 65535.0
-        mean = float(getattr(stats, "mean", 0.0)) / maximum
-        label = self.findChild(QLabel, "slitValue")
-        if label is not None:
-            label.setText(self.tr("{value:.1f}% of the range").format(
-                value=mean * 100.0))
-            state = "ok" if 0.10 <= mean <= 0.60 else "warning"
-            label.setProperty("state", state)
-            label.style().unpolish(label)
-            label.style().polish(label)
-
-    # @args: frame - the live frame
-    def _update_focus(self, frame) -> None:
-        try:
-            stats = frame.stats()
-            maximum = 65535.0 if int(getattr(frame.dtype, "itemsize", 2)) > 1 else 255.0
-            self._focus_dialog.set_stats(float(stats.mean) / maximum,
-                                         float(stats.std) / maximum)
-        except (AttributeError, TypeError, ValueError):
+        if self.histogram.frame_size() == (0, 0):
+            text, state = self.tr("No frame yet"), "muted"
+        else:
+            fraction = self.histogram.saturation_fraction() * 100.0
+            if fraction >= 0.1:
+                text = self.tr("{value:.1f}% clipped at white").format(
+                    value=fraction)
+                state = "warning"
+            else:
+                text = self.tr("No clipping")
+                state = "ok"
+        if label.text() == text and label.property("state") == state:
             return
+        label.setText(text)
+        label.setProperty("state", state)
+        label.style().unpolish(label)
+        label.style().polish(label)
 
     # @args: counters - the live StreamCounters
     def _on_counters(self, counters: StreamCounters) -> None:
@@ -1135,7 +1516,286 @@ class MainWindow(QMainWindow):
                     "two errors: measure again later, towards the east or west.")
             self.statusBar().showMessage(message, 12000)
 
+    # ---------------------------------------------------------------- focus
+
+    # @args: frame - the live frame. The three focusers are measured at most
+    #        every 0.25 s: the grid is 288 block means, cheap but not free, and
+    #        the observer cannot react faster than that
+    def _update_focus_metrics(self, frame) -> None:
+        now = time.monotonic()
+        if now - self._last_focus_s < FOCUS_REFRESH_S:
+            return
+        self._last_focus_s = now
+        try:
+            grid = frame_grid(frame, self.session.roi.band)
+            metrics = compute_metrics(grid)
+        except (AttributeError, TypeError, ValueError):
+            return
+        self._focus_watcher.update(metrics)
+        self._refresh_focus_labels()
+
+    # @args: none. Paints the live metrics and their running best
+    def _refresh_focus_labels(self) -> None:
+        latest = self._focus_watcher.latest()
+        holds = self._focus_watcher.holds()
+        if latest is None:
+            for name in ("lineContrastValue", "lineGradientValue",
+                         "edgeSharpValue", "edgeFlatValue",
+                         "detailContrastValue", "detailGradientValue",
+                         "detailCountValue"):
+                self._set_metric_label(name, self.tr("Not measured yet"), True)
+            self._refresh_focus_tilt()
+            return
+        # The hole in the table: which label, which metric, decimals, and
+        # whether lower is better. Edge wobble is the only figure where a lower
+        # number is the better one, so its hold takes the low value.
+        rows = (
+            ("lineContrastValue", "line_contrast", 3, False),
+            ("lineGradientValue", "line_gradient", 4, False),
+            ("edgeSharpValue", "edge_sharp", 3, False),
+            ("edgeFlatValue", "edge_flat", 2, True),
+            ("detailContrastValue", "detail_contrast", 3, False),
+            ("detailGradientValue", "detail_gradient", 4, False),
+            ("detailCountValue", "detail_count", 0, False),
+        )
+        for name, key, decimals, lower_better in rows:
+            value = getattr(latest, key)
+            hold = holds.get(key)
+            if decimals <= 0:
+                current = str(int(round(float(value))))
+                best = (str(int(round(float(hold.low if lower_better
+                                         else hold.high))))
+                        if hold is not None else "")
+            else:
+                current = f"{float(value):.{decimals}f}"
+                best = (f"{float(hold.low if lower_better else hold.high):.{decimals}f}"
+                        if hold is not None else "")
+            text = (self.tr("{value} · best {best}").format(value=current, best=best)
+                    if best else current)
+            self._set_metric_label(name, text, False)
+        self._refresh_focus_tilt()
+
+    # @args: none. Paints the last tilt, its guidance and the ROI height it needs
+    def _refresh_focus_tilt(self) -> None:
+        tilt = self.session.last_tilt()
+        band_height = int(self.session.roi.band[3])
+        if tilt is None:
+            self._set_label("focusTiltValue", self.tr("Not measured"), "muted")
+            self._set_label("focusTiltHint", self.tr(
+                "Measure the slit tilt: rotate the slit until the line is "
+                "parallel to Dec."), "muted")
+            self._set_label("focusTiltHeight", self.tr(
+                "The ROI must hold the band plus the drift and a {margin:g} px "
+                "margin.").format(margin=TILT_MARGIN_PX), "muted")
+            return
+        if not getattr(tilt, "ok", False):
+            self._set_label("focusTiltValue", self.tr("The edge was not found"),
+                            "warning")
+            self._set_label("focusTiltHint", self.tr(
+                "Check that the Sun is on the slit, then measure again."),
+                "warning")
+            self._set_label("focusTiltHeight", self.tr(
+                "The ROI must hold the band plus the drift and a {margin:g} px "
+                "margin.").format(margin=TILT_MARGIN_PX), "muted")
+            return
+        deg = float(tilt.tilt_deg)
+        drift = float(tilt.tilt_px)
+        edge = float(tilt.edge_std_px)
+        aligned = abs(deg) <= FOCUS_TILT_TOLERANCE_DEG
+        trusted = edge <= FOCUS_EDGE_STD_MAX_PX
+        self._set_label("focusTiltValue", self.tr(
+            "{deg:.2f} deg, {px:.1f} px drift").format(deg=deg, px=drift),
+            "ok" if aligned and trusted else "warning")
+        if edge > FOCUS_EDGE_STD_MAX_PX:
+            self._set_label("focusTiltHint", self.tr(
+                "The edge is irregular ({value:.1f} px); measure again before "
+                "trusting the tilt.").format(value=edge), "warning")
+        elif abs(deg) <= FOCUS_TILT_TOLERANCE_DEG:
+            self._set_label("focusTiltHint", self.tr(
+                "The slit is parallel to Dec within {tol:.1f} deg.").format(
+                    tol=FOCUS_TILT_TOLERANCE_DEG), "ok")
+        else:
+            self._set_label("focusTiltHint", self.tr(
+                "Rotate the slit towards zero: it leans {deg:.2f} deg. The scan "
+                "can still run with a taller ROI.").format(deg=abs(deg)),
+                "warning")
+        needed = int(math.ceil(band_height + abs(drift) + TILT_MARGIN_PX))
+        self._set_label("focusTiltHeight", self.tr(
+            "The ROI must be at least {needed} px tall: band {band} + drift "
+            "{drift:.1f} + margin {margin:g}.").format(
+                needed=needed, band=band_height, drift=abs(drift),
+                margin=TILT_MARGIN_PX), "muted")
+
+    # @args: none. The one action of the Focus step
+    def measure_focus_tilt(self) -> None:
+        result = self.session.measure_tilt(self.session.roi.band)
+        self._refresh_focus_tilt()
+        if hasattr(self, "roi_editor"):
+            self.roi_editor.refresh_tilt()
+            self.roi_editor.refresh_warnings()
+        if result is None:
+            self.statusBar().showMessage(self.tr(
+                "The tilt meter needs a frame and the SHG module. Check the "
+                "camera and the stream, then measure again."), 9000)
+            return
+        if not getattr(result, "ok", False):
+            self.statusBar().showMessage(self.tr(
+                "The tilt could not be measured: {reason}. Check that the Sun is "
+                "on the slit and measure again.").format(
+                    reason=self._reason_text(result.reason_code)), 10000)
+            return
+        deg = float(result.tilt_deg)
+        drift = float(result.tilt_px)
+        edge = float(result.edge_std_px)
+        if abs(deg) > FOCUS_TILT_TOLERANCE_DEG:
+            needed = int(math.ceil(int(self.session.roi.band[3]) + abs(drift)
+                                   + TILT_MARGIN_PX))
+            self.statusBar().showMessage(self.tr(
+                "Tilt {deg:.2f} deg, {px:.1f} px of drift. Rotate the slit "
+                "towards zero; the ROI must be {needed} px tall. The scan can "
+                "still run with that taller ROI.").format(
+                    deg=deg, px=drift, needed=needed), 12000)
+            return
+        self.session.complete_step("focus", tilt_deg=deg, tilt_px=drift,
+                                   edge_std_px=edge,
+                                   **self._focus_metric_numbers())
+        message = self.tr(
+            "Slit parallel to Dec within {tol:.1f} deg. The Focus step is done; "
+            "the ROI can be tight.").format(tol=FOCUS_TILT_TOLERANCE_DEG)
+        if edge > FOCUS_EDGE_STD_MAX_PX:
+            message += self.tr(
+                " The edge is irregular ({value:.1f} px), so treat the tilt with "
+                "caution.").format(value=edge)
+        self.statusBar().showMessage(message, 12000)
+
+    # @args: none. Clears the running best so the next focuser position is
+    #        compared against a fresh baseline
+    def reset_focus_holds(self) -> None:
+        self._focus_watcher.reset()
+        self._last_focus_s = 0.0
+        self._refresh_focus_labels()
+        self.statusBar().showMessage(self.tr(
+            "Best focus values reset: the next readings start a fresh "
+            "comparison."), 6000)
+
+    # @args: none
+    # @return: the numeric focus metrics of the last reading, for the saved step
+    def _focus_metric_numbers(self) -> dict[str, float]:
+        latest = self._focus_watcher.latest()
+        if latest is None:
+            return {}
+        numbers = {}
+        for key, value in latest.as_dict().items():
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                numbers[key] = float(value)
+        return numbers
+
+    # @args: name - the metric label; text - its value and best; muted - no data
+    def _set_metric_label(self, name: str, text: str, muted: bool) -> None:
+        label = self.findChild(QLabel, name)
+        if label is None:
+            return
+        label.setText(text)
+        label.setProperty("state", "muted" if muted else "")
+        label.style().unpolish(label)
+        label.style().polish(label)
+
+    # @args: none. Clears the focus readings when the camera closes
+    def _reset_focus_readings(self) -> None:
+        self._focus_watcher.reset()
+        self._last_focus_s = 0.0
+        self._refresh_focus_labels()
+
+    # -------------------------------------------------------- line identification
+
+    # @args: checked - the toolbar check changed
+    def _toggle_identification(self, checked: bool) -> None:
+        if self.spectrum_frame is not None:
+            self.spectrum_frame.setVisible(bool(checked))
+        if not checked:
+            self._identify_timer.stop()
+            self._identify_generation += 1
+            return
+        self._identify_generation += 1
+        self.spectrum_panel.show_waiting()
+        self._identify_timer.start()
+        self._identify_now()
+
+    # @args: none
+    # @return: the [spectrum] settings plus the current band and generation
+    def _spectrum_params(self) -> dict:
+        return {
+            "dispersion": float(self.session.value(
+                "spectrum", "dispersion_angstrom_px")),
+            "target_wavelength": float(self.session.value(
+                "spectrum", "target_wavelength_angstrom")),
+            "flip": bool(self.session.value("spectrum", "flip")),
+            "tolerance": float(self.session.value(
+                "spectrum", "line_tolerance_angstrom")),
+            "min_confidence": float(self.session.value(
+                "spectrum", "min_confidence")),
+            "anchor_search_px": float(self.session.value(
+                "spectrum", "anchor_search_px")),
+            "band_y": int(self.session.roi.band[1]),
+            "generation": self._identify_generation,
+        }
+
+    # @args: none. One 2 Hz tick: copy the profile here, match it in the worker
+    def _identify_now(self) -> None:
+        if self.identify_check is None or not self.identify_check.isChecked():
+            return
+        params = self._spectrum_params()
+        if params["dispersion"] <= 0:
+            self.spectrum_panel.show_no_dispersion()
+            return
+        harness = self.session.harness
+        frame = harness.last_frame() if harness is not None else None
+        if frame is None:
+            self.spectrum_panel.show_no_spectrum()
+            return
+        try:
+            profile = dispersion_profile(frame, self.session.roi.band)
+        except (AttributeError, TypeError, ValueError):
+            self.spectrum_panel.show_no_spectrum()
+            return
+        if profile.size < 3:
+            self.spectrum_panel.show_reason("empty_profile")
+            return
+        # The profile is a new 1D array, not the live frame buffer: the worker
+        # can take all the time it needs without touching a recycled frame.
+        self._identify_generation += 1
+        params["generation"] = self._identify_generation
+        self._identify_worker.submit(profile, params)
+
+    # @args: result - an IdentificationResult, or None if the worker failed
+    #        params - the settings that produced it
+    def _on_identification(self, result, params: dict) -> None:
+        if self.identify_check is None or not self.identify_check.isChecked():
+            return
+        if int(params.get("generation", -1)) != self._identify_generation:
+            return
+        if result is None:
+            self.spectrum_panel.show_reason("engine_error")
+            return
+        self.spectrum_panel.show_result(
+            result, int(params.get("band_y", 0)),
+            float(params.get("min_confidence", 0.35)))
+
+    # @args: none. Called after Settings closes: re-read the [spectrum] keys
+    def _refresh_spectrum_settings(self) -> None:
+        if self.identify_check is None or not self.identify_check.isChecked():
+            return
+        self._identify_generation += 1
+        params = self._spectrum_params()
+        if params["dispersion"] <= 0:
+            self.spectrum_panel.show_no_dispersion()
+            return
+        self.spectrum_panel.show_waiting()
+        self._identify_now()
+
     # ---------------------------------------------------------------- ROI
+
+
 
     # @args: none. Applies the fields, saving the values silently
     def apply_roi(self) -> None:
@@ -1169,10 +1829,14 @@ class MainWindow(QMainWindow):
             capture_width=float(self.session.roi.capture[2]),
             capture_height=float(self.session.roi.capture[3]))
         x, y, width, height = self.session.roi.capture
-        self.statusBar().showMessage(self.tr(
+        message = self.tr(
             "ROI applied to the camera: {width} x {height} px at ({x}, {y}). "
             "The strip sets the frame rate and the SER size.").format(
-                width=width, height=height, x=x, y=y), 8000)
+                width=width, height=height, x=x, y=y)
+        if self._profiles.available and not self._active_profile:
+            message += self.tr(
+                " No active profile: the ROI preset was not saved.")
+        self.statusBar().showMessage(message, 9000)
 
     # @args: none. Runs the tilt meter and reports it
     def measure_tilt(self) -> None:
@@ -1190,6 +1854,11 @@ class MainWindow(QMainWindow):
 
     # @args: none. Asks for a name and stores the preset in the profile
     def save_preset(self) -> None:
+        if self._profiles.available and not self._active_profile:
+            self.statusBar().showMessage(self.tr(
+                "There is no active profile: save one in the top bar before "
+                "saving a preset."), 8000)
+            return
         name, accepted = QInputDialog.getText(
             self, self.tr("Save ROI preset"),
             self.tr("Name for this preset:"),
@@ -1323,6 +1992,14 @@ class MainWindow(QMainWindow):
                         self.tr("Waiting for the first frames..."), "muted")
         self.scan_view.set_progress(0.0, 0)
         self.scan_view.set_result("")
+        # The strip that carries the captured disk opens by itself: the observer
+        # needs it while the sweep runs, and it folds again when they choose
+        # (ADR-026).
+        self._set_strip("scanStripToggle", "scanBody", True)
+        # While a scan runs the progress strip is the point of watching: the
+        # header cannot fold it away until the run ends.
+        self._enable("scanStripToggle", False)
+        self._update_scan_strip_status(0, 0, n_cycles)
         self._busy_scan = True
         self._cycle = 0
         self._cycle_total = n_cycles
@@ -1353,15 +2030,30 @@ class MainWindow(QMainWindow):
         self.recon.clear()
         self._set_label("reconMessage",
                         self.tr("Waiting for the first frames..."), "muted")
+        self._update_scan_strip_status(0, cycle, total)
         self._set_label("scanStatusValue", self.tr(
             "Cycle {cycle} of {total}: sweeping the slit across the disk..."
         ).format(cycle=cycle, total=total), "warning")
+
+    # @args: percent - of the planned sweep; cycle, total - current cycle
+    def _update_scan_strip_status(self, percent: int, cycle: int = 0,
+                                  total: int = 0) -> None:
+        if cycle and total:
+            text = self.tr("Cycle {cycle} of {total}, {percent}%").format(
+                cycle=cycle, total=total, percent=int(percent))
+        elif percent:
+            text = self.tr("{percent}% of the planned sweep").format(
+                percent=int(percent))
+        else:
+            text = self.tr("Starting")
+        self._set_label("scanStripStatus", text, "warning")
 
     # @args: phase - "recentring" or "scanning"
     def _on_scan_phase(self, phase: str) -> None:
         if phase == "recentring":
             self._set_label("scanStatusValue", self.tr(
                 "Recentring the Sun before the next cycle..."), "warning")
+            self._set_label("scanStripStatus", self.tr("Recentring"), "warning")
         elif phase == "scanning":
             self._set_label("scanStatusValue", self.tr("Sweeping..."), "warning")
 
@@ -1374,6 +2066,7 @@ class MainWindow(QMainWindow):
         percent = int(progress.progress * 100)
         cycle = getattr(self, "_cycle", 0) or 1
         total_cycles = getattr(self, "_cycle_total", 0) or 1
+        self._update_scan_strip_status(percent, cycle, total_cycles)
         self._set_label("scanStatusValue", self.tr(
             "Cycle {cycle} of {cycles}, row {row}: {percent}% complete. Dec error "
             "{dec:.1f} arcsec; a large value means part of the disk is outside "
@@ -1441,14 +2134,18 @@ class MainWindow(QMainWindow):
         self._busy_scan = False
         self._enable("scanPauseButton", False)
         self._enable("scanAbortButton", False)
+        self._enable("scanStripToggle", True)
         self._update_scan_enabled()
         self.scan_view.set_result_from(result, self._planned_rows())
         text = self.tr("{frames} frames in {seconds:.0f} s. {reason}").format(
             frames=result.frames_written, seconds=float(result.duration_s),
             reason=self._result_reason(result))
         if result.status.value == "completed":
-            text += self.tr(" Session folder: {folder}.").format(
+            text += self.tr(" Data folder: {folder}.").format(
                 folder=str(self.session.folder))
+            self._set_label("scanStripStatus", self.tr("Finished"), "ok")
+        else:
+            self._set_label("scanStripStatus", self.tr("Stopped"), "warning")
         self._set_label("scanResultValue", text,
                         "ok" if result.status.value == "completed" else "warning")
         if result.status.value == "completed":
@@ -1459,7 +2156,7 @@ class MainWindow(QMainWindow):
                 dec_error_arcsec=float(result.dec_error_arcsec))
         if result.ser_paths:
             finished_text = self.tr(
-                "Finished. The session folder holds the SER files and the log.")
+                "Finished. The data folder holds the SER files and the log.")
         elif self.session.is_simulated():
             finished_text = self.tr(
                 "Finished in the simulator: the SER recording is disabled in "
@@ -1472,7 +2169,7 @@ class MainWindow(QMainWindow):
                         "ok" if result.status.value == "completed" else "warning")
         if result.ser_paths:
             self.statusBar().showMessage(self.tr(
-                "Session written to {folder}").format(
+                "Data written to {folder}").format(
                     folder=str(Path(result.ser_paths[0]).parent)), 9000)
 
     # @args: none. Pause and resume share one button, as a scan does
@@ -1533,6 +2230,7 @@ class MainWindow(QMainWindow):
         self._initial_fill()
         self.roi_editor.reload()
         self._sync_camera_panel()
+        self._refresh_spectrum_settings()
         self.statusBar().showMessage(self.tr(
             "Settings saved. Every value has a default, so a partial file still "
             "starts the app."), 6000)
@@ -1570,16 +2268,6 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(self.tr(
             "Preset '{name}' copied into the ROI step. Apply it there when you "
             "are ready.").format(name=preset.name), 7000)
-
-    # @args: none. Focus aid, live from the last frames
-    def open_focus_aid(self) -> None:
-        if self._focus_dialog is None:
-            self._focus_dialog = FocusAidDialog(self)
-        frame = self._last_frame()
-        if frame is not None:
-            self._update_focus(frame)
-        self._focus_dialog.show()
-        self._focus_dialog.raise_()
 
     # @args: none. In-app log viewer
     def open_logs(self) -> None:
@@ -1623,13 +2311,20 @@ class MainWindow(QMainWindow):
             self.tr("PySide6 {version}").format(version=PySide6.__version__),
             self.tr("Settings: {path}").format(path=paths.settings_path()),
             self.tr("Profile: {path}").format(path=paths.profile_path()),
-            self.tr("Session: {path}").format(path=self.session.folder),
+            self.tr("Data folder: {path}").format(path=self.session.folder),
             self.tr("Camera: {state}").format(state=camera),
             self.tr("Mount: {state}").format(state=mount),
             self.tr("ROI capture: {rect}").format(rect=str(roi.capture)),
             self.tr("Spectral band: {rect}").format(rect=str(roi.band)),
             self.tr("Tilt: {deg:.2f} deg, {px:.1f} px").format(
                 deg=float(roi.tilt_deg), px=float(roi.tilt_px)),
+            self.tr("Spectrum: {target:.2f} Å target, {dispersion:.4f} Å/px, "
+                    "flip {flip}").format(
+                        target=float(self.session.value(
+                            "spectrum", "target_wavelength_angstrom")),
+                        dispersion=float(self.session.value(
+                            "spectrum", "dispersion_angstrom_px")),
+                        flip=bool(self.session.value("spectrum", "flip"))),
             self.tr("Run 'python -m solarscribe --diagnostics' for the backend "
                     "and device list."),
         ])
@@ -1640,13 +2335,14 @@ class MainWindow(QMainWindow):
         box.setWindowTitle(self.tr("Quick start"))
         box.setIcon(QMessageBox.Icon.Information)
         box.setText(self.tr(
-            "1. Find the Sun: open the telescope panel, connect the mount and "
-            "press Point at the Sun and centre.\n"
-            "2. Polar alignment: start the measurement and leave the telescope "
-            "tracking; it needs 20 to 40 minutes.\n"
-            "3. ROI: draw the spectral band on the video and type the capture "
-            "rectangle; press Apply this ROI.\n"
-            "4. Scanning: prepare, then start. The quick recon tells you whether "
+            "1. Open the camera in the camera panel on the right.\n"
+            "2. Find the Sun: connect the mount and press Point at the Sun and "
+            "centre.\n"
+            "3. Focus: sharpen the three focusers and measure the slit tilt; "
+            "rotate the slit until it is parallel to Dec.\n"
+            "4. ROI: drag the spectral band on the video, type the capture strip "
+            "and press Apply this ROI.\n"
+            "5. Scanning: prepare, then start. The quick recon tells you whether "
             "the take went well; the post-processing stays external."))
         box.exec()
 
@@ -1664,7 +2360,7 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------- file actions
 
-    # @args: none. Starts a new session folder and resets the four steps
+    # @args: none. Starts a new session folder and resets the five steps
     def new_session(self) -> None:
         self.session.new_session()
         self.recon.clear()
@@ -1673,7 +2369,7 @@ class MainWindow(QMainWindow):
         self._reset_live_readings()
         self._initial_fill()
         self.statusBar().showMessage(self.tr(
-            "New session: {folder}").format(folder=str(self.session.folder)), 6000)
+            "New data folder: {folder}").format(folder=str(self.session.folder)), 6000)
 
     # @args: none. Clears the readings that belonged to the previous run: the
     #        step state is loaded or reset, but a live "Aligned" from yesterday
@@ -1682,7 +2378,6 @@ class MainWindow(QMainWindow):
         self._set_label("sunStateValue", self.tr("Not measured yet"), "muted")
         self._set_label("decErrorValue", self.tr("Not measured yet"), "muted")
         self._set_label("deadZoneValue", self.tr("Not measured yet"), "muted")
-        self._set_label("slitValue", self.tr("Not measured yet"), "muted")
         self._set_label("polarStateValue", self.tr("Not started"), "muted")
         self._set_label("polarAzValue", self.tr("Not measured yet"), "muted")
         self._set_label("polarAltValue", self.tr("Not measured yet"), "muted")
@@ -1691,8 +2386,14 @@ class MainWindow(QMainWindow):
             "Dropped frames: none so far. Every dropped frame is a gap in the "
             "SER that the reconstruction has to bridge."), "muted")
         self._set_label("scanResultValue", self.tr(
-            "When a scan finishes, its result and the session folder appear "
+            "When a scan finishes, its result and the data folder appear "
             "here."), "muted")
+        self._set_label("scanStripStatus", self.tr("Idle"), "muted")
+        self._set_label("histogramSaturation", self.tr("No frame yet"), "muted")
+        self._reset_focus_readings()
+        self._identify_generation += 1
+        if self.identify_check is not None and self.identify_check.isChecked():
+            self.spectrum_panel.show_no_spectrum()
         for name, value in (("polarProgress", 0), ("scanProgressBar", 0)):
             bar = self.findChild(QWidget, name)
             if bar is not None:
@@ -1704,6 +2405,7 @@ class MainWindow(QMainWindow):
         self._enable("polarSecondButton", False)
         self._enable("scanPauseButton", False)
         self._enable("scanAbortButton", False)
+        self._enable("scanStripToggle", True)
         self._busy_scan = False
         self._busy_center = False
         self._prepared = False
@@ -1716,7 +2418,7 @@ class MainWindow(QMainWindow):
     # @args: none. Opens another session folder, silently restoring its steps
     def open_session(self) -> None:
         folder = QFileDialog.getExistingDirectory(
-            self, self.tr("Open session"), str(self.session.folder))
+            self, self.tr("Open data folder"), str(self.session.folder))
         if not folder:
             return
         loaded = Session.load(folder, demo=self.session.demo, autosave=True,
@@ -1728,7 +2430,7 @@ class MainWindow(QMainWindow):
         self._reset_live_readings()
         self._initial_fill()
         self.statusBar().showMessage(self.tr(
-            "Session opened: {folder}. The steps are as you left them.").format(
+            "Data folder opened: {folder}. The steps are as you left them.").format(
                 folder=folder), 7000)
 
     # @args: none. Opens the session folder in the file manager
@@ -1758,13 +2460,6 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(self.tr(
             "{what} is not available in this build. The simulator covers the "
             "interface until the engine lands.").format(what=what), 8000)
-
-    # @args: none
-    # @return: the last frame the simulator produced, or None
-    def _last_frame(self):
-        if self.session.harness is None:
-            return None
-        return self.session.harness.last_frame()
 
     # @args: none
     # @return: (mount, name) from the device layer, or None when it is absent or
@@ -1866,6 +2561,8 @@ class MainWindow(QMainWindow):
         # a queued frame cannot repaint a window that is going away.
         self._display_timer.stop()
         self._health_timer.stop()
+        self._identify_timer.stop()
+        self._identify_worker.stop()
         self.telescope.stop_polling()
         if hasattr(self, "camera_panel"):
             self.camera_panel.shutdown()

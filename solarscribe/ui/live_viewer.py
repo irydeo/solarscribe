@@ -151,7 +151,7 @@ class LiveViewer(QWidget):
         self._band = tuple(int(v) for v in roi) if roi is not None else None
         self.update()
 
-    # @args: on - show the band overlay at all (the magnifier turns it off)
+    # @args: on - show the band overlay at all (the ROI checkbox turns it off)
     def set_show_band(self, on: bool) -> None:
         self._show_band = bool(on)
         self.update()
@@ -250,17 +250,24 @@ class LiveViewer(QWidget):
         painter.setPen(QPen(QColor(PALETTE.accent), 2))
         painter.drawRect(rect)
 
+        # The caption sits on the spectrum, which is bright and busy; a dark
+        # plate behind it is what makes it readable at a glance.
+        label = QRect(rect.left() + 4, rect.top() + 3,
+                      min(230, max(20, rect.width() - 8)), 18)
+        painter.fillRect(label, QColor(0, 0, 0, 150))
+        painter.setPen(QColor(PALETTE.text))
+        painter.drawText(label.adjusted(4, 0, -4, 0),
+                         Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft,
+                         self.tr("Spectral band: drag to move, corners to resize"))
+
         # Four corner handles, big enough for a mouse and honest about where
-        # the drag will take hold.
+        # the drag will take hold. They are painted last so the caption plate
+        # cannot hide them.
         painter.setBrush(QColor(PALETTE.accent))
         for corner in (rect.topLeft(), rect.topRight(),
                        rect.bottomLeft(), rect.bottomRight()):
             painter.drawRect(QRect(corner.x() - 5, corner.y() - 5, 10, 10))
         painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.setPen(QColor(PALETTE.muted))
-        painter.drawText(rect.adjusted(6, 4, -6, -4),
-                         Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft,
-                         self.tr("Spectral band: drag to move, corners to resize"))
 
     # @args: painter, target - the image rectangle
     def _paint_cross(self, painter: QPainter, target: QRect) -> None:

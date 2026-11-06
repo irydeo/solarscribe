@@ -157,7 +157,7 @@ class CameraPanel(QWidget):
                 "if it is not, the device layer is not in this build."))
         else:
             self._say(self.tr("Found {count} camera(s). Choose one and press "
-                              "Use this camera.").format(count=len(self._cameras)))
+                              "Open.").format(count=len(self._cameras)))
 
     # @args: detail - the discovery error for the log
     def _discovery_failed(self, detail: str) -> None:
@@ -208,9 +208,10 @@ class CameraPanel(QWidget):
             self._set_text(self.rate_value, "--")
             return
         if simulated:
-            self._set_state("warning")
-            self._set_text(self.state_label, self.tr("Simulator, streaming")
-                           if streaming else self.tr("Simulator, stopped"))
+            # The 210 px right band cannot hold "Simulator, streaming"; the dot
+            # already says streaming, and the message below says simulator.
+            self._set_state("ok" if streaming else "warning")
+            self._set_text(self.state_label, self.tr("Simulator"))
         else:
             self._set_state("ok" if streaming else "warning")
             self._set_text(self.state_label,

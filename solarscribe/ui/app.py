@@ -100,7 +100,10 @@ def _run_gui(args: list[str]) -> int:
         session_folder = session_folder or str(root / "session")
 
     settings_path = Path(settings_file) if settings_file else paths.settings_path()
-    profile_path = paths.profile_path()
+    # The self test gets a throwaway profile too, so it never reads or writes
+    # the user's named profiles (profiles.json is the sibling of this file).
+    profile_path = (Path(temporary.name) / "profile.json" if temporary
+                    else paths.profile_path())
     log_folder = Path(temporary.name) / "log" if temporary else paths.log_dir()
     _configure_logging(log_folder)
     logger = logging.getLogger("solarscribe")

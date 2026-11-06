@@ -12,7 +12,7 @@
 ############################################################
 
 # Where SolarScribe keeps its files on each platform (ADR-004, ADR-017,
-# ADR-024). platformdirs applies the platform convention for us:
+# ADR-024, ADR-027). platformdirs applies the platform convention for us:
 #   - Linux: $XDG_CONFIG_HOME/SolarScribe and $XDG_DATA_HOME/SolarScribe,
 #     falling back to ~/.config and ~/.local/share; logs under the XDG state
 #     directory.
@@ -37,7 +37,7 @@ from pathlib import Path
 
 import platformdirs
 
-from solarscribe.config.schema import CONFIG_FILE, PROFILE_FILE
+from solarscribe.config.schema import CONFIG_FILE, PROFILE_FILE, PROFILES_FILE
 
 __all__ = [
     "APP_NAME",
@@ -46,6 +46,7 @@ __all__ = [
     "default_session_base",
     "log_dir",
     "profile_path",
+    "profiles_path",
     "settings_path",
 ]
 
@@ -56,7 +57,8 @@ __all__ = [
 APP_NAME = "SolarScribe"
 
 
-# @return: the per-platform folder for the small files: the INI and the profile
+# @return: the per-platform folder for the small files: the INI, the named
+#          profiles and the legacy single profile
 def config_dir() -> Path:
     # appauthor=False keeps the Linux and macOS paths clean; on Windows it gives
     # %LOCALAPPDATA%\SolarScribe instead of %LOCALAPPDATA%\SolarScribe\SolarScribe.
@@ -87,6 +89,13 @@ def settings_path() -> Path:
     return config_dir() / CONFIG_FILE
 
 
-# @return: the JSON profile the app reads and writes
+# @return: the legacy single profile (or an exported one); the startup store is
+#          profiles_path()
 def profile_path() -> Path:
     return config_dir() / PROFILE_FILE
+
+
+# @return: the named-profile store loaded at startup (ADR-027). profile_path()
+#          stays for the legacy single file and for exporting one profile
+def profiles_path() -> Path:
+    return config_dir() / PROFILES_FILE

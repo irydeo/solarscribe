@@ -5,7 +5,7 @@
 This guide covers the supported systems, the prerequisites and the two ways to
 get SolarScribe: the packaged installers and a source install.
 
-> **Status (2026-11-06)**: the packaged installers are **planned**, not
+> **Status (2026-11-07)**: the packaged installers are **planned**, not
 > published. The source install works and the main window starts with the
 > simulator; real capture with a camera and a mount is not validated yet. The
 > installers described in sections 2 and 3 are the agreed shape (ADR-004,
@@ -231,19 +231,19 @@ the program, the user's data goes to the user's directories.
 
 | Content | Windows | Linux |
 | --- | --- | --- |
-| Settings (`config.ini`) and profile (`profile.json`) | `%LOCALAPPDATA%\SolarScribe\` | `~/.config/SolarScribe/` |
-| Session folders, SER files and logs | `%LOCALAPPDATA%\SolarScribe\sessions\` by default, configurable | `~/.local/share/SolarScribe/sessions/` by default, configurable |
+| Settings (`config.ini`) and profiles (`profiles.json`; an old `profile.json` is read as `default`) | `%LOCALAPPDATA%\SolarScribe\` | `~/.config/SolarScribe/` |
+| Data folders (session folders), SER files and logs | `%LOCALAPPDATA%\SolarScribe\sessions\` by default, configurable | `~/.local/share/SolarScribe/sessions/` by default, configurable |
 
-The session base folder is configurable in the settings. Windows uses
-`%LOCALAPPDATA%` rather than the roaming profile on purpose: a session folder of
-several gigabytes has no place in a roaming profile.
+The data base folder is configurable in the settings; the design and the logs call
+it the session base. Windows uses `%LOCALAPPDATA%` rather than the roaming profile
+on purpose: a data folder of several gigabytes has no place in a roaming profile.
 
-The session folder is created per session and named with its date and time. The
-files inside follow the `sun_YYYYMMDD_HHMM_scanNN` pattern.
+The data folder is created per run and named with its date and time. The files
+inside follow the `sun_YYYYMMDD_HHMM_scanNN` pattern.
 
-**Important**: the session folder is **yours**. The application never deletes a
-SER or a log. Uninstalling the program does not remove your captures, so copy
-them out before removing the data folder by hand.
+**Important**: the data folder is **yours**. The application never deletes a SER
+or a log. Uninstalling the program does not remove your captures, so copy them out
+before removing the data folder by hand.
 
 ---
 
@@ -308,7 +308,7 @@ install.
 | The mount connects but does not move | The driver reports no rate support, or the mount is parked | Unpark, check the rate selector, try a small move with the telescope panel |
 | The application starts but no window appears from source | `solarscribe.ui.app` does not exist yet | Expected at this stage; use the version and the unit tests to validate the install |
 | SmartScreen blocks the Windows installer | The installer is not code-signed | Check the Releases page and use **More info → Run anyway** |
-| A scan refuses to start for lack of disk | The free-space floor (1 GB by default) was hit | Free space or point the session folder at another disk |
+| A scan refuses to start for lack of disk | The free-space floor (1 GB by default) was hit | Free space or point the data folder at another disk |
 | The interface stays in English on a Spanish system | The language setting is forced, or the `.qm` is missing | Set the language in the settings; developers rebuild the catalogues |
 | A profile written by hand stops the start | A syntax error or an unknown version | The app should fall back to defaults; if it does not, that is a bug, report it with the file |
 

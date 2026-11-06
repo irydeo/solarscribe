@@ -7,11 +7,12 @@ pensada una sesión. Está escrita desde el diseño y los contratos, así que se
 puede leer antes de que exista el código. Las secciones marcadas como **Previsto**
 describen el comportamiento acordado, no algo que puedas ejecutar hoy.
 
-> **Estado de esta guía (2026-11-06)**: los motores reales de captura, centrado y
-> barrido están conectados a la interfaz y corren contra un simulador de espectro
-> solar; la captura con cámara y montura reales todavía no está validada. La guía
-> se escribe junto a los contratos, para fijar el comportamiento antes de probar
-> cada rincón del hardware.
+> **Estado de esta guía (2026-11-07)**: los motores reales y la interfaz de cinco
+> pasos están conectados: captura, centrado, enfoque, barrido, líneas espectrales
+> y perfiles con nombre corren contra un simulador de espectro solar; la captura
+> con cámara y montura reales todavía no está validada. La guía se escribe junto a
+> los contratos, para fijar el comportamiento antes de probar cada rincón del
+> hardware.
 
 ---
 
@@ -50,10 +51,10 @@ Este repositorio es joven, y fingir lo contrario te haría perder el tiempo.
 | --- | --- |
 | Esqueleto del paquete y layout de capas | **Disponible** |
 | Módulos de contrato (`devices`, `capture`, `shg`, `config`) | **Disponible** |
-| Esquema de configuración, perfil y estado de sesión | **Disponible**: lectura y escritura con valores por defecto, escritura atómica y migración de perfil v1 a v2 |
+| Esquema de configuración, perfiles con nombre y estado de sesión | **Disponible**: lectura y escritura con valores por defecto, escritura atómica, migración v1 a v2 y un almacén `profiles.json` |
 | Test de la regla de dependencias (`tests/unit/test_layers.py`) | **Disponible** |
 | Interfaz, panel de cámara y simulador | **Disponible**: la ventana arranca, el descubrimiento encuentra el simulador y la cámara se abre y envía |
-| Motores reales conectados a la ventana | **Conectado (simulador)**: centrado, ROI, preparación, barrido y vista previa corren contra el simulador |
+| Motores reales conectados a la ventana | **Conectado (simulador)**: centrado, Enfoque, ROI, preparación, barrido, líneas espectrales, recon rápido y perfiles con nombre corren contra el simulador |
 | Captura con cámara y montura reales | **Previsto (MVP)**: los drivers y motores existen, todavía sin validar en hardware |
 | Instaladores para Windows y Linux | **Todavía no disponible** |
 | Catálogos ES/EN y esta guía | **Disponible**; todo lo extraíble está traducido, 0 sin traducir |
@@ -84,7 +85,7 @@ primero que conviene adjuntar a un informe de fallo.
 | **Disponible** | Funciona en el árbol de fuentes actual. |
 | **Conectado (simulador)** | El motor real está conectado a la interfaz y corre contra el simulador; la vía de hardware sigue siendo Previsto (MVP). |
 | **Previsto (MVP)** | Acordado en el diseño y los contratos; forma parte de la primera versión utilizable. |
-| **Previsto (fase 2)** | Acordado, pero después del MVP (más backends de cámara, ayuda al enfoque, diagnóstico de dispositivos). |
+| **Previsto (fase 2)** | Acordado, pero después del MVP (más backends de cámara en la fase 2, un respaldo directo por serie para la montura en la fase 3). |
 | **Previsto (fase 3)** | Endurecimiento y backends de montura adicionales. |
 | **Solo diseño** | La decisión existe; la forma aún puede cambiar. |
 
@@ -137,64 +138,81 @@ GitHub Releases están previstos.
 encender cámara + montura
         |
         v
-bienvenida / ajustes: ubicación, perfil, idioma
+barra de perfiles: elegir, guardar o gestionar un perfil con nombre
         |
         v
-panel de cámara: buscar una cámara, abrirla, restaurar el preset de ROI del perfil
+bienvenida / ajustes: ubicación, idioma; los ajustes guardan las entradas de espectro
         |
         v
-1. Buscar el Sol: GOTO por efeméride, centrado grueso y fino sobre la rendija
+panel de cámara: buscar una cámara, abrirla, restaurar el preset de ROI del perfil activo
         |
         v
-2. Alineación polar: muestras de deriva en Dec, indicaciones de azimut y altitud
+1. Buscar Sol: GOTO por efeméride, centrado grueso y fino sobre la rendija
         |
         v
-3. ROI: franja de captura, banda espectral, tilt, validación, FPS y caudal estimados
+2. Polar: muestras de deriva en Dec, indicaciones de azimut y altitud
         |
         v
-4. Escaneado: preparación (centrado fino + calibración de la tasa), barrido simple o
+3. Enfoque: tres enfoques y el tilt rendija-Dec, con métricas en vivo
+        |
+        v
+4. ROI: franja de captura, banda espectral, validación, FPS y caudal estimados
+        |
+        v
+5. Barrido: preparación (centrado fino + calibración de la tasa), barrido simple o
    mosaico, tres ciclos por defecto, progreso y contadores de frames perdidos
         |
         v
 SER + scan_log.csv + scan_stats.jsonl + session_meta.json
         |
         v
-recon rápido en pantalla + resumen de la sesión + abrir la carpeta
+histograma, tira de barrido y recon rápido + abrir la carpeta de datos
 ```
 
 ---
 
 ## 4. Flujo de sesión
 
-### 4.1 El raíl, no un asistente modal
+### 4.1 La imagen primero, el raíl después
 
-La vista principal es una **sesión por pasos**. Un raíl horizontal muestra el
-estado de cada paso (pendiente, en curso, hecho, saltado). La navegación es
-libre: el raíl guía, no bloquea. Todos los controles siguen visibles; no hay un
-modo experto aparte. El estado se guarda en silencio tras cada cambio y un paso
-completado se puede reabrir.
+El visor ocupa la mayor parte de la ventana y crece con ella. El raíl de cinco
+pasos es una sola línea de 28 px, el panel lateral tiene un máximo de 330 px y las
+bandas inferiores se pliegan: el histograma de brillo y la tira de barrido son
+cabeceras de 24 px hasta que se abren. Maximizar la ventana da el espacio extra a
+la imagen, no a los paneles.
 
-Esto importa porque una sesión es una secuencia de decisiones de puesta a punto, y
-un formulario con todos los controles a la vez no le dice a quien empieza por
-dónde ir. También importa porque un observador experto debe poder saltar directo
-al ROI cuando el Sol ya está sobre la rendija.
+El raíl sigue funcionando como una sesión: muestra el estado de cada paso con
+palabras (pendiente, en curso, hecho, saltado), la navegación es libre, recomienda
+sin bloquear, el estado se guarda en silencio tras cada cambio y un paso
+completado se puede reabrir. El lado derecho tiene los paneles de cámara,
+telescopio y salud del flujo; se pliegan desde su barra de título o desde
+**Herramientas → Paneles**.
 
-**Estado**: Conectado (simulador). El raíl, la navegación libre y el autoguardado
-silencioso corren en la ventana; los pasos mueven los motores reales con el
-simulador.
+Esto importa porque el trabajo es ver el Sol, no leer un formulario. El raíl guía
+a quien empieza sin quitarle la imagen a un observador experto.
 
-### 4.2 Los cuatro pasos
+**Estado**: Conectado (simulador). El raíl, la navegación libre, el autoguardado
+silencioso y el diseño plegable corren en la ventana; los pasos mueven los
+motores reales con el simulador.
+
+### 4.2 Los cinco pasos
 
 | Paso | Qué hace | Por qué importa |
 | --- | --- | --- |
-| **Buscar el Sol** | GOTO al Sol por efeméride local y centrado grueso y fino sobre la rendija | El barrido necesita el disco sobre la rendija antes que nada |
-| **Alineación polar** | Muestrea la Dec del Sol con el tiempo y separa el error de azimut del de altitud | Un mal seguimiento de día emborrona el disco y sesga la tasa de barrido |
-| **ROI** | El usuario elige la franja de captura y la banda espectral; se mide el tilt y se valida el ROI | El ROI fija la tasa de fotogramas, el tamaño del SER y el caudal |
-| **Escaneado** | Centrado fino, autocalibración de la tasa y barrido simple o mosaico | Aquí es donde se escriben los datos |
+| **Buscar Sol** | Apunta al Sol por efeméride local y lo centra grueso y fino sobre la rendija | El barrido necesita el disco sobre la rendija antes que nada |
+| **Polar** | Muestrea la Dec del Sol con el tiempo y separa el error de azimut del de altitud | Un mal seguimiento de día emborrona el disco y sesga la tasa de barrido |
+| **Enfoque** | Tres enfoques con métricas en vivo y después el tilt rendija-Dec y la altura de ROI que necesita | Un espectro blando o una rendija inclinada cuestan contraste y obligan a un ROI más alto |
+| **ROI** | El usuario elige la franja de captura y la banda espectral; se valida el ROI y se puede comprobar el tilt rápido | El ROI fija la tasa de fotogramas, el tamaño del SER y el caudal |
+| **Barrido** | Centrado fino, autocalibración de la tasa y barrido simple o mosaico | Aquí es donde se escriben los datos |
+
+El enfoque es un paso propio porque los tres enfoques y la alineación de la
+rendija son una tarea, no un diálogo: necesitan métricas en vivo, un mejor valor
+retenido y un tilt guiado. El paso ROI conserva una medida rápida del tilt porque
+la altura de la franja la necesita.
 
 El centrado fino y la calibración de la tasa son **preparación dentro del paso
-Escaneado**, no un quinto paso. El prototipo dejó esa lección: las dos
-operaciones van juntas y ambas dependen de la exposición final.
+Barrido**, no otro paso: las dos operaciones van juntas y ambas dependen de la
+exposición final.
 
 **Estado**: Conectado (simulador). El raíl, la navegación libre y el autoguardado
 silencioso corren en la ventana; los pasos mueven los motores reales con el
@@ -260,8 +278,11 @@ de verdad.
   histograma solo no puede resolver el centro. Es la **zona muerta**, un límite
   geométrico, no un problema de ajuste. La interfaz lo dice y encadena el paso
   fino.
-- **Respaldo manual**: el panel de telescopio está siempre disponible para mover
-  N/S/E/O, hacer GOTO por coordenadas, sync, seguimiento y park.
+- **Respaldo manual**: el panel de telescopio (visible por defecto, plegable
+  desde su barra de título o **Herramientas → Paneles**) tiene conectar, buscar
+  montura, **Ir al Sol**, N/S/E/O con selector de tasa, Parar, seguimiento y
+  park. El GOTO por coordenadas y el Sync no están en la interfaz; el contrato de
+  montura los conserva para un futuro modo avanzado.
 
 La efeméride local hace que el GOTO funcione sin red. Una ubicación equivocada es
 la causa más común de un primer GOTO malo: revisa latitud y longitud antes de
@@ -294,7 +315,51 @@ demuestran el cableado y la guía, no el cielo.
 se puede separar. El asistente dice cuándo una medida es débil en vez de mostrar
 una cifra segura que no lo es.
 
-### 5.4 El ROI: la franja que hace posible el barrido
+### 5.4 Enfoque: tres enfoques y la rendija
+
+**Estado**: Conectado (simulador). Las métricas de `shg.focus` y el ajuste de
+`shg.tilt` corren en vivo. El simulador no tiene línea de rendija inclinada, así
+que el tilt lee unos 0,0°; un fotograma real es lo que lo demuestra.
+
+El SHG tiene tres enfoques que interactúan, así que enfocar es una iteración, no
+una sola rueda:
+
+1. **Espectrógrafo** (enfoque de cámara): maximizar el **contraste de líneas** y
+   la **nitidez de líneas** de las líneas de absorción.
+2. **Colimador**: maximizar la **nitidez del borde** de la rendija y minimizar la
+   **ondulación del borde**, para que el borde sea nítido y recto.
+3. **Telescopio**: maximizar el **contraste de detalle** y la **nitidez del
+   detalle** de la superficie solar, y mantener alto el **recuento de detalle**.
+
+Cada métrica se actualiza en vivo y guarda un **mejor valor desde el último
+reinicio**; la segunda cifra es el mejor. **Reiniciar los mejores valores** borra
+la retención para que la siguiente posición de enfoque se compare con una base
+nueva. El enfoque es un juicio: compara con el mejor y luego mide el tilt.
+
+- **Qué significan las cifras**: el contraste dice cuánto destacan las líneas de
+  absorción sobre el continuo; la nitidez dice a qué velocidad cambia el brillo a
+  través de una línea, así que una línea desenfocada es suave; la nitidez del
+  borde dice cuánto escalón hay en el borde de la rendija; la ondulación dice
+  cuánto se desvía el borde a lo largo de la rendija en celdas de rejilla; el
+  recuento de detalle dice cuántas estructuras de superficie encuentra el perfil.
+  La exposición se cancela en las cifras de cociente, así que cambiarla no las
+  mueve.
+- **Rendija a Dec**: el tilt es el ángulo entre la línea espectral y el
+  fotograma, en **grados** y en **píxeles de deriva**. Cero significa que la
+  rendija es paralela al eje de declinación. Gira la rendija hasta que esté cerca
+  de cero. Un tilt no impide el barrido, pero la línea ocupa más filas y el ROI
+  debe ser más alto.
+- **Altura del ROI**: `banda + |deriva| + margen de 2 px`; el paso dice la altura
+  que necesita. Un ROI menor recortaría el orden.
+- **Medir el tilt de la rendija**: ajusta una recta al borde de la rendija del
+  fotograma actual e informa del tilt y de la altura que necesita. Si el borde es
+  irregular, lo dice y llama provisional al tilt en vez de esconder el aviso.
+- **Qué no hace**: la captura no endereza los fotogramas. El post-proceso aplica
+  la corrección y recibe el tilt registrado.
+- **La comprobación rápida en ROI**: el paso ROI conserva una medida rápida del
+  tilt porque la altura de la franja la necesita; la alineación guiada vive aquí.
+
+### 5.5 El ROI: la franja que hace posible el barrido
 
 **Estado**: Conectado (simulador). Los rectángulos se envían al motor de captura
 real y el preset se restaura del perfil al abrir la cámara; el simulador responde
@@ -340,26 +405,6 @@ post-proceso.
 de captura, así que el editor dibuja la banda espectral encima. Un rectángulo de
 captura mayor que el fotograma sería ficción; el rectángulo entregado se cambia
 en el panel de cámara.
-
-### 5.5 Medición del tilt
-
-**Estado**: Conectado (simulador), con una excepción honesta: el simulador no
-tiene línea de rendija inclinada, así que el tilt lee unos 0,0°. El ajuste lo
-ejercitan las pruebas unitarias; un fotograma real es lo que lo demuestra.
-
-- **Qué hace**: ajusta una recta a la posición del borde de la rendija (o de una
-  línea de absorción) a lo ancho del ROI. La pendiente es el tilt, expresado en
-  **grados** y en **píxeles de deriva** a lo ancho del ROI.
-- **Rectitud**: el ajuste también informa de lo recto que es el borde. Un borde
-  ondulado significa que la cifra de tilt no es de fiar, y la interfaz lo dice en
-  vez de mostrar un número.
-- **Para qué se usa**: dimensionar la altura del ROI, guiarte para dejar la línea
-  recta (idealmente cerca de 0°) y registrar el valor para el post-proceso.
-- **Qué no hace**: la captura no endereza los fotogramas. Corregir el tilt es
-  tarea del post-proceso, que lo hace mejor y no debe encontrar datos crudos ya
-  modificados.
-- **Cuándo se recalcula**: si cambia la óptica, el ROI o la orientación de la
-  cámara.
 
 ### 5.6 Preparación del escaneado: centrado fino y calibración de la tasa
 
@@ -448,21 +493,28 @@ cámara; un valor rechazado vuelve como mensaje, no como un cambio silencioso.
   binning, la sesión dice cuál y conserva el valor anterior. El detalle técnico va
   al registro.
 
-### 5.9 Visualización del barrido, recon rápido y resumen
+### 5.9 Histograma, tira de barrido y recon rápido
 
-**Estado**: Conectado (simulador). La visualización sigue el progreso real del
-barrido y el resumen sale del resultado del barrido.
+**Estado**: Conectado (simulador). El histograma lee la banda en vivo, la tira de
+barrido sigue el progreso real y el recon rápido sale de la capa SHG.
 
-- **Durante el barrido**: el visor muestra la franja ya capturada, la línea de la
-  rendija y el porcentaje completado, sobre un **disco esquemático** que funciona
-  sin red. Si hay conexión, la imagen real del Sol del día (SDO) puede sustituir
-  al disco esquemático. El porcentaje se refiere al barrido previsto, así que 100%
-  significa que el plan terminó, no que la imagen esté procesada.
-- **A medida que avanza el barrido**: un **recon rápido**, calculado por la capa
-  SHG con `shg.quick_recon`. Colapsa la banda espectral de cada fotograma en un
-  perfil y apila los perfiles en el tiempo formando un disco; la ventana pinta el
-  resultado en pantalla mientras corre el barrido. La leyenda dice cuántos
-  fotogramas y filas entraron.
+- **Histograma de brillo**: siempre presente como cabecera de 24 px, y se pliega
+  para abrirlo cuando hace falta. Tiene 256 bins en escala logarítmica,
+  calculados **solo sobre la banda espectral**, para que las filas oscuras no
+  aplasten el espectro. Dos asas, negro y blanco: arrastra una, o haz clic cerca
+  de una para mover la más próxima; el blanco nunca cruza el negro. Las zonas
+  sombreadas son lo que recorta el estiramiento. La cabecera avisa con la
+  fracción de banda que ya está en el nivel máximo; baja la exposición o sube el
+  asa blanca para que el espectro no se recorte.
+- **Tira de barrido**: una cabecera de 24 px con el porcentaje y el ciclo que
+  **se abre sola al empezar un barrido**. Muestra el disco capturado, la línea de
+  la rendija y el recon rápido, y se puede plegar otra vez al terminar.
+- **El porcentaje** es del barrido previsto, así que 100% significa que el plan
+  terminó, no que la imagen esté procesada.
+- **Recon rápido**: a medida que avanza el barrido, la capa SHG ejecuta
+  `shg.quick_recon`. Colapsa la banda espectral de cada fotograma en un perfil y
+  apila los perfiles en el tiempo formando un disco; la ventana pinta el
+  resultado. La leyenda dice cuántos fotogramas y filas entraron.
 - **Qué no es el recon rápido**: calibrado, alineado, corregido de flat ni
   fotométrico. No se exporta, no relee el SER y no sustituye al post-proceso.
 - **Cuando no se puede construir**: la ventana dice por qué en lenguaje llano,
@@ -470,15 +522,51 @@ barrido y el resumen sale del resultado del barrido.
   todavía no hay fotogramas, la banda espectral no tiene píxeles, o los
   fotogramas no permiten construir la vista previa. El motivo nombra el paso que
   hay que revisar.
-- **Resumen**: fotogramas capturados, fotogramas perdidos, duración y ruta de la
-  sesión, con un botón para abrir la carpeta de la sesión.
+- **Resumen**: fotogramas capturados, fotogramas perdidos, duración y carpeta de
+  datos, con un botón para abrir la carpeta.
 
 **Honestidad**: el recon rápido no es autoritativo. Si se ve bien, los datos
 probablemente sirven; si se ve mal, el motivo suele estar en los registros, y el
 resumen apunta allí. La leyenda "vista previa ligera, no para medir" forma parte
 del widget a propósito.
 
-### 5.10 Panel de salud y contadores de rendimiento
+### 5.10 Líneas espectrales
+
+**Estado**: Conectado (simulador). La identificación es nativa
+(`shg.spectrum`); no llama a JSol'Ex ni a ningún servicio externo.
+
+- **Qué hace**: detecta depresiones de absorción en la banda espectral y las
+  empareja con un catálogo integrado, nombrando las líneas y ordenándolas por su
+  fila en el fotograma. Corre unas dos veces por segundo mientras el panel está
+  encendido.
+- **Las dos entradas**: en **Ajustes → Espectro**, la **línea objetivo** es la
+  longitud de onda a la que está sintonizada la rejilla (H-alpha en 6562,81 Å por
+  defecto) y la **dispersión** es cuántos ángstroms cubre un píxel. La línea
+  objetivo ancla la correspondencia píxel a longitud de onda; la dispersión
+  convierte una distancia en píxeles en longitud de onda. Una dispersión de 0
+  apaga la identificación.
+- **Por qué importan las dos**: una línea objetivo equivocada desplaza todos los
+  nombres con ella; una dispersión equivocada estira o comprime el patrón. Son
+  entradas, no medidas, así que el panel no puede adivinarlas.
+- **Qué muestra el panel**: el ancla (nombre, longitud de onda y fila), una cifra
+  de confianza y una tabla de líneas con su profundidad, su residuo frente a la
+  longitud de onda en reposo del catálogo y su tipo, solar o telúrica. Los
+  nombres se ordenan por fila.
+- **Confianza**: una puntuación F1 sobre las líneas fuertes del catálogo y las
+  depresiones detectadas. Dice cuánto sostiene el patrón los nombres, no cuánto
+  de exacta es una longitud de onda. Por debajo del mínimo configurado no se
+  muestran nombres.
+- **Las líneas telúricas** vienen de la atmósfera terrestre, no del Sol. El panel
+  las etiqueta para que no se lean como rasgos solares.
+- **Límite honesto**: esto es una coincidencia de patrón, no una calibración de
+  longitud de onda. Ayuda a identificar las líneas; no sustituye a una
+  calibración del espectrógrafo.
+- **Cuando no identifica**: no hay espectro en pantalla, no hay píxeles en la
+  banda, no hay línea de absorción, no hay coincidencia con el catálogo, falta la
+  línea objetivo o la dispersión es cero. Cada mensaje nombra el paso o el ajuste
+  que hay que revisar.
+
+### 5.11 Panel de salud y contadores de rendimiento
 
 **Estado**: Conectado (simulador). Los contadores salen del motor de captura
 real; con el simulador demuestran el cableado, no la tasa sostenida.
@@ -505,7 +593,7 @@ rendimiento, no un contador en vivo del panel.
 cámara real puede demostrar 120 fps y 207 MB/s. El panel dice cuál de las dos
 cosas está mirando.
 
-### 5.11 Calendario del cielo, pestaña Sol
+### 5.12 Calendario del cielo, pestaña Sol
 
 **Estado**: Disponible. Las cifras se calculan localmente a partir de la posición
 del observatorio; la imagen SDO opcional necesita red.
@@ -531,24 +619,42 @@ solares:
 locales, y la visualización recurre al disco esquemático. Si falta el módulo de
 efemérides, las cifras se ocultan en vez de inventarse.
 
-### 5.12 Perfiles, ajustes e idioma
+### 5.13 Perfiles con nombre, ajustes e idioma
 
-**Estado**: Conectado (simulador). El perfil lo lee y lo escribe el almacén de
-configuración; el diálogo de ajustes edita el mismo esquema.
+**Estado**: Conectado (simulador). `profiles.json` lo lee y lo escribe el almacén
+de configuración; la barra de perfiles y el gestor usan la misma API.
 
-- **Un solo perfil**, no una lista de perfiles que compiten: datos del telescopio
-  (focal, apertura, longitud de rendija), datos de la cámara (modelo, tamaño de
-  píxel, binning) y presets de ROI por cámara y óptica.
-- **Presets de ROI** restaurados al abrir la cámara y reescritos al aplicar un
-  ROI, para que la siguiente sesión empiece con la misma franja. Un preset que no
-  cabe en el sensor se ajusta y se avisa.
-- **Ajustes INI** heredados de `nightscribe-scan`, más las claves nuevas de ROI,
-  tilt, montura, límites de captura y sesión. Cada clave tiene un valor por
+- **Barra de perfiles**: la barra superior muestra el **perfil activo**.
+  **Guardar como…** guarda la óptica, la cámara y los presets de ROI actuales con
+  un nombre nuevo; **Gestionar…** abre el gestor. El perfil activo se carga al
+  arrancar.
+- **Qué guarda un perfil**: datos del telescopio (focal, apertura, longitud de
+  rendija), datos de la cámara (modelo, tamaño de píxel, binning) y presets de
+  ROI por cámara y óptica, para una configuración de instrumento. La posición del
+  observatorio es aparte: vive en Ajustes y en el asistente de bienvenida.
+- **Cambiar de perfil** recarga la óptica y los presets de ROI y mantiene la
+  cámara conectada. No mueve el telescopio ni reinicia la cámara; aplica un preset
+  de ROI si cambió la franja.
+- **Gestor**: lista los perfiles, marca el activo, crea uno nuevo desde la
+  configuración actual, renombra, borra y usa uno. El último perfil no se puede
+  borrar, y borrar pregunta antes porque se pierden la óptica y los presets de ROI
+  de ese perfil.
+- **Un solo fichero**: `profiles.json` en la carpeta de configuración guarda todos
+  los nombres y el activo; cada bloque es un perfil v2 completo. El antiguo
+  `profile.json` se lee como perfil `default`, y un `nightscribe-profiles.json` v1
+  se migra. Un nombre activo editado a mano que no existe deja la aplicación sin
+  perfil activo en vez de elegir otro en silencio.
+- **Un solo usuario**: dos instancias de la aplicación escribiendo a la vez pueden
+  pisarse, como en el prototipo.
+- **Presets de ROI** dentro del perfil: se restauran al abrir la cámara y se
+  reescriben al aplicar un ROI. Un preset que no cabe en el sensor se ajusta y se
+  avisa.
+- **Ajustes INI** heredados de `nightscribe-scan`, más las claves de ROI, tilt,
+  montura, límites de captura, sesión y espectro. Cada clave tiene un valor por
   defecto y una explicación, así que un fichero editado a mano nunca impide
   arrancar.
-- **Editable a mano**: el fichero es texto plano. Un valor que no se puede
-  interpretar vuelve a su defecto, y el diálogo de ajustes explica qué controla
-  cada clave.
+- **Ajustes → Espectro** guarda la línea objetivo y la dispersión que usa el
+  panel de líneas espectrales (ver §5.10).
 - **Idioma**: el del sistema por defecto, con español e inglés disponibles.
   Cambiarlo pide reiniciar la aplicación para que recargue sus catálogos.
 
@@ -558,7 +664,7 @@ tiempo de ejecución. Una sesión en español los muestra en español; si falta 
 traducción, el diálogo recurre al texto de desarrollo en vez de mostrar un
 tooltip vacío.
 
-### 5.13 Modo seco y simuladores
+### 5.14 Modo seco y simuladores
 
 **Estado**: Disponible. `--dry-run` comprueba la geometría sin abrir la cámara ni
 mover la montura; el simulador de la interfaz ejecuta los motores reales contra un
@@ -586,39 +692,24 @@ hardware real puede demostrar la tasa, el ruido y el caudal de disco.
 Los simuladores son también lo que hace posibles las pruebas automáticas, y por eso
 forman parte del diseño del producto y no son un añadido.
 
-### 5.14 Ayuda al enfoque
+### 5.15 Diagnóstico de dispositivos y backends de montura
 
-**Estado**: el diálogo está en la interfaz; la rutina completa y sus pruebas
-están previstas (fase 2).
-
-Los indicadores de enfoque siguen la rutina del SHG-700:
-
-1. **Espectrógrafo**: maximizar el contraste y el gradiente de las líneas de
-   absorción. H-alpha es la línea principal.
-2. **Colimador**: maximizar la nitidez del borde de la rendija y minimizar su
-   planitud.
-3. **Telescopio**: maximizar el contraste, el gradiente y el número de estructuras
-   de la superficie.
-
-Los indicadores se calculan en los dos ejes, así que la orientación de la cámara
-no importa. El diseño reserva la rutina completa para la fase 2; el diálogo de la
-interfaz actual muestra el nivel medio y el contraste del fotograma en vivo, que
-son los dos indicadores que más importan.
-
-### 5.15 Diagnóstico de dispositivos y backends de montura adicionales
-
-**Estado**: el modo `--diagnostics` está disponible en esta compilación; los
-backends de montura adicionales están previstos (fase 3).
+**Estado**: el modo `--diagnostics` y el backend de montura INDIGO están
+disponibles en esta compilación; el respaldo directo por serie está previsto
+(fase 3).
 
 - Un modo de **diagnóstico de dispositivos** informa de qué SDK y backends se
   encontraron, qué declara cada cámara y qué acepta la montura. Se ejecuta con
   `python -m solarscribe --diagnostics` e imprime las rutas, la óptica, los
   presets de ROI y el estado de la capa de dispositivos.
-- Backends de montura adicionales: respaldo directo por serie (LX200, OnStep) e
-  INDIGO.
-
-Los backends adicionales no hacen falta para barrer con el equipo de referencia,
-y por eso llegan después del MVP.
+- **Backends de montura**: ASCOM COM en Windows, INDI en Linux, INDIGO en los
+  dos, y el simulador de montura. INDIGO habla JSON sobre TCP con
+  `indigo_server`; elige una de las clases de tasa de la montura en vez de unos
+  arcosegundos/s arbitrarios, así que la calibración del barrido mide la tasa que
+  recibe de verdad.
+- Un **respaldo por serie** directo (LX200, OnStep) está previsto (fase 3). No
+  hace falta para barrer con el equipo de referencia, y por eso llega después del
+  MVP.
 
 ---
 
@@ -664,7 +755,7 @@ sustituye por el suyo, y las herramientas de post-proceso.
 | 5 | Comprobaciones de consistencia entre barridos | Conectado (simulador) |
 | 6 | `scan_log.csv`, `scan_stats.jsonl`, `session_meta.json` | Conectado (simulador) |
 | 7 | Panel de control con perfiles y configuración | Disponible en el simulador, como sesión PySide6 |
-| 8 | Ayuda al enfoque | Diálogo presente; rutina completa prevista (fase 2) |
+| 8 | Enfoque: tres enfoques y el tilt rendija-Dec | Conectado (simulador) |
 | 9 | Barrido simple y mosaico multífila con centrado en Dec por cuerdas | Conectado (simulador) |
 | 10 | Bucle de autoexposición | Conectado (simulador) |
 | 11 | Centrado en Dec: bucle izquierda/derecha y cuerda | Conectado (simulador) |
@@ -712,8 +803,9 @@ Este es el mapa.
 | El Sol se sale de la rendija a mitad del barrido | Error de seguimiento o un golpe | Pausa, avisa y espera | Recentra con el panel de telescopio y continúa |
 | La aplicación arranca sin cámara ni montura | Falta un SDK o el backend de la plataforma | Dice qué falta y sigue funcionando | Instala el SDK o el backend; usa el simulador para explorar |
 
-**Estado**: los comportamientos están previstos; el texto de la interfaz se
-escribirá con el código y se traducirá con el resto de las cadenas.
+**Estado**: los comportamientos están conectados en el simulador y el texto es
+el de la interfaz; la columna de hardware todavía hay que demostrarla en
+dispositivos reales.
 
 ---
 
@@ -721,21 +813,22 @@ escribirá con el código y se traducirá con el resto de las cadenas.
 
 **Estado**: Conectado (simulador). El motor de barrido escribe los tres registros
 y el SER en una captura real; el simulador no graba SER, así que su carpeta de
-sesión contiene el estado, los registros y el resumen, pero ningún fichero SER.
+datos contiene el estado, los registros y el resumen, pero ningún fichero SER.
 Los formatos se heredan de `nightscribe-scan`; las columnas nuevas se añaden,
 nunca sustituyen a las antiguas.
 
-### 9.1 La carpeta de sesión
+### 9.1 La carpeta de datos
 
-Una carpeta por sesión, nombrada con su fecha y hora, dentro de una carpeta base
-configurable. Los ficheros se llaman:
+La aplicación la llama **carpeta de datos**; el diseño y los registros la llaman
+carpeta de sesión. Hay una carpeta por tanda, nombrada con su fecha y hora, dentro
+de una carpeta base configurable. Los ficheros se llaman:
 
 ```
 sun_AAAAMMDD_HHMM_scanNN.ser    un fichero por barrido o por fila del mosaico
 scan_log.csv                    una fila por barrido, reescrita tras cada barrido
 scan_stats.jsonl                una muestra JSON por barrido
 session_meta.json               la configuración efectiva y la geometría
-session_state.json              la memoria de la aplicación sobre los cuatro pasos
+session_state.json              la memoria de la aplicación sobre los cinco pasos
 ```
 
 La ortografía de arriba es la que fija el contrato de configuración. La ubicación
@@ -977,6 +1070,39 @@ Las cifras de la interfaz se traducen como frases, nunca como códigos desnudos:
 el motor informa de un código de motivo estable y la interfaz lo convierte en una
 frase con sus números.
 
+### 10.11 Cómo se nombran las líneas espectrales
+
+El panel es nativo: lee la banda en vivo, no un fichero SER, y no llama a JSol'Ex
+ni a ningún servicio externo. Los pasos son:
+
+1. **Colapsar el eje de la rendija.** El eje de la rendija es X (ancho del
+   fotograma) y el de dispersión es Y (alto). Promediar en X conserva las líneas
+   de absorción, que corren a lo largo de X, y elimina el detalle de superficie.
+2. **Encontrar el continuo local.** Un cuartil superior móvil sobre una ventana
+   varias veces más ancha que una línea: una depresión estrecha no se adueña del
+   cuartil, así que el blaze y el gradiente de iluminación se cancelan sin que la
+   línea se convierta en su propio continuo. Una depresión es un mínimo local por
+   debajo de una fracción de ese continuo.
+3. **Anclar la correspondencia.**
+   `longitud(px) = ancla + (px - px_ancla) * dispersión * signo`. El ancla es la
+   línea objetivo configurada; `signo` es negativo cuando la dirección de
+   dispersión está volteada. Sin un píxel de ancla medido, el MVP asume que la
+   depresión más fuerte es la línea objetivo. Eso es una suposición, no una
+   medida, y el panel lo dice cuando la confianza es baja.
+4. **Emparejar y puntuar.** Las depresiones detectadas se comparan con las líneas
+   fuertes del catálogo dentro de la ventana. El emparejamiento se refina
+   desplazando el ancla unos píxeles, y la confianza es una puntuación F1 sobre
+   líneas del catálogo encontradas y depresiones detectadas con nombre. Un empate
+   conserva el desplazamiento menor, para que el ancla no vague cuando el
+   emparejamiento es simétrico.
+5. **Etiquetar el tipo.** El catálogo marca líneas solares y telúricas; una línea
+   telúrica viene de la atmósfera terrestre, no del Sol.
+
+El resultado es una **coincidencia de patrón**, no una calibración de longitud de
+onda. La línea objetivo y la dispersión son entradas porque el panel no puede
+medirlas con un solo fotograma; una objetivo equivocada desplaza todos los
+nombres, y una dispersión equivocada estira o comprime el patrón.
+
 ---
 
 ## 11. Límites y honestidad
@@ -992,6 +1118,17 @@ Estos son los límites que conviene conocer antes de fiarse de una toma:
   altitud, y el asistente lo dice en vez de inventar precisión.
 - **El tilt se mide, no se corrige.** Los fotogramas crudos siguen crudos; el
   post-proceso aplica la corrección.
+- **Las cifras de enfoque son relativas.** Contraste, nitidez y recuento de
+  detalle comparan posiciones de enfoque; el mejor valor retenido es la
+  referencia, no una nota absoluta de calidad. El simulador no tiene línea de
+  rendija inclinada, así que el tilt lee unos 0,0° allí.
+- **Los nombres de líneas son una coincidencia de patrón.** El panel de líneas
+  espectrales identifica depresiones contra un catálogo; no es una calibración de
+  longitud de onda. Una línea objetivo equivocada desplaza todos los nombres, y
+  una dispersión equivocada estira o comprime el patrón.
+- **Los perfiles con nombre son de un solo usuario.** Cada guardado es atómico,
+  pero dos instancias de la aplicación escribiendo a la vez pueden pisarse, como
+  en el prototipo.
 - **El recon rápido no es el resultado.** Responde a "¿salió la toma?", no a "¿cómo
   está el Sol?".
 - **SolarScribe no hace post-proceso.** El recon, el apilado y el mosaico siguen
@@ -1014,6 +1151,8 @@ Estos son los límites que conviene conocer antes de fiarse de una toma:
 - [Índice de ADRs](../../design/adr/README.md). Las decisiones más visibles aquí:
   ADR-006 (centrado), ADR-007 (alineación polar), ADR-010 (ROI), ADR-011 (pasos de
   sesión), ADR-013 (rendimiento), ADR-018 (contrato con el post-proceso), ADR-019
-  (montura), ADR-020 (resultado), ADR-021 (red), ADR-022 (tilt).
+  (montura), ADR-020 (resultado), ADR-021 (red), ADR-022 (tilt), ADR-026
+  (interfaz imagen primero), ADR-027 (perfiles con nombre), ADR-028 (raíl de
+  cinco pasos).
 - Guía de usuario y herramientas de `nightscribe-scan`, el prototipo al que esta
   aplicación sustituye en la captura.

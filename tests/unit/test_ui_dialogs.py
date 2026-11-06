@@ -12,9 +12,8 @@
 ############################################################
 
 # The dialogs carry the explanations: the settings tooltips are the schema's
-# "why", the logs are the diagnosis, the sky calendar refuses to guess and the
-# focus aid admits what it cannot measure. These tests read the words, not the
-# pixels.
+# "why", the logs are the diagnosis and the sky calendar refuses to guess. These
+# tests read the words, not the pixels.
 
 import os
 
@@ -28,7 +27,6 @@ from PySide6.QtWidgets import (  # noqa: E402
 
 from solarscribe.config import store  # noqa: E402
 from solarscribe.config.schema import SCHEMA, RoiPreset  # noqa: E402
-from solarscribe.ui.focus_aid import FocusAidDialog  # noqa: E402
 from solarscribe.ui.logs_viewer import LogsViewer  # noqa: E402
 from solarscribe.ui.roi_manager import RoiManagerDialog  # noqa: E402
 from solarscribe.ui.settings_dialog import SettingsDialog  # noqa: E402
@@ -140,15 +138,6 @@ def test_roi_manager_lists_presets_and_returns_the_chosen_one(qapp):
     dialog._use_current()
     assert seen and seen[0].name == "wide"
     assert dialog.result() == dialog.DialogCode.Accepted
-
-
-def test_focus_aid_shows_percentages_of_the_range(qapp):
-    dialog = FocusAidDialog()
-    dialog.set_stats(0.25, 0.042)
-    mean, std = dialog.texts()
-    assert "25.0%" in mean
-    assert "4.20%" in std
-    assert "full range" in mean
 
 
 def test_welcome_banner_emits_the_location(qapp):

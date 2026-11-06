@@ -11,7 +11,7 @@
 #
 ############################################################
 
-# ADR-011 is a promise, not a layout: four steps, free navigation, silent
+# ADR-011 is a promise, not a layout: five steps, free navigation, silent
 # autosave and "reopen step". These tests pin the promise at the Session and at
 # the rail. The rail is where a newcomer decides whether the app is a wizard
 # that blocks or a guide that does not, so the click on a pending step is a
@@ -46,7 +46,7 @@ def session(tmp_path):
                    profile_path=tmp_path / "profile.json")
 
 
-def test_four_steps_start_pending_and_recommend_the_first(session):
+def test_all_steps_start_pending_and_recommend_the_first(session):
     assert tuple(session.state.steps) == SESSION_STEPS
     assert all(session.status_of(step) is StepStatus.PENDING
                for step in SESSION_STEPS)
@@ -103,11 +103,13 @@ def test_autosave_can_be_turned_off(tmp_path):
     assert not (tmp_path / "session" / "session_state.json").exists()
 
 
-def test_recommendation_walks_the_four_steps(session):
+def test_recommendation_walks_all_five_steps(session):
     assert session.recommended_step() == "find_sun"
     session.complete_step("find_sun")
     assert session.recommended_step() == "polar"
     session.complete_step("polar")
+    assert session.recommended_step() == "focus"
+    session.complete_step("focus")
     assert session.recommended_step() == "roi"
     session.complete_step("roi")
     assert session.recommended_step() == "scan"
@@ -115,14 +117,17 @@ def test_recommendation_walks_the_four_steps(session):
     assert session.recommended_step() == "scan"
 
 
-def test_rail_shows_four_chips_with_words_not_only_colours(qapp, session):
+def test_rail_shows_five_chips_with_words_not_only_colours(qapp, session):
     rail = StepRail()
     rail.set_state(session.state, "find_sun")
     assert rail.steps() == SESSION_STEPS
     first = rail.button("find_sun")
     assert "1." in first.text()
-    assert "Find the Sun" in first.text()
+    assert "Find Sun" in first.text()
     assert "Pending" in first.text()
+    # ADR-026: one line, 28 px, not the old two-line 64 px rail.
+    assert "\n" not in first.text()
+    assert first.maximumHeight() <= 28
     # A pending step must be clickable: that is the whole point of ADR-011.
     assert first.isEnabled()
 

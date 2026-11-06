@@ -41,6 +41,7 @@ BuildArch:      noarch
 %endif
 BuildRequires:  python3-devel
 Recommends:     indi
+Recommends:     python3dist(pyserial)
 Recommends:     fxload
 
 %description

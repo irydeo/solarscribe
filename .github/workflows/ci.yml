@@ -113,6 +113,7 @@ jobs:
       - name: Smoke test the source package
         run: |
           python installer/smoke_test.py --module --gui
+          python -m solarscribe gui --self-test
           python -m compileall -q installer
 
       - name: Validate the packaging metadata
@@ -148,6 +149,7 @@ jobs:
       - name: Smoke test the source package
         run: |
           python installer/smoke_test.py --module --gui
+          python -m solarscribe gui --self-test
           python -m compileall -q installer
 
   linux-package:
@@ -185,7 +187,9 @@ jobs:
         run: python -m PyInstaller installer/solarscribe.spec --clean --noconfirm
 
       - name: Smoke test the frozen binary
-        run: python installer/smoke_test.py --frozen dist/solarscribe/solarscribe
+        run: |
+          python installer/smoke_test.py --frozen dist/solarscribe/solarscribe
+          dist/solarscribe/solarscribe gui --self-test
 
       - name: Build the .deb
         run: |
@@ -292,6 +296,7 @@ jobs:
       - name: Start it
         run: |
           /usr/bin/solarscribe --version
+          /usr/bin/solarscribe gui --self-test
           python3 installer/smoke_test.py --module --gui || \
             (echo "the installed package did not start"; exit 1)
         env:
@@ -315,6 +320,7 @@ jobs:
         run: |
           dnf install -y ./dist/*.rpm
           solarscribe --version
+          solarscribe gui --self-test
 
   windows-package:
     name: Build Windows installer
@@ -343,7 +349,10 @@ jobs:
         run: python -m PyInstaller installer/solarscribe.spec --clean --noconfirm
 
       - name: Smoke test the frozen binary
-        run: python installer/smoke_test.py --frozen dist\solarscribe\solarscribe.exe
+        run: |
+          python installer/smoke_test.py --frozen dist\solarscribe\solarscribe.exe
+          & dist\solarscribe\solarscribe.exe gui --self-test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress

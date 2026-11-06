@@ -22,7 +22,7 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication  # noqa: E402
+from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
 from solarscribe.devices.abc import (  # noqa: E402
     Axis, DeviceError, MountCaps, MountStatus,
@@ -120,14 +120,16 @@ def test_connect_and_disconnect_say_what_happened(qapp):
     assert not mount.connected
 
 
-def test_position_is_formatted_with_units(qapp):
+def test_position_is_not_a_readout_anymore(qapp):
+    # ADR-026: the Sun is the only target. The panel no longer shows RA/Dec,
+    # the coordinate GOTO fields or Sync; what is left is the essentials.
     mount = FakeMount()
     panel = TelescopePanel(mount=mount)
     panel.refresh()
-    assert "12.34560" in panel.ra_value.text()
-    assert "h" in panel.ra_value.text()
-    assert "-10.5000" in panel.dec_value.text()
-    assert "deg" in panel.dec_value.text()
+    for name in ("raValue", "decValue", "gotoRaSpin", "gotoDecSpin",
+                 "gotoButton", "syncButton", "abortButton", "positionBox",
+                 "gotoBox"):
+        assert panel.findChild(QWidget, name) is None, name
 
 
 def test_goto_sun_uses_the_provider(qapp):
@@ -148,19 +150,6 @@ def test_goto_sun_explains_a_missing_ephemeris(qapp):
     assert mount.slews == []
 
 
-def test_goto_coordinates_and_sync(qapp):
-    mount = FakeMount()
-    panel = TelescopePanel(mount=mount)
-    panel.refresh()
-    panel.goto_ra.setValue(5.5)
-    panel.goto_dec.setValue(20.0)
-    panel.goto_clicked()
-    assert mount.slews[-1] == (5.5, 20.0)
-    panel.sync_clicked()
-    assert mount.syncs[-1] == (5.5, 20.0)
-    assert "Synced" in panel.message()
-
-
 def test_move_buttons_use_the_selected_rate_and_stop(qapp):
     mount = FakeMount()
     panel = TelescopePanel(mount=mount)
@@ -179,7 +168,7 @@ def test_move_buttons_use_the_selected_rate_and_stop(qapp):
     assert "Stopped" in panel.message()
 
 
-def test_tracking_park_and_abort(qapp):
+def test_tracking_and_park(qapp):
     mount = FakeMount()
     panel = TelescopePanel(mount=mount)
     panel.refresh()
@@ -190,8 +179,7 @@ def test_tracking_park_and_abort(qapp):
     assert panel.park_button.text() == "Unpark"
     panel.park_clicked()
     assert not mount.parked
-    panel.abort_clicked()
-    assert mount.aborts == 1
+    assert panel.park_button.text() == "Park"
 
 
 def test_a_mount_error_is_a_sentence_not_a_code(qapp):
@@ -211,8 +199,9 @@ def test_unsupported_controls_are_disabled(qapp):
     panel = TelescopePanel(mount=mount)
     panel.refresh()
     assert not panel.north_button.isEnabled()
-    assert not panel.goto_button.isEnabled()
     assert not panel.goto_sun_button.isEnabled()
+    assert not panel.track_check.isEnabled()
+    assert not panel.park_button.isEnabled()
 
 
 def test_moves_without_a_connection_explain_themselves(qapp):

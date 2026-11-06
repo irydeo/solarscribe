@@ -28,8 +28,10 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+from PySide6.QtCore import QPoint, Qt  # noqa: E402
+from PySide6.QtTest import QTest  # noqa: E402
 from PySide6.QtWidgets import (  # noqa: E402
-    QApplication, QLabel, QPushButton, QSpinBox,
+    QApplication, QLabel, QPushButton, QSpinBox, QToolButton, QWidget,
 )
 
 from solarscribe.config import store  # noqa: E402
@@ -43,6 +45,7 @@ BUDGETS = {
     "free_navigation": 5.0,
     "find_sun": 30.0,
     "polar": 30.0,
+    "focus": 30.0,
     "roi": 25.0,
     "reopen": 10.0,
     "scan": 90.0,
@@ -152,6 +155,31 @@ def test_a_newcomer_can_finish_a_session_on_the_simulator(qapp, tmp_path):
         assert "arcmin" in window.findChild(QLabel, "polarAzValue").text()
         timings["polar"] = time.monotonic() - start
 
+        # --- focus: three focusers and the slit tilt ------------------------
+        start = time.monotonic()
+        window.rail.button("focus").click()
+        # The three focusers are live from the capture frames; the labels carry
+        # the current value and the running best.
+        assert _wait_for(
+            lambda: "best" in window.findChild(
+                QLabel, "lineContrastValue").text(), timeout=8.0), \
+            "the focus metrics never received a frame"
+        for name in ("lineContrastValue", "lineGradientValue",
+                     "edgeSharpValue", "edgeFlatValue", "detailContrastValue",
+                     "detailGradientValue", "detailCountValue"):
+            text = window.findChild(QLabel, name).text()
+            assert "Not measured" not in text, f"{name} stayed empty"
+            assert "best" in text, f"{name} has no best figure"
+        window.findChild(QPushButton, "focusMeasureButton").click()
+        assert _wait_for(
+            lambda: session.status_of("focus").value == "done", timeout=8.0), \
+            "the slit tilt never reached the Dec axis"
+        tilt_text = window.findChild(QLabel, "focusTiltValue").text()
+        assert "deg" in tilt_text and "px drift" in tilt_text
+        assert "ROI must be at least" in window.findChild(
+            QLabel, "focusTiltHeight").text()
+        timings["focus"] = time.monotonic() - start
+
         # --- ROI -------------------------------------------------------------
         start = time.monotonic()
         window.rail.button("roi").click()
@@ -173,6 +201,11 @@ def test_a_newcomer_can_finish_a_session_on_the_simulator(qapp, tmp_path):
             QLabel, "scanStatusValue").text(), timeout=8.0), \
             "the preparation never reported ready"
         window.findChild(QPushButton, "scanPrimaryButton").click()
+        # While a scan runs the progress strip is open and cannot be folded
+        # away; the histogram stays visible too.
+        assert window.findChild(QWidget, "scanBody").isVisible()
+        assert not window.findChild(QToolButton, "scanStripToggle").isEnabled()
+        assert window.findChild(QWidget, "histogramBody").isVisible()
         assert _wait_for(
             lambda: session.status_of("scan").value == "done", timeout=90.0), \
             "the scan never finished"
@@ -185,9 +218,9 @@ def test_a_newcomer_can_finish_a_session_on_the_simulator(qapp, tmp_path):
         timings["scan"] = time.monotonic() - start
 
         # --- the friction checks that matter ---------------------------------
-        for step in ("find_sun", "polar", "roi", "scan"):
+        for step in ("find_sun", "polar", "focus", "roi", "scan"):
             assert session.status_of(step).value == "done"
-        assert "All four steps are done" in window.findChild(
+        assert "All five steps are done" in window.findChild(
             QLabel, "recommendationLabel").text()
 
         # Every figure on the status bar says what it means.
@@ -235,3 +268,83 @@ def test_a_newcomer_can_finish_a_session_on_the_simulator(qapp, tmp_path):
             f"{name} took {seconds:.1f} s, above the {BUDGETS[name]:.1f} s "
             f"budget: a newcomer is fighting the interface")
     print(f"  total            {sum(timings.values()):6.2f}")
+
+
+def test_the_image_owns_the_window_and_the_panels_fold(qapp, tmp_path):
+    # ADR-026: the image is the point. A newcomer must find more than half of
+    # the window given to the video, a slim rail, and a telescope panel that
+    # folds away and comes back from Tools, Panels.
+    start = time.monotonic()
+    settings = store.default_settings()
+    session = Session(settings=settings, folder=tmp_path / "session", demo=True,
+                      autosave=True, settings_path=tmp_path / "config.ini",
+                      profile_path=tmp_path / "profile.json")
+    window = MainWindow(session, show_welcome=False)
+    window.resize(1280, 820)
+    window.show()
+    qapp.processEvents()
+    try:
+        assert not hasattr(window, "magnifier")
+        assert window.viewer.height() > window.height() * 0.5
+        assert window.rail.button("find_sun").maximumHeight() <= 28
+        assert window.findChild(QWidget, "sidePanel").maximumWidth() <= 320
+        assert window.telescope_dock.maximumWidth() == 210
+        assert window.findChild(QWidget, "histogramBody").isVisible()
+        assert not window.findChild(QWidget, "scanBody").isVisible()
+        action = window._action("actionTelescopePanel")
+        assert action.isChecked()
+        action.setChecked(False)
+        assert not window.findChild(QWidget, "telescopeDock").isVisible()
+        action.setChecked(True)
+        assert window.findChild(QWidget, "telescopeDock").isVisible()
+        # The visible session ceremony is gone; the data folder is still there.
+        assert window._action("actionNewSession") is None
+        assert window._action("actionOpenSession") is None
+        assert window._action("actionOpenSessionFolder") is not None
+        assert time.monotonic() - start <= 10.0
+    finally:
+        window.close()
+
+
+def test_the_histogram_is_a_foldable_strip_over_the_band(qapp, tmp_path):
+    # The UFE-style histogram: open by default, compact, computed on the
+    # spectral band, and the handles move the stretch with a click.
+    start = time.monotonic()
+    settings = store.default_settings()
+    session = Session(settings=settings, folder=tmp_path / "session", demo=True,
+                      autosave=True, settings_path=tmp_path / "config.ini",
+                      profile_path=tmp_path / "profile.json")
+    window = MainWindow(session, show_welcome=False)
+    window.resize(1280, 820)
+    window.show()
+    window.start_capture()
+    try:
+        toggle = window.findChild(QToolButton, "histogramToggle")
+        assert toggle is not None
+        assert window.findChild(QWidget, "histogramBody").isVisible()
+        toggle.setChecked(False)
+        qapp.processEvents()
+        assert not window.findChild(QWidget, "histogramBody").isVisible()
+        toggle.setChecked(True)
+        qapp.processEvents()
+        assert window.findChild(QWidget, "histogramBody").isVisible()
+        assert _wait_for(lambda: window.histogram.peaks() > 0, timeout=10.0), \
+            "the histogram never received a band frame"
+        band = session.roi.band
+        assert window.histogram.frame_size() == (band[2], band[3])
+        before = window.histogram.stretch()
+        # A click near the right edge grabs the white handle.
+        point = QPoint(max(2, window.histogram.width() - 8),
+                       max(2, window.histogram.height() // 2))
+        QTest.mouseClick(window.histogram, Qt.MouseButton.LeftButton, pos=point)
+        qapp.processEvents()
+        after = window.histogram.stretch()
+        assert after[1] > before[1], "the white handle did not move"
+        assert after[0] < after[1], "the handles crossed"
+        # The saturation sentence is present, with its meaning in the tooltip.
+        saturation = window.findChild(QLabel, "histogramSaturation")
+        assert saturation.text()
+        assert saturation.toolTip()
+        assert time.monotonic() - start <= 20.0
+    finally:
+        window.close()

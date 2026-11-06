@@ -125,3 +125,41 @@ def test_histogram_counts_the_frame(qapp):
     assert histogram.peaks() > 0
     histogram.set_stretch(5.0, 95.0)
     assert histogram.counts.sum() > 0
+
+
+def test_histogram_click_moves_the_nearest_handle(qapp):
+    histogram = HistogramWidget()
+    histogram.resize(400, 120)
+    histogram.show()
+    histogram.set_frame(FakeFrame())
+    histogram.set_stretch(5.0, 95.0)
+    seen = []
+    histogram.stretchChanged.connect(lambda low, high: seen.append((low, high)))
+    # A click near the left edge must grab the black handle, not the white one.
+    QTest.mouseClick(histogram, Qt.MouseButton.LeftButton, pos=QPoint(6, 50))
+    assert seen, "the handle click emitted nothing"
+    assert seen[-1][0] < 5.0
+    assert seen[-1][1] == pytest.approx(95.0)
+    # A click near the right edge grabs the white handle.
+    QTest.mouseClick(histogram, Qt.MouseButton.LeftButton, pos=QPoint(390, 50))
+    assert seen[-1][1] > 95.0
+    # The white handle never crosses the black one.
+    histogram.set_stretch(48.0, 52.0)
+    QTest.mouseClick(histogram, Qt.MouseButton.LeftButton, pos=QPoint(4, 50))
+    QTest.mouseClick(histogram, Qt.MouseButton.LeftButton, pos=QPoint(396, 50))
+    low, high = histogram.stretch()
+    assert low < high
+
+
+def test_histogram_reports_saturation(qapp):
+    class SaturatedFrame(FakeFrame):
+        def __init__(self):
+            super().__init__()
+            self._array[100:200, :] = 65535
+            self.data = memoryview(self._array)
+
+    histogram = HistogramWidget()
+    histogram.set_frame(SaturatedFrame())
+    assert histogram.saturation_fraction() > 0.1
+    histogram.set_frame(FakeFrame())
+    assert histogram.saturation_fraction() == pytest.approx(0.0)

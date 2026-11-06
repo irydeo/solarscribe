@@ -11,7 +11,7 @@
 #
 ############################################################
 
-# The four-step rail of the session (ADR-011).
+# The four-step rail of the session (ADR-011, ADR-026).
 #
 # It is a custom widget and lives in code instead of a .ui because its content
 # is a function of SessionState: four chips, each with a live status. What the
@@ -19,9 +19,10 @@
 # A chip that is pending is not disabled; clicking it enters the step and the
 # status changes to "in progress". The rail guides, it never blocks.
 #
-# Each chip carries the step's plain-language name and its status spelled out
-# ("Pending", "In progress", "Done", "Skipped"): a colour alone would leave the
-# colour-blind user (and the screenshot reader) without the information.
+# ADR-026 slimmed it from a 64 px, two-line rail to one 28 px line: the image is
+# the point, the rail is an indicator. The status is still spelled out in words
+# ("Pending", "In progress", "Done", "Skipped") on the same line, because a
+# colour alone would leave the colour-blind user without the information.
 
 from __future__ import annotations
 
@@ -39,12 +40,14 @@ from solarscribe.config.schema import SESSION_STEPS, SessionState, StepStatus
 __all__ = ["StepRail", "STEP_TITLES"]
 
 
-# The visible names of the four steps. They are plain language on purpose
-# (ADR-011): "Find the Sun", not "stage_1_goto". Kept here so the help text and
-# the tests have one spelling; the rail asks _title() for the translated one.
+# The full visible names of the five steps. They are plain language on purpose
+# (ADR-011): "Find the Sun", not "stage_1_goto". Kept here for the page titles
+# and the docs; the rail uses a shorter label (Find Sun, Polar, Scan) so five
+# chips fit on a 13 inch laptop without clipping (ADR-026).
 STEP_TITLES = {
     "find_sun": "Find the Sun",
     "polar": "Polar alignment",
+    "focus": "Focus",
     "roi": "ROI",
     "scan": "Scanning",
 }
@@ -64,15 +67,17 @@ class StepRail(QWidget):
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(4)
         for index, step in enumerate(SESSION_STEPS, start=1):
             button = QToolButton(self)
             button.setObjectName(f"step_{step}")
             button.setCheckable(True)
+            button.setProperty("rail", True)
             button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
             button.setSizePolicy(QSizePolicy.Policy.Expanding,
                                  QSizePolicy.Policy.Fixed)
-            button.setMinimumHeight(52)
+            button.setMinimumHeight(26)
+            button.setMaximumHeight(28)
             button.setText(f"{index}. {self._title(step)}")
             button.setToolTip(self.tr(
                 "Go to this step. Steps never block: you can come back at any "
@@ -100,7 +105,7 @@ class StepRail(QWidget):
             button.setProperty("stepStatus", status.value)
             self._refresh_style(button)
             title = self._title(step)
-            button.setText(f"{self._index(step)}. {title}\n{self._status_text(status)}")
+            button.setText(f"{self._index(step)}. {title} · {self._status_text(status)}")
             checked = step == current
             button.setChecked(checked)
 
@@ -108,13 +113,17 @@ class StepRail(QWidget):
     # @return: its translated name. Literals on purpose: lupdate cannot extract
     #          a string behind a dictionary lookup (ADR-016)
     def _title(self, step: str) -> str:
+        # The rail is an indicator, not the page title: short labels let the
+        # five chips and their status words fit at 1024 px (ADR-026).
         if step == "find_sun":
-            return self.tr("Find the Sun")
+            return self.tr("Find Sun")
         if step == "polar":
-            return self.tr("Polar alignment")
+            return self.tr("Polar")
+        if step == "focus":
+            return self.tr("Focus")
         if step == "roi":
             return self.tr("ROI")
-        return self.tr("Scanning")
+        return self.tr("Scan")
 
     # @args: current - the step now open. Marks the chip selected without
     #                 changing any status

@@ -11,9 +11,14 @@
 #
 ############################################################
 
-# The telescope panel of ADR-019, and the reason it is a first-class screen:
-# the scan is a movement of the mount, so the observer must be able to connect,
-# point, nudge, track, park and abort without leaving the app.
+# The telescope panel of ADR-019, slimmed by ADR-026: the essentials only.
+#
+# The scan is a movement of the mount, so the observer must be able to connect,
+# point, nudge, track and park without leaving the app. A solar observer never
+# types a GOTO coordinate: the Sun is the only target, and its position comes
+# from the ephemeris. The coordinate fields, sync and abort slew were removed
+# with their live RA/Dec readout; the mount contract still has them for the
+# engine and for a future advanced mode.
 #
 # Design decisions that matter for usability:
 #   - One obvious danger exit: "Stop" stops every axis at once. It is always
@@ -87,14 +92,6 @@ class TelescopePanel(QWidget):
         self.connect_button = self.findChild(QPushButton, "connectButton")
         self.mount_combo = self.findChild(QComboBox, "mountCombo")
         self.refresh_button = self.findChild(QPushButton, "mountRefreshButton")
-        self.ra_value = self.findChild(QLabel, "raValue")
-        self.dec_value = self.findChild(QLabel, "decValue")
-        self.tracking_value = self.findChild(QLabel, "trackingValue")
-        self.park_value = self.findChild(QLabel, "parkValue")
-        self.goto_ra = self.findChild(QWidget, "gotoRaSpin")
-        self.goto_dec = self.findChild(QWidget, "gotoDecSpin")
-        self.goto_button = self.findChild(QPushButton, "gotoButton")
-        self.sync_button = self.findChild(QPushButton, "syncButton")
         self.goto_sun_button = self.findChild(QPushButton, "gotoSunButton")
         self.north_button = self.findChild(QPushButton, "northButton")
         self.south_button = self.findChild(QPushButton, "southButton")
@@ -104,8 +101,18 @@ class TelescopePanel(QWidget):
         self.rate_combo = self.findChild(QComboBox, "rateCombo")
         self.track_check = self.findChild(QWidget, "trackCheck")
         self.park_button = self.findChild(QPushButton, "parkButton")
-        self.abort_button = self.findChild(QPushButton, "abortButton")
         self.message_label = self.findChild(QLabel, "telescopeMessage")
+        # The N/S/E/W pad is the only reason the panel needed 290 px. Narrow
+        # buttons keep the right band at ~230 px and give the image the rest
+        # (ADR-026); the letters are short and the tooltips carry the meaning.
+        for button in (self.north_button, self.south_button,
+                       self.east_button, self.west_button):
+            if button is not None:
+                button.setFixedWidth(38)
+        if self.stop_button is not None:
+            self.stop_button.setFixedWidth(56)
+        if self.rate_combo is not None:
+            self.rate_combo.setMinimumWidth(90)
 
     # @args: none. Fills the rate selector, with a word for each value
     def _populate_rates(self) -> None:
@@ -115,10 +122,12 @@ class TelescopePanel(QWidget):
         self.rate_combo.clear()
         # The labels are added with their true meaning: the solar motion is the
         # yardstick, so "Sidereal" is not jargon but a reference the user knows.
-        self.rate_combo.addItem(self.tr("Fine: 1 arcsec/s"), 1.0)
-        self.rate_combo.addItem(self.tr("Slow: 5 arcsec/s"), 5.0)
-        self.rate_combo.addItem(self.tr("Sidereal: 15 arcsec/s"), 15.0)
-        self.rate_combo.addItem(self.tr("Fast: 60 arcsec/s"), 60.0)
+        # The labels stay short enough for the 210 px right band; the tooltip
+        # and the "Moving at N arcsec/s" sentence carry the full unit.
+        self.rate_combo.addItem(self.tr("Fine 1″/s"), 1.0)
+        self.rate_combo.addItem(self.tr("Slow 5″/s"), 5.0)
+        self.rate_combo.addItem(self.tr("Sidereal 15″/s"), 15.0)
+        self.rate_combo.addItem(self.tr("Fast 60″/s"), 60.0)
         self.rate_combo.setCurrentIndex(1)
         self.rate_combo.blockSignals(False)
 
@@ -128,10 +137,6 @@ class TelescopePanel(QWidget):
             self.connect_button.clicked.connect(self.connect_clicked)
         if self.refresh_button is not None:
             self.refresh_button.clicked.connect(self.refresh_devices)
-        if self.goto_button is not None:
-            self.goto_button.clicked.connect(self.goto_clicked)
-        if self.sync_button is not None:
-            self.sync_button.clicked.connect(self.sync_clicked)
         if self.goto_sun_button is not None:
             self.goto_sun_button.clicked.connect(self.goto_sun_clicked)
         if self.north_button is not None:
@@ -156,8 +161,6 @@ class TelescopePanel(QWidget):
             self.track_check.toggled.connect(self.tracking_toggled)
         if self.park_button is not None:
             self.park_button.clicked.connect(self.park_clicked)
-        if self.abort_button is not None:
-            self.abort_button.clicked.connect(self.abort_clicked)
 
     # @args: mount - a Mount implementation; name - what to show in the combo
     def set_mount(self, mount: Mount | None, name: str = "") -> None:
@@ -201,8 +204,6 @@ class TelescopePanel(QWidget):
         if self._mount is None:
             self._set_state("warning")
             self._set_text(self.state_label, self.tr("No mount"))
-            self._set_text(self.ra_value, "--")
-            self._set_text(self.dec_value, "--")
             self._set_connected_ui(False)
             return
         try:
@@ -214,10 +215,6 @@ class TelescopePanel(QWidget):
         if not connected:
             self._set_state("warning")
             self._set_text(self.state_label, self.tr("Not connected"))
-            self._set_text(self.ra_value, "--")
-            self._set_text(self.dec_value, "--")
-            self._set_text(self.tracking_value, self.tr("Unknown"))
-            self._set_text(self.park_value, self.tr("Unknown"))
             return
 
         self._set_state("ok")
@@ -230,17 +227,14 @@ class TelescopePanel(QWidget):
                 self._fail(error)
                 return
         try:
-            ra, dec = self._mount.position()
             status = self._mount.status()
         except DeviceError as error:
             self._fail(error)
             return
-        self._set_text(self.ra_value, self.tr("{value:.5f} h").format(value=ra))
-        self._set_text(self.dec_value, self.tr("{value:+.4f} deg").format(value=dec))
-        self._set_text(self.tracking_value,
-                       self.tr("Tracking") if status.tracking else self.tr("Stopped"))
-        self._set_text(self.park_value,
-                       self.tr("Parked") if status.parked else self.tr("Unparked"))
+        # The panel shows only what the observer needs for a solar scan: the
+        # tracking switch and the park button. The mount's RA/Dec are not shown:
+        # the Sun is the target, and a coordinate readout was one more number
+        # without a decision attached (ADR-026).
         if self.track_check is not None:
             self.track_check.blockSignals(True)
             self.track_check.setChecked(bool(status.tracking))
@@ -248,10 +242,6 @@ class TelescopePanel(QWidget):
         if self.park_button is not None:
             self.park_button.setText(self.tr("Unpark") if status.parked
                                      else self.tr("Park"))
-        # The GOTO/sync fields are inputs, not a readout: the live RA/Dec labels
-        # above already show where the mount is. Overwriting the fields every
-        # second would make it impossible to type a coordinate or to sync the
-        # point the observer just centred by hand.
 
     # @args: none. Rebuilds the combo from the factory, if there is one
     def refresh_devices(self) -> None:
@@ -292,26 +282,6 @@ class TelescopePanel(QWidget):
             return
         self.refresh()
 
-    # @args: none. GOTO to the coordinates in the fields
-    def goto_clicked(self) -> None:
-        if not self._require_connected() or self.goto_ra is None or self.goto_dec is None:
-            return
-        ra = float(self.goto_ra.value()) % 24.0
-        dec = float(self.goto_dec.value())
-        if not -90.0 <= dec <= 90.0:
-            self._say(self.tr("Declination must be between -90 and +90 degrees."))
-            return
-        try:
-            assert self._mount is not None
-            self._mount.slew(ra, dec)
-        except DeviceError as error:
-            self._fail(error)
-            return
-        self._say(self.tr("Slewing to RA {ra:.4f} h, Dec {dec:+.3f} deg. "
-                          "The Sun is not here unless you computed it.").format(
-            ra=ra, dec=dec))
-        self.refresh()
-
     # @args: none. GOTO to the Sun by the local ephemeris
     def goto_sun_clicked(self) -> None:
         if not self._require_connected():
@@ -338,21 +308,6 @@ class TelescopePanel(QWidget):
         self._say(self.tr("Slewing to the Sun (RA {ra:.4f} h, Dec {dec:+.2f} "
                           "deg). When it stops, centre it on the slit.").format(
             ra=float(ra), dec=float(dec)))
-        self.refresh()
-
-    # @args: none. Tells the mount it is where the fields say
-    def sync_clicked(self) -> None:
-        if not self._require_connected() or self.goto_ra is None or self.goto_dec is None:
-            return
-        try:
-            assert self._mount is not None
-            self._mount.sync(float(self.goto_ra.value()) % 24.0,
-                             float(self.goto_dec.value()))
-        except DeviceError as error:
-            self._fail(error)
-            return
-        self._say(self.tr("Synced: the mount now believes it is here. Only do "
-                          "this when the Sun really is centred."))
         self.refresh()
 
     # @args: axis - RA or DEC; sign - direction of the rate
@@ -435,19 +390,6 @@ class TelescopePanel(QWidget):
             return
         self.refresh()
 
-    # @args: none. Cancels a GOTO without parking
-    def abort_clicked(self) -> None:
-        if not self._require_connected():
-            return
-        try:
-            assert self._mount is not None
-            self._mount.abort_slew()
-        except DeviceError as error:
-            self._fail(error)
-            return
-        self._say(self.tr("GOTO cancelled. The mount stays where it is."))
-        self.refresh()
-
     # @args: none
     # @return: the rate selected in the combo, in arcsec/s
     def _rate(self) -> float:
@@ -477,8 +419,6 @@ class TelescopePanel(QWidget):
         if caps is None:
             return
         for button, allowed in (
-            (self.goto_button, caps.can_slew),
-            (self.sync_button, caps.can_sync),
             (self.goto_sun_button, caps.can_slew),
             (self.north_button, caps.supports_axis_rates),
             (self.south_button, caps.supports_axis_rates),
@@ -486,7 +426,6 @@ class TelescopePanel(QWidget):
             (self.west_button, caps.supports_axis_rates),
             (self.track_check, caps.can_track),
             (self.park_button, caps.can_park),
-            (self.abort_button, caps.can_abort),
         ):
             if button is not None:
                 button.setEnabled(bool(allowed))
@@ -499,11 +438,10 @@ class TelescopePanel(QWidget):
             self.connect_button.setText(self.tr("Disconnect") if connected
                                         else self.tr("Connect"))
         if not connected:
-            for button in (self.goto_button, self.sync_button,
-                           self.goto_sun_button, self.north_button,
+            for button in (self.goto_sun_button, self.north_button,
                            self.south_button, self.east_button,
                            self.west_button, self.track_check,
-                           self.park_button, self.abort_button):
+                           self.park_button):
                 if button is not None:
                     button.setEnabled(False)
         elif self._caps is not None:
@@ -551,12 +489,6 @@ class TelescopePanel(QWidget):
     def _set_text(self, label: QLabel | None, text: str) -> None:
         if label is not None:
             label.setText(text)
-
-    # @args: spin - the coordinate field; value - hours or degrees; limit - 24 or 90
-    def _set_spin(self, spin, value: float, limit: float) -> None:
-        spin.blockSignals(True)
-        spin.setValue(max(-limit, min(limit, float(value))))
-        spin.blockSignals(False)
 
     # @args: text - a sentence for the user, and the signal the window listens to
     def _say(self, text: str) -> None:

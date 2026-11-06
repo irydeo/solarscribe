@@ -15,16 +15,16 @@
     <number>6</number>
    </property>
    <property name="leftMargin">
-    <number>10</number>
+    <number>6</number>
    </property>
    <property name="topMargin">
-    <number>10</number>
+    <number>6</number>
    </property>
    <property name="rightMargin">
-    <number>10</number>
+    <number>6</number>
    </property>
    <property name="bottomMargin">
-    <number>10</number>
+    <number>6</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="cameraStateRow">
@@ -88,7 +88,7 @@
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>Use this camera</string>
+        <string>Open</string>
        </property>
        <property name="toolTip">
         <string>Opens the camera, restores the ROI preset from the profile and starts the stream. If the preset does not fit this sensor, the best fitting rectangle is used and the ROI step explains it.</string>

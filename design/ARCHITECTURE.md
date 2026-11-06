@@ -1,7 +1,6 @@
 # SolarScribe: contratos entre capas y modelo de datos
 
-Estado: **v1.1** (configuración reconciliada con el prototipo y `config/store.py`
-escrito). Fecha: 2026-11-06.
+Estado: **v1.2** (perfiles con nombre y raíl de cinco pasos). Fecha: 2026-11-06.
 Documento de apoyo de [DESIGN.md](../DESIGN.md) y de los ADRs. Describe **cómo se
 construye en paralelo**: los contratos que cada agente implementa o consume, y
 los datos que viajan entre capas. La versión inglesa llegará cuando el diseño se
@@ -21,6 +20,11 @@ contra el `CONFIG_SCHEMA` real de `nightscribe-scan` y contra su
 `config/schema.py` con su sección y su default (ADR-024). Además, la lectura y la
 escritura dejan de ser una promesa: `config/store.py` y `config/paths.py` existen
 con el contrato de §3.2. No cambia ningún tipo de §2.
+
+**v1.2** añade dos contratos que el uso real pidió: los perfiles dejan de ser uno
+solo y pasan a ser un almacén de nombres con una selección activa (ADR-027), y el
+estado de sesión pasa de cuatro a cinco pasos con la entrada de Focus. Los dos
+cambios tienen su migración escrita en §2.4 y §3.2.
 
 > Regla de oro: **ningún contrato implícito**. Si un agente necesita saber qué es
 > un tipo o qué promete un método, la firma está en los módulos de contrato y su
@@ -254,7 +258,7 @@ unidades de §2 y códigos de motivo en vez de frases.
 
 ### 2.4 Estado de sesión: `solarscribe/config/schema.py`
 
-El estado de los cuatro pasos **no vive en `ui`** (decisión de ADR-023): vive en
+El estado de los cinco pasos **no vive en `ui`** (decisión de ADR-023): vive en
 `config/schema.py`, junto al esquema.
 
 - Es **persistencia**: `SessionState` se guarda y se carga de un fichero, y eso es
@@ -265,9 +269,9 @@ El estado de los cuatro pasos **no vive en `ui`** (decisión de ADR-023): vive e
 - La UI **pinta** el estado y delega; no lo define.
 
 **Tipos**: `StepStatus` (`PENDING`, `CURRENT`, `DONE`, `SKIPPED`), `SESSION_STEPS`
-(`find_sun`, `polar`, `roi`, `scan`, en el orden del raíl), `StepState` (`status`,
-`updated_at`, `metrics`) y `SessionState` (`steps`, `session_dir`, `created_at`,
-`updated_at`).
+(`find_sun`, `polar`, `focus`, `roi`, `scan`, en el orden del raíl), `StepState`
+(`status`, `updated_at`, `metrics`) y `SessionState` (`steps`, `session_dir`,
+`created_at`, `updated_at`).
 
 - El fichero es `session_state.json` **dentro de la carpeta de la sesión**, y no es
   `session_meta.json`: ese es el contrato con el post-proceso (ADR-018) y sus
@@ -280,6 +284,21 @@ El estado de los cuatro pasos **no vive en `ui`** (decisión de ADR-023): vive e
 - `save_session_state(state, path)` y `load_session_state(path)` se implementan en
   `config/store.py`, con el autoguardado silencioso tras cada cambio de estado
   (ADR-011).
+
+**Migración a cinco pasos (Focus).** ADR-011 describía cuatro pasos; el raíl actual
+tiene cinco porque el enfoque (los tres focusers y la alineación rendija-Dec,
+DESIGN.md §9.2) se separó del ROI; el cambio lo concreta ADR-028. Los nombres son
+estables y este es el orden:
+`find_sun`, `polar`, `focus`, `roi`, `scan`. Consecuencias, ya implementadas:
+
+- `load_session_state()` parte de `new_steps()`, es decir, de los cinco pasos. Un
+  `session_state.json` guardado con cuatro pasos carga con `focus` en `PENDING`;
+  los otros cuatro conservan su estado y sus métricas.
+- `save_session_state()` escribe los cinco en el orden del raíl y descarta
+  cualquier paso que no esté en `SESSION_STEPS`, así que el fichero tiene una sola
+  forma canónica.
+- La UI pinta el raíl recorriendo `SESSION_STEPS`, no una lista propia: añadir un
+  paso es cambiar esa tupla y la migración de arriba, no dos sitios.
 
 La UI **no** contiene lógica de negocio: escucha `CaptureEngine` y `ScanEngine`,
 pinta el estado de `SessionState` y delega. La regla de `self.tr()` (ADR-016) aplica
@@ -334,11 +353,12 @@ Tres módulos y una frontera clara:
 - `config/schema.py`: la **tabla** de claves (`SCHEMA`, una tupla de `Key`) y los
   **tipos de valor** (`Profile`, `TelescopeData`, `CameraData`, `RoiPreset`,
   `SessionState`, `StepState`, `StepStatus`, `SESSION_STEPS`) más los nombres de
-  fichero (`CONFIG_FILE`, `PROFILE_FILE`, `SESSION_STATE_FILE`,
-  `SCAN_LOG_FILE`, `SCAN_STATS_FILE`, `SESSION_META_FILE`).
-- `config/store.py`: la **lectura y la escritura** (`Settings`, `Profile`,
-  `SessionState`) y el **nombre de cada sesión y de cada barrido**. Es un
-  algoritmo y por eso no vive en el módulo de contrato (ADR-023).
+  fichero (`CONFIG_FILE`, `PROFILE_FILE`, `PROFILES_FILE`, `SESSION_STATE_FILE`,
+  `SCAN_LOG_FILE`, `SCAN_STATS_FILE`, `SESSION_META_FILE`) y las versiones de
+  formato (`PROFILE_VERSION`, `PROFILES_VERSION`).
+- `config/store.py`: la **lectura y la escritura** (`Settings`, `ProfileStore`,
+  `Profile`, `SessionState`) y el **nombre de cada sesión y de cada barrido**. Es
+  un algoritmo y por eso no vive en el módulo de contrato (ADR-023).
 - `config/paths.py`: las **carpetas por plataforma** con `platformdirs`.
 
 Ninguna capa de arriba decide una ruta: pide `paths.settings_path()`,
@@ -355,8 +375,15 @@ plataforma, no la del script. La reconciliación contra el prototipo la resolvi�
 ADR-024, con una sola excepción de default: `scan.num_cycles` vale 3 porque
 DESIGN.md §6 y §7 piden tres ciclos por sesión, y el ADR lo deja escrito. Las
 claves nuevas de SolarScribe (ROI, montura, sesión, polar, límites de captura,
-observatorio y cámara) se **añaden** con `origin="new"`; nunca se renombra una
-heredada.
+observatorio, cámara y espectro) se **añaden** con `origin="new"`; nunca se
+renombra una heredada.
+
+`[spectrum]` es el contrato de la identificación nativa de líneas
+(`shg/spectrum.py`): la línea objetivo a la que está sintonizada la red, la
+dispersión en angstroms por píxel, el sentido de la dispersión, la tolerancia de
+emparejamiento, la confianza mínima y la ventana de refinado del ancla. Con
+`dispersion_angstrom_px = 0` la identificación se desactiva: sin escala, una
+distancia en píxeles no es una longitud de onda.
 
 **Una verdad por comportamiento (ADR-024).** Antes de la reconciliación el
 esquema tenía claves propias que repetían una heredada. Se conservan como
@@ -407,19 +434,19 @@ percentil, no la media). No había código consumiéndolas.
   clave fuera del esquema, igual que `default_value()`, para que una errata no se
   lea como un cero.
 
-**INI frente a perfil: quién manda.** El **INI es la verdad de la sesión**; el
-perfil es una **instantánea con nombre** del instrumento y sus presets de ROI.
-Seleccionar un perfil en Ajustes escribe sus datos en el INI; no hay una fusión
-automática ni dos fuentes que puedan discrepar. Es lo que hacía el panel del
-prototipo: elegir un perfil copiaba su configuración al formulario. Por eso los
-datos físicos (`optics.focal_length`, `optics.pixel_size`,
+**INI frente a perfil: quién manda.** El **INI es la verdad de la sesión**; cada
+perfil del almacén es una **instantánea con nombre** del instrumento y sus presets
+de ROI. Seleccionar un perfil en Ajustes escribe sus datos en el INI; no hay una
+fusión automática ni dos fuentes que puedan discrepar. Es lo que hacía el panel
+del prototipo: elegir un perfil copiaba su configuración al formulario. Por eso
+los datos físicos (`optics.focal_length`, `optics.pixel_size`,
 `mosaic.mosaic_slit_length_mm`) y los del perfil (`TelescopeData`,
 `CameraData`) tienen los mismos defaults: mientras no se aplique un perfil, el
 INI manda y no cambia nada.
 
-**Perfil JSON v2** con los datos del telescopio y los **presets de ROI** por
-cámara + óptica, como `dataclass` (`Profile`, `TelescopeData`, `CameraData`,
-`RoiPreset`):
+**Perfil JSON v2**: cada perfil del almacén tiene los datos del telescopio y los
+**presets de ROI** por cámara + óptica, como `dataclass` (`Profile`,
+`TelescopeData`, `CameraData`, `RoiPreset`):
 
 ```jsonc
 {
@@ -438,7 +465,8 @@ a 714 mm de focal subtienden `7/714 rad = 33.7'`, justo por encima del diámetro
 **ancho** de la rendija (la resolución espectral) no se guarda: la captura no lo
 necesita e inventar una cifra sería peor que omitirla.
 
-`load_profile()` es **tolerante** y migra lo que encuentra:
+`load_profile()` (un solo fichero, legado o exportado) es **tolerante** y migra lo
+que encuentra:
 
 - v2 escrito a mano: números como texto, una sección ausente, una clave
   desconocida o un preset en forma de mapa nombre -> rectángulos se aceptan; lo
@@ -452,16 +480,88 @@ necesita e inventar una cifra sería peor que omitirla.
 - Al guardar se pierden las claves que esta versión no conoce: un fichero de una
   versión futura lo debe guardar la versión futura.
 
-`save_settings()`, `save_profile()` y `save_session_state()` escriben a un
-temporal en la misma carpeta y lo mueven sobre el destino (`os.replace`), de modo
-que un cierre a mitad de escritura deja el fichero bueno anterior, no medio
-fichero.
+**Perfiles con nombre (ADR-027).** El perfil único se queda corto en cuanto el
+observador tiene dos montajes o dos presets de ROI: tiene que elegir uno al
+arrancar y verlo por su nombre. El almacén es **un solo `profiles.json`** con
+todos los nombres y la selección activa, en la carpeta de configuración
+(`paths.profiles_path()`):
+
+```jsonc
+{
+  "version": 2,
+  "active": "SHG-700",
+  "profiles": {
+    "SHG-700": {
+      "version": 2,
+      "telescope": { "focal_length_mm": 714, "aperture_mm": 80, "slit_length_mm": 7 },
+      "camera":    { "model": "...", "pixel_size_um": 2, "binning": 1 },
+      "roi_presets": [
+        { "name": "default", "capture": [0, 0, 3480, 248], "band": [0, 40, 3480, 160] }
+      ]
+    },
+    "SHG-700 wide": { "version": 2, "telescope": { "...": "..." } }
+  }
+}
+```
+
+Por qué **un fichero y no uno por perfil**: el arranque necesita la lista y la
+selección activa en una sola lectura; con un fichero por perfil harían falta un
+barrido de carpeta y un marcador aparte para el activo, y renombrar o borrar
+serían dos escrituras que un cierre a medias puede dejar a medias. Con un solo
+fichero, cada operación es un `os.replace` atómico. Es además la forma de
+`nightscribe-scan`, así que un `nightscribe-profiles.json` se migra tal cual. El
+coste aceptado: dos instancias de la app escribiendo a la vez se pisan; es una
+aplicación de escritorio de un solo usuario, igual que el prototipo.
+
+Cada bloque de perfil es un documento `Profile` v2 completo, así que se puede
+exportar a un `profile.json` suelto sin conversión. La API es explícita y pura: las
+operaciones devuelven un `ProfileStore` nuevo y solo `save_profiles()` toca el
+disco.
+
+```python
+load_profiles(path, *, legacy_path=None) -> ProfileStore
+save_profiles(store, path) -> None
+profile_names(store) -> tuple[str, ...]          # en el orden del fichero
+active_profile(store) -> Profile | None          # None si el activo no existe
+set_active_profile(store, name) -> ProfileStore  # KeyError si no existe
+save_named_profile(store, name, profile, *, make_active=False) -> ProfileStore
+rename_profile(store, old, new) -> ProfileStore  # KeyError / ValueError
+delete_profile(store, name) -> ProfileStore      # KeyError si no existe
+```
+
+Reglas de lectura y migración:
+
+- **Sin `profiles.json`**: se migra el antiguo `profile.json` de la misma
+  carpeta (o el que diga `legacy_path`) como perfil `"default"`, activo, y se
+  devuelve. La lectura no escribe: el primer `save_profiles()` lo persiste y el
+  fichero antiguo no se toca.
+- **Con `profiles.json`**: es la verdad; el `profile.json` antiguo se ignora.
+- **`nightscribe-profiles.json` v1**: se aceptan todos los nombres y el `active`;
+  cada bloque v1 se traduce con las mismas reglas de `load_profile()`.
+- **Fichero truncado**: se intenta el `profile.json` antiguo y, si no hay, el
+  perfil por defecto; nunca se arranca sin perfil.
+- **Instalación nueva**: un perfil `"default"` activo, para que la UI siempre
+  tenga algo visible que cargar.
+- **`active` desconocido** (errata a mano): el nombre se conserva y
+  `active_profile()` devuelve `None`; no se activa otro instrumento en silencio.
+  La UI avisa y pide elegir.
+- **Borrar el activo**: deja `active=""`; no se elige otro perfil por su cuenta.
+  Borrar el último deja un almacén vacío, y un fichero explícitamente vacío no
+  resucita el perfil por defecto (solo la ausencia de fichero lo hace).
+
+`save_settings()`, `save_profile()`, `save_profiles()` y `save_session_state()`
+escriben a un temporal en la misma carpeta y lo mueven sobre el destino
+(`os.replace`), de modo que un cierre a mitad de escritura deja el fichero bueno
+anterior, no medio fichero.
 
 **Carpetas y nombres de sesión (DESIGN.md §10).** `config/paths.py` resuelve:
 
 - `config_dir()`: `%LOCALAPPDATA%\SolarScribe` en Windows;
   `$XDG_CONFIG_HOME/SolarScribe` (o `~/.config/SolarScribe`) en Linux; ahí viven
-  `config.ini` y `profile.json`.
+  `config.ini`, `profiles.json` y el antiguo `profile.json`.
+- `profiles_path()`: `config_dir()/profiles.json`, el almacén que se carga al
+  arrancar (ADR-027); `profile_path()` sigue apuntando al perfil único, legado o
+  exportado.
 - `data_dir()`: `%LOCALAPPDATA%\SolarScribe` en Windows;
   `$XDG_DATA_HOME/SolarScribe` (o `~/.local/share/SolarScribe`) en Linux.
 - `log_dir()`: la carpeta de logs de la plataforma (XDG state en Linux,

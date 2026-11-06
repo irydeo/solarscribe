@@ -107,6 +107,13 @@ hiddenimports = [
     "PySide6.QtSvg",
     "PySide6.QtUiTools",
 ]
+if IS_WIN:
+    # The ASCOM backend reaches COM through win32com, and the probe checks it
+    # with importlib.util.find_spec, which the frozen importer must answer.
+    # pywin32 is a Windows-only dependency of the package, so it is present in
+    # a normal Windows build; naming the modules keeps a lazy import from
+    # dropping the bridge out of the bundle.
+    hiddenimports += ["win32com", "win32com.client", "pythoncom", "pywintypes"]
 # Device backends are imported dynamically by the registry (an SDK missing at
 # build time must not break the build), so the import graph cannot see them.
 # Only names that actually exist today are added; the list grows by itself

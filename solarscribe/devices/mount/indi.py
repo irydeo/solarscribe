@@ -129,6 +129,14 @@ class IndiProtocol:
         prop = self.get(device, name)
         return prop.get("state", "") if prop else ""
 
+    # @args: device, name - property key; child - element name
+    # @return: (min, max) from the definition, or None when it is not a number
+    def number_range(self, device: str, name: str, child: str):
+        prop = self.get(device, name)
+        if not prop:
+            return None
+        return prop.get("ranges", {}).get(child)
+
     # @args: vector - an ElementTree element
     # @return: none. Stores def* and set* vectors; ignores messages
     def _ingest(self, vector) -> None:
@@ -140,13 +148,26 @@ class IndiProtocol:
         if not device or not name:
             return
         values = {}
+        ranges = {}
         for child in vector:
             child_name = child.attrib.get("name", "")
-            if child_name:
-                values[child_name] = (child.text or "").strip()
+            if not child_name:
+                continue
+            values[child_name] = (child.text or "").strip()
+            # defNumber carries the accepted interval; keeping it lets the
+            # capabilities report a real rate range instead of a guess.
+            if child.tag.startswith("def"):
+                low = child.attrib.get("min")
+                high = child.attrib.get("max")
+                if low is not None and high is not None:
+                    try:
+                        ranges[child_name] = (float(low), float(high))
+                    except ValueError:
+                        pass
         self.properties[(device, name)] = {
             "state": vector.attrib.get("state", ""),
             "values": values,
+            "ranges": ranges,
             "kind": tag[3:],      # Switch, Number, Text...
         }
 
@@ -246,17 +267,29 @@ class IndiMount:
                 target=self._read_loop, name="indi-reader", daemon=True,
             )
             self._reader.start()
-        self._send('<getProperties version="1.7"/>')
-        self._send(
-            f'<newSwitchVector device="{self._device}" name="CONNECTION">'
-            '<oneSwitch name="CONNECT">On</oneSwitch></newSwitchVector>'
-        )
+        try:
+            self._send('<getProperties version="1.7"/>')
+            self._send(
+                f'<newSwitchVector device="{self._device}" name="CONNECTION">'
+                '<oneSwitch name="CONNECT">On</oneSwitch></newSwitchVector>'
+            )
+        except DeviceError:
+            # Half a connection is worse than none: the reader would keep the
+            # socket and the panel would show a mount that cannot be talked to.
+            self._reader_stop.set()
+            self._transport.close()
+            raise
         self._connected = True
 
     # @args: none. Idempotent
     # @return: none
     def close(self) -> None:
-        self.stop()
+        try:
+            self.stop()
+        except DeviceError:
+            # The socket is already gone: stopping is moot, but closing must
+            # still release the reader and the transport.
+            pass
         self._reader_stop.set()
         # Close before joining: recv() blocks, so closing the socket is what
         # wakes the reader thread. Joining first would always time out.
@@ -445,18 +478,46 @@ class IndiMount:
             slewing = True
         return MountStatus(tracking=tracking, slewing=slewing, parked=parked)
 
-    # @return: what the INDI telescope interface offers
+    # @return: what the INDI telescope interface offers. The definitions
+    #          received from the server win; before any definition arrives (the
+    #          socket is open but the reader has not run yet) the optimistic
+    #          set is returned, and a driver that lacks a property simply
+    #          ignores the vector when it is sent.
     def capabilities(self) -> MountCaps:
+        motion_we = "TELESCOPE_MOTION_WE"
+        motion_ns = "TELESCOPE_MOTION_NS"
+        on_coord = "ON_COORD_SET"
+        track = "TELESCOPE_TRACK_STATE"
+        park = "TELESCOPE_PARK"
+        abort = "TELESCOPE_ABORT_MOTION"
+        known = any(device == self._device
+                    for device, _name in self._protocol.properties)
+        if not known:
+            return MountCaps(
+                supports_axis_rates=True, can_slew=True, can_sync=True,
+                can_track=True, can_park=True, can_abort=True,
+                reports_position_while_moving=True,
+                min_rate_arcsec_s=0.01, max_rate_arcsec_s=5000.0,
+            )
+        minimum, maximum = 0.01, 5000.0
+        interval = self._protocol.number_range(
+            self._device, "TELESCOPE_MOTION_RATE", "MOTION_RATE",
+        )
+        if interval is not None:
+            minimum, maximum = interval
         return MountCaps(
-            supports_axis_rates=True,
-            can_slew=True,
-            can_sync=True,
-            can_track=True,
-            can_park=True,
-            can_abort=True,
+            supports_axis_rates=(
+                self._protocol.get(self._device, motion_we) is not None
+                and self._protocol.get(self._device, motion_ns) is not None
+            ),
+            can_slew=self._protocol.get(self._device, on_coord) is not None,
+            can_sync=self._protocol.get(self._device, on_coord) is not None,
+            can_track=self._protocol.get(self._device, track) is not None,
+            can_park=self._protocol.get(self._device, park) is not None,
+            can_abort=self._protocol.get(self._device, abort) is not None,
             reports_position_while_moving=True,
-            min_rate_arcsec_s=0.01,
-            max_rate_arcsec_s=5000.0,
+            min_rate_arcsec_s=minimum,
+            max_rate_arcsec_s=maximum,
         )
 
     # @args: none

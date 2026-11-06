@@ -28,9 +28,16 @@ dependencies = [
     "numpy>=1.26",
     "PySide6>=6.6",
     "platformdirs>=4.0",
+    # The Windows mount backend is ASCOM COM (ADR-019). pywin32 is the bridge
+    # that makes win32com.client importable, and PyInstaller bundles it into
+    # the frozen Windows app. On Linux the marker keeps it out of the install.
+    "pywin32>=306; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
+# The direct LX200/OnStep serial fallback is optional (ADR-019): the standard
+# Linux path is INDI, and the app reports the missing pyserial and carries on.
+serial = ["pyserial>=3.5"]
 dev = [
     "pytest>=8.0",
     "pytest-xdist>=3.5",

@@ -27,22 +27,17 @@
     </message>
     <message>
         <location line="+30"/>
-        <location line="+85"/>
+        <location line="+86"/>
         <source>{model} (simulator)</source>
         <translation>{model} (simulador)</translation>
     </message>
     <message>
-        <location line="-78"/>
+        <location line="-79"/>
         <source>No camera was found. The simulator should always be there; if it is not, the device layer is not in this build.</source>
         <translation>No se encontró ninguna cámara. El simulador debería estar siempre; si no está, la capa de dispositivos no está en esta compilación.</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Found {count} camera(s). Choose one and press Use this camera.</source>
-        <translation>Se encontraron {count} cámara(s). Elige una y pulsa Usar esta cámara.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Discovery failed. Check the device diagnostics for the backend list; the log has the technical detail.</source>
         <translation>El descubrimiento falló. Revisa el diagnóstico de dispositivos para la lista de backends; el registro tiene el detalle técnico.</translation>
     </message>
@@ -52,14 +47,14 @@
         <translation>Elige primero una cámara.</translation>
     </message>
     <message>
-        <location line="+32"/>
-        <source>Simulator, streaming</source>
-        <translation>Simulador, enviando</translation>
+        <location line="-21"/>
+        <source>Found {count} camera(s). Choose one and press Open.</source>
+        <translation>Se encontraron {count} cámara(s). Elige una y pulsa Abrir.</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Simulator, stopped</source>
-        <translation>Simulador, parada</translation>
+        <location line="+55"/>
+        <source>Simulator</source>
+        <translation>Simulador</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -138,8 +133,8 @@
     </message>
     <message>
         <location line="+12"/>
-        <source>Use this camera</source>
-        <translation>Usar esta cámara</translation>
+        <source>Open</source>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -213,88 +208,6 @@
         <location line="+6"/>
         <source>Press Find to see the cameras. The simulator is always available and is labelled as such.</source>
         <translation>Pulsa Buscar para ver las cámaras. El simulador está siempre disponible y se etiqueta como tal.</translation>
-    </message>
-</context>
-<context>
-    <name>FocusAidDialog</name>
-    <message>
-        <location filename="../focus_aid.ui" line="+14"/>
-        <location line="+24"/>
-        <source>Focus aid</source>
-        <translation>Ayuda al enfoque</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>title</source>
-        <translation>title</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <location line="+62"/>
-        <source>hint</source>
-        <translation>hint</translation>
-    </message>
-    <message>
-        <location line="-56"/>
-        <source>A sharp image has more contrast: the spectrum&apos;s dark lines are deeper and the edge is crisper. These two numbers follow the live frame, so turn the focuser until the standard deviation stops rising.</source>
-        <translation>Una imagen nítida tiene más contraste: las líneas oscuras del espectro son más profundas y el borde más definido. Estas dos cifras siguen al fotograma en vivo, así que gira el enfoque hasta que la desviación típica deje de subir.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Live frame</source>
-        <translation>Fotograma en vivo</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Mean level</source>
-        <translation>Nivel medio</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <location line="+20"/>
-        <source>number</source>
-        <translation>number</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <location line="+20"/>
-        <source>--</source>
-        <translation>--</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <source>Average brightness of the frame, as a fraction of the maximum. Around a quarter of the range fills the histogram without clipping.</source>
-        <translation>Brillo medio del fotograma, como fracción del máximo. Alrededor de un cuarto del rango llena el histograma sin saturar.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Contrast</source>
-        <translation>Contraste</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Standard deviation of the frame, as a fraction of the maximum. Higher means more contrast, which is what correct focus produces.</source>
-        <translation>Desviación típica del fotograma, como fracción del máximo. Más alta significa más contraste, que es lo que produce un enfoque correcto.</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>This is a live indicator, not a measurement: seeing moves it. Judge the trend over several seconds, not a single reading, and do not touch the focus while a scan is running.</source>
-        <translation>Es un indicador en vivo, no una medida: el seeing lo mueve. Juzga la tendencia a lo largo de varios segundos, no una lectura suelta, y no toques el enfoque mientras corre un barrido.</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Close</source>
-        <translation>Cerrar</translation>
-    </message>
-    <message>
-        <location filename="../focus_aid.py" line="+54"/>
-        <source>{value:.1f}% of full range</source>
-        <translation>{value:.1f}% del rango completo</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>{value:.2f}% of full range</source>
-        <translation>{value:.2f}% del rango completo</translation>
     </message>
 </context>
 <context>
@@ -468,17 +381,17 @@
 <context>
     <name>HistogramWidget</name>
     <message>
-        <location filename="../histogram.py" line="+49"/>
-        <source>Counts per brightness level. The markers are the black and white points of the stretch: below the first and above the second, the viewer clips.</source>
-        <translation>Recuento por nivel de brillo. Las marcas son los puntos negro y blanco del estiramiento: por debajo de la primera y por encima de la segunda, el visor recorta.</translation>
+        <location filename="../histogram.py" line="+68"/>
+        <source>Counts per brightness level of the spectral band. The handles are the black and white points: below the black point and above the white point the viewer clips. Drag a handle, or click near one, to move the nearest. The numbers under the bars are the levels in camera counts (DN).</source>
+        <translation>Recuento por nivel de brillo de la banda espectral. Las asas son los puntos negro y blanco: por debajo del punto negro y por encima del blanco, el visor recorta. Arrastra un asa, o haz clic cerca de una, para mover la más próxima. Los números bajo las barras son los niveles en cuentas de cámara (DN).</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+121"/>
         <source>Waiting for the first frame</source>
         <translation>Esperando el primer fotograma</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+33"/>
         <source>black</source>
         <translation>negro</translation>
     </message>
@@ -486,6 +399,16 @@
         <location line="+1"/>
         <source>white</source>
         <translation>blanco</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>black {value}</source>
+        <translation>negro {value}</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>white {value}</source>
+        <translation>blanco {value}</translation>
     </message>
 </context>
 <context>
@@ -506,7 +429,7 @@
         <translation>Conecta la cámara y arranca el flujo. El paso ROI dibuja la banda espectral sobre esta vista.</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+38"/>
         <source>Spectral band: drag to move, corners to resize</source>
         <translation>Banda espectral: arrastra para mover, las esquinas para redimensionar</translation>
     </message>
@@ -620,49 +543,84 @@
         <translation>SolarScribe</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+55"/>
+        <source>Profile</source>
+        <translation>Perfil</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A profile stores the optics, the camera and the ROI presets for one instrument setup. The active profile is loaded at startup.</source>
+        <translation>Un perfil guarda la óptica, la cámara y los presets de ROI de una configuración de instrumento. El perfil activo se carga al arrancar.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>The active profile. Switching reloads its optics and ROI presets and keeps the camera connected.</source>
+        <translation>El perfil activo. Cambiarlo recarga su óptica y sus presets de ROI y mantiene la cámara conectada.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Save as…</source>
+        <translation>Guardar como…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Stores the current optics, camera and ROI presets under a new profile name and makes it active.</source>
+        <translation>Guarda la óptica, la cámara y los presets de ROI actuales con un nombre de perfil nuevo y lo deja activo.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Manage…</source>
+        <translation>Gestionar…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Lists the profiles, switches the active one, or renames and deletes them.</source>
+        <translation>Lista los perfiles, cambia el activo, o los renombra y los borra.</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <location line="+69"/>
+        <location line="+45"/>
+        <location line="+111"/>
+        <location line="+58"/>
+        <location line="+122"/>
+        <location line="+58"/>
+        <location line="+211"/>
+        <location line="+16"/>
         <location line="+42"/>
-        <location line="+128"/>
         <location line="+55"/>
-        <location line="+13"/>
-        <location line="+119"/>
-        <location line="+55"/>
-        <location line="+229"/>
-        <location line="+13"/>
+        <location line="+231"/>
+        <location line="+16"/>
+        <location line="+16"/>
         <location line="+68"/>
-        <location line="+82"/>
+        <location line="+85"/>
         <location line="+83"/>
         <location line="+13"/>
         <location line="+13"/>
-        <location line="+163"/>
-        <location line="+60"/>
-        <location line="+39"/>
-        <location line="+70"/>
+        <location line="+310"/>
+        <location line="+137"/>
+        <location line="+93"/>
         <location line="+13"/>
         <source>hint</source>
         <translation>hint</translation>
     </message>
     <message>
-        <location line="-1252"/>
-        <source>Recommended next: Find the Sun. You can go to any step at any time.</source>
-        <translation>Siguiente recomendado: Buscar el Sol. Puedes ir a cualquier paso en cualquier momento.</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <location line="+183"/>
-        <location line="+187"/>
-        <location line="+310"/>
+        <location line="-1761"/>
+        <location line="+166"/>
+        <location line="+180"/>
+        <location line="+327"/>
+        <location line="+331"/>
         <source>title</source>
         <translation>title</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+490"/>
-        <location filename="../main_window.ui" line="-677"/>
+        <location filename="../main_window.py" line="+627"/>
+        <location filename="../main_window.ui" line="-1001"/>
         <source>Find the Sun</source>
         <translation>Buscar el Sol</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+13"/>
+        <location filename="../main_window.ui" line="+16"/>
         <source>The Sun has to sit on the slit before anything can be measured. The app computes where the Sun is from your observatory position; the telescope panel on the right lets you nudge it by hand.</source>
         <translation>El Sol tiene que estar sobre la rendija antes de poder medir nada. La aplicación calcula dónde está el Sol a partir de la posición del observatorio; el panel de telescopio de la derecha permite moverlo a mano.</translation>
     </message>
@@ -680,31 +638,37 @@
         <location line="+7"/>
         <location line="+20"/>
         <location line="+20"/>
+        <location line="+126"/>
         <location line="+20"/>
-        <location line="+136"/>
-        <location line="+17"/>
         <location line="+20"/>
+        <location line="+1276"/>
         <source>muted</source>
         <translation>muted</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+1192"/>
-        <location line="+1"/>
+        <location filename="../main_window.py" line="+919"/>
+        <location line="+832"/>
         <location line="+1"/>
         <location line="+1"/>
         <location line="+2"/>
         <location line="+1"/>
-        <location filename="../main_window.ui" line="-230"/>
+        <location filename="../main_window.ui" line="-1479"/>
         <location line="+20"/>
         <location line="+20"/>
+        <location line="+146"/>
         <location line="+20"/>
-        <location line="+153"/>
+        <location line="+143"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
         <location line="+20"/>
         <source>Not measured yet</source>
         <translation>Sin medir todavía</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="-230"/>
+        <location filename="../main_window.ui" line="-490"/>
         <source>Measured from the bright fraction of the frame. A missing Sun means the spectrum is dark and the scan cannot start.</source>
         <translation>Se mide por la fracción brillante del fotograma. Que falte el Sol significa que el espectro está oscuro y el barrido no puede empezar.</translation>
     </message>
@@ -717,16 +681,6 @@
         <location line="+13"/>
         <source>How far the Sun is from the slit centre, in arcseconds. Close to zero means the slit crosses the middle of the disk; a large error cuts the scan short.</source>
         <translation>Cuánto dista el Sol del centro de la rendija, en arcosegundos. Cerca de cero significa que la rendija cruza el centro del disco; un error grande acorta el barrido.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Slit signal</source>
-        <translation>Señal de rendija</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>How much light is reaching the slit, as a fraction of the brightest possible frame. Too low means the Sun is off the slit or the exposure is short.</source>
-        <translation>Cuánta luz llega a la rendija, como fracción del fotograma más brillante posible. Demasiado baja significa que el Sol está fuera de la rendija o que la exposición es corta.</translation>
     </message>
     <message>
         <location line="+33"/>
@@ -749,28 +703,13 @@
         <translation>Para todos los ejes a la vez. Úsalo siempre que el telescopio se esté moviendo a un sitio que no querías.</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>The coarse centring uses the bright fraction of the frame. Near the centre it is flat, so it gets you close and the Scanning step finishes the job.</source>
-        <translation>El centrado grueso usa la fracción brillante del fotograma. Cerca del centro es plana, así que te acerca y el paso Escaneado termina el trabajo.</translation>
-    </message>
-    <message>
-        <location filename="../main_window.py" line="-1196"/>
-        <location filename="../main_window.ui" line="+42"/>
+        <location filename="../main_window.py" line="-1754"/>
+        <location filename="../main_window.ui" line="+55"/>
         <source>Polar alignment</source>
         <translation>Alineación polar</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+13"/>
-        <source>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun&apos;s drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error.</source>
-        <translation>Polaris no se ve de día, así que el propio Sol es la referencia. El asistente muestrea la deriva del Sol y dice qué tornillo girar. Es preciso porque es lento: 20 a 40 minutos separan el error de azimut del de altitud.</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</source>
-        <translation>Mejor momento: medir la altitud cerca del meridiano, y el azimut hacia el este o el oeste.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location filename="../main_window.ui" line="+23"/>
         <source>Live measurement</source>
         <translation>Medición en vivo</translation>
     </message>
@@ -780,13 +719,13 @@
         <translation>Estado</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+1194"/>
+        <location filename="../main_window.py" line="+1752"/>
         <location filename="../main_window.ui" line="+10"/>
         <source>Not started</source>
         <translation>Sin empezar</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+7"/>
+        <location filename="../main_window.ui" line="+10"/>
         <source>Azimuth error</source>
         <translation>Error de azimut</translation>
     </message>
@@ -826,17 +765,12 @@
         <translation>Parar la medición</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>The assistant subtracts the Sun&apos;s own motion from the measured drift. A second measurement confirms the first one; the step is done when the two agree.</source>
-        <translation>El asistente resta el movimiento propio del Sol a la deriva medida. Una segunda medida confirma la primera; el paso termina cuando las dos coinciden.</translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+382"/>
         <source>Capture ROI</source>
         <translation>ROI de captura</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+25"/>
         <source>A preset saved for this camera and optic. Applying it restores both rectangles at once.</source>
         <translation>Un preset guardado para esta cámara y óptica. Aplicarlo restaura los dos rectángulos a la vez.</translation>
     </message>
@@ -846,12 +780,7 @@
         <translation>Guardar preset</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>Capture ROI, sensor pixels</source>
-        <translation>ROI de captura, píxeles de sensor</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+12"/>
         <source>The rectangle the camera reads out. Its width and height fix the frame rate and the SER size.</source>
         <translation>El rectángulo que lee la cámara. Su ancho y su alto fijan la tasa de fotogramas y el tamaño del SER.</translation>
     </message>
@@ -869,65 +798,62 @@
     </message>
     <message>
         <location line="+7"/>
-        <location line="+77"/>
+        <location line="+80"/>
         <source>Width</source>
         <translation>Ancho</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-70"/>
         <source>Width of the delivered frame. Wider means a lower frame rate and a bigger SER.</source>
         <translation>Ancho del fotograma entregado. Más ancho significa menos tasa de fotogramas y un SER más grande.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+74"/>
+        <location line="+80"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <location line="-64"/>
+        <location line="-70"/>
         <source>Top edge on the sensor, in binned pixels.</source>
         <translation>Borde superior en el sensor, en píxeles bineados.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+71"/>
+        <location line="+80"/>
         <source>Height</source>
         <translation>Alto</translation>
     </message>
     <message>
-        <location line="-61"/>
+        <location line="-70"/>
         <source>Height of the delivered frame. It must hold the spectral band plus the tilt drift.</source>
         <translation>Alto del fotograma entregado. Debe contener la banda espectral más la deriva por tilt.</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Spectral band, frame pixels</source>
-        <translation>Banda espectral, píxeles de frame</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+13"/>
         <source>The useful strip of the dispersed spectrum inside the frame. If it does not fit, the order is clipped.</source>
         <translation>La franja útil del espectro dispersado dentro del fotograma. Si no cabe, el orden se recorta.</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+79"/>
         <source>Tilt</source>
         <translation>Tilt</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location line="+25"/>
+        <location line="-325"/>
+        <location line="+332"/>
         <source>number</source>
         <translation>number</translation>
     </message>
     <message>
-        <location line="-22"/>
+        <location filename="../main_window.py" line="-798"/>
+        <location filename="../main_window.ui" line="-329"/>
+        <location line="+332"/>
         <source>Not measured</source>
         <translation>Sin medir</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../main_window.ui" line="+3"/>
         <source>How far the spectral line leans across the frame, in degrees and in pixels of drift. A tilted line skews the reconstruction and needs a taller ROI.</source>
         <translation>Cuánto se inclina la línea espectral a lo ancho del fotograma, en grados y en píxeles de deriva. Una línea inclinada sesga la reconstrucción y exige un ROI más alto.</translation>
     </message>
@@ -937,12 +863,7 @@
         <translation>Medir el tilt</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Fits a line to the slit edge of the current frame. If the edge is not straight, the app says so instead of showing a number.</source>
-        <translation>Ajusta una recta al borde de la rendija del fotograma actual. Si el borde no es recto, la aplicación lo dice en vez de mostrar un número.</translation>
-    </message>
-    <message>
-        <location line="+12"/>
+        <location line="+18"/>
         <source>Rate: not estimated</source>
         <translation>Tasa: sin estimar</translation>
     </message>
@@ -952,7 +873,7 @@
         <translation>Fotogramas por segundo y caudal de datos estimados de este ROI. Debe alcanzar la tasa objetivo, o el barrido será demasiado lento para terminar antes de que el Sol se mueva.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+13"/>
         <source>Scale: not available until the profile has the optics.</source>
         <translation>Escala: no disponible hasta que el perfil tenga la óptica.</translation>
     </message>
@@ -977,13 +898,279 @@
         <translation>Envía los rectángulos a la cámara. El flujo se reinicia con el ROI nuevo; una grabación en curso se cierra limpiamente antes.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="-1191"/>
+        <location filename="../main_window.py" line="-949"/>
         <location filename="../main_window.ui" line="+42"/>
         <source>Scanning</source>
         <translation>Escaneado</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+13"/>
+        <location filename="../main_window.ui" line="-1108"/>
+        <source>Optics, camera and ROI presets, loaded at startup.</source>
+        <translation>Óptica, cámara y presets de ROI, cargados al arrancar.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The active profile is the one whose optics, camera data and ROI presets the app uses. It is separate from the observatory position, which lives in Settings and the welcome assistant.</source>
+        <translation>El perfil activo es aquel cuya óptica, datos de cámara y presets de ROI usa la aplicación. Es independiente de la posición del observatorio, que vive en Ajustes y en el asistente de bienvenida.</translation>
+    </message>
+    <message>
+        <location line="+69"/>
+        <source>Next: Find the Sun. Any step is open.</source>
+        <translation>Siguiente: Buscar el Sol. Cualquier paso está abierto.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The rail recommends, it never blocks. Open any step at any time; the state is saved silently.</source>
+        <translation>El raíl recomienda, nunca bloquea. Abre cualquier paso en cualquier momento; el estado se guarda en silencio.</translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Get the Sun onto the slit. The app can point and centre it.</source>
+        <translation>Pon el Sol sobre la rendija. La aplicación puede apuntarlo y centrarlo.</translation>
+    </message>
+    <message>
+        <location line="+111"/>
+        <source>The coarse stage gets close; the scan step finishes the centring.</source>
+        <translation>La etapa gruesa te acerca; el paso de barrido termina el centrado.</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun&apos;s drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error. Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</source>
+        <translation>Polaris no se ve de día, así que el propio Sol es la referencia. El asistente muestrea la deriva del Sol y dice qué tornillo girar. Es preciso porque es lento: 20 a 40 minutos separan el error de azimut del de altitud. Mejor momento: medir la altitud cerca del meridiano, y el azimut hacia el este o el oeste.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Measure the Sun&apos;s drift and turn the screws it names.</source>
+        <translation>Mide la deriva del Sol y gira los tornillos que indica.</translation>
+    </message>
+    <message>
+        <location line="+122"/>
+        <source>The assistant subtracts the Sun&apos;s own motion; a second measurement confirms the first.</source>
+        <translation>El asistente resta el movimiento propio del Sol; una segunda medida confirma la primera.</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>The SHG-700 has three focusers that interact, so the observer iterates: spectrograph, collimator and telescope. The slit also has to be parallel to the declination axis; the tilt figure says how far it is and how tall the ROI must be.</source>
+        <translation>El SHG-700 tiene tres enfoques que interactúan, así que el observador itera: espectrógrafo, colimador y telescopio. La rendija también debe ser paralela al eje de declinación; la cifra de tilt dice cuánto se desvía y qué altura necesita el ROI.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Sharpen the three focusers and make the slit parallel to Dec.</source>
+        <translation>Afina los tres enfoques y deja la rendija paralela a Dec.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Spectrograph: absorption lines</source>
+        <translation>Espectrógrafo: líneas de absorción</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Focuser 1: turn the camera focus until the absorption lines are as contrasted and sharp as possible. The figures update live and the best is the running hold since the last reset.</source>
+        <translation>Enfoque 1: gira el enfoque de la cámara hasta que las líneas de absorción tengan el máximo contraste y nitidez. Las cifras se actualizan en vivo y la mejor es el máximo retenido desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Line contrast</source>
+        <translation>Contraste de líneas</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
+        <location line="+20"/>
+        <source>metric</source>
+        <translation>metric</translation>
+    </message>
+    <message>
+        <location line="-138"/>
+        <source>How much the absorption lines stand out from the continuum. Higher is better; the exposure cancels out because both terms scale. The second number is the best since the last reset.</source>
+        <translation>Cuánto destacan las líneas de absorción sobre el continuo. Más alto es mejor; la exposición se cancela porque ambos términos escalan. La segunda cifra es la mejor desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Line sharpness</source>
+        <translation>Nitidez de líneas</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How fast the brightness changes across an absorption line. Higher is sharper; a defocused line is smooth. The second number is the best since the last reset.</source>
+        <translation>A qué velocidad cambia el brillo a través de una línea de absorción. Más alto es más nítido; una línea desenfocada es suave. La segunda cifra es la mejor desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Collimator: slit edge</source>
+        <translation>Colimador: borde de rendija</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Focuser 2: turn the collimator until the physical slit edge is sharp and straight. A straight edge is also what the tilt measurement wants.</source>
+        <translation>Enfoque 2: gira el colimador hasta que el borde físico de la rendija esté nítido y recto. Un borde recto es también lo que quiere la medición de tilt.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Edge sharpness</source>
+        <translation>Nitidez del borde</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How strong the step at the slit edge is. Higher is sharper. The second number is the best since the last reset.</source>
+        <translation>Cuánto escalón hay en el borde de la rendija. Más alto es más nítido. La segunda cifra es la mejor desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Edge wobble</source>
+        <translation>Ondulación del borde</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How much the slit edge wanders along the slit, in grid cells. Lower is straighter; a straight edge is what the tilt wants. The second number is the best (lowest) since the last reset.</source>
+        <translation>Cuánto se desvía el borde de la rendija a lo largo de la rendija, en celdas de rejilla. Más bajo es más recto; un borde recto es lo que quiere el tilt. La segunda cifra es la mejor (la más baja) desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Telescope: surface detail</source>
+        <translation>Telescopio: detalle de superficie</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Focuser 3: turn the telescope focus until the solar surface detail is contrasted and abundant. The figures update live and the best is the running hold since the last reset.</source>
+        <translation>Enfoque 3: gira el enfoque del telescopio hasta que el detalle de la superficie solar tenga contraste y abundancia. Las cifras se actualizan en vivo y la mejor es el máximo retenido desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Detail contrast</source>
+        <translation>Contraste de detalle</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How much the solar surface detail stands out. Higher is better; the exposure cancels out. The second number is the best since the last reset.</source>
+        <translation>Cuánto destaca el detalle de la superficie solar. Más alto es mejor; la exposición se cancela. La segunda cifra es la mejor desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Detail sharpness</source>
+        <translation>Nitidez del detalle</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How fast the surface detail changes. Higher is sharper. The second number is the best since the last reset.</source>
+        <translation>A qué velocidad cambia el detalle de la superficie. Más alto es más nítido. La segunda cifra es la mejor desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Detail count</source>
+        <translation>Recuento de detalle</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How many surface structures the profile finds. More is closer to focus. The second number is the best since the last reset.</source>
+        <translation>Cuántas estructuras de superficie encuentra el perfil. Más es más cerca del enfoque. La segunda cifra es la mejor desde el último reinicio.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Slit to Dec</source>
+        <translation>Rendija a Dec</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>How far the spectral line leans across the frame, in degrees and in pixels of drift. Zero means the slit is parallel to the declination axis, which is what the scan wants.</source>
+        <translation>Cuánto se inclina la línea espectral a lo ancho del fotograma, en grados y en píxeles de deriva. Cero significa que la rendija es paralela al eje de declinación, que es lo que quiere el barrido.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Rotate the slit until the tilt is near zero. The scan can still run with a tilt; the ROI must then be taller, because the tilted line covers more rows.</source>
+        <translation>Gira la rendija hasta que el tilt esté cerca de cero. El barrido puede correr con tilt; entonces el ROI debe ser más alto, porque la línea inclinada ocupa más filas.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>The ROI must hold the band plus the drift and a 2 px margin.</source>
+        <translation>El ROI debe contener la banda más la deriva y un margen de 2 px.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The ROI has to hold the spectral band plus the drift the tilt produces plus a 2 px margin (ADR-022). A smaller ROI would crop the order.</source>
+        <translation>El ROI debe contener la banda espectral más la deriva que produce el tilt más un margen de 2 px (ADR-022). Un ROI menor recortaría el orden.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Measure the slit tilt</source>
+        <translation>Medir el tilt de la rendija</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Fits a line to the slit edge of the current frame and reports the tilt and the ROI height it needs. If the edge is not straight, it says so and warns that the tilt is provisional.</source>
+        <translation>Ajusta una recta al borde de la rendija del fotograma actual e informa del tilt y de la altura de ROI que necesita. Si el borde no es recto, lo dice y avisa de que el tilt es provisional.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Reset the best values</source>
+        <translation>Reiniciar los mejores valores</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Clears the best figures so the next focuser position is compared with a fresh baseline. The live readings keep updating.</source>
+        <translation>Borra las mejores cifras para que la siguiente posición de enfoque se compare con una base nueva. Las lecturas en vivo siguen actualizándose.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Focus is a judgement: compare with the best, then measure the tilt.</source>
+        <translation>El enfoque es un juicio: compara con el mejor y luego mide el tilt.</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>The strip the camera delivers sets the frame rate and the SER. It must hold the spectrum and the tilt.</source>
+        <translation>La franja que entrega la cámara fija la tasa de fotogramas y el SER. Debe contener el espectro y el tilt.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Drag the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</source>
+        <translation>El ROI es la franja que entrega la cámara. Fija la tasa de fotogramas y exactamente lo que se escribe al SER, así que debe contener el espectro con sitio para el tilt. Arrastra la banda espectral sobre el vídeo y escribe el rectángulo de captura: el fotograma ya es el ROI de captura, así que un rectángulo mayor dibujado encima sería ficción.</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Capture strip, sensor px</source>
+        <translation>Franja de captura, px de sensor</translation>
+    </message>
+    <message>
+        <location line="+83"/>
+        <source>Spectral band, frame px</source>
+        <translation>Banda espectral, px de frame</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Left edge of the band inside the frame, in frame pixels.</source>
+        <translation>Borde izquierdo de la banda dentro del fotograma, en píxeles de frame.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Width of the usable spectrum. It can be narrower than the frame.</source>
+        <translation>Ancho del espectro útil. Puede ser menor que el fotograma.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Top edge of the band inside the frame, in frame pixels.</source>
+        <translation>Borde superior de la banda dentro del fotograma, en píxeles de frame.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Height of the usable spectrum. The histogram and the quick recon read only this strip.</source>
+        <translation>Alto del espectro útil. El histograma y el recon rápido leen solo esta franja.</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Fits a line to the slit edge of the current frame. The guided alignment lives in the Focus step; this quick measure keeps the ROI height honest when you jump straight here. If the edge is not straight, it says so.</source>
+        <translation>Ajusta una recta al borde de la rendija del fotograma actual. La alineación guiada vive en el paso Enfoque; esta medida rápida mantiene honesta la altura del ROI cuando saltas directo aquí. Si el borde no es recto, lo dice.</translation>
+    </message>
+    <message>
+        <location line="+115"/>
+        <source>Prepare centres and calibrates; the scan writes one SER per row.</source>
+        <translation>Preparar centra y calibra; el barrido escribe un SER por fila.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>One sweep writes one SER per row. The preparation centres the Sun on the slit and calibrates the sweep rate; then the scan runs. You can pause and recentre at any time, and the frames already written are kept.</source>
         <translation>Un barrido escribe un SER por fila. La preparación centra el Sol sobre la rendija y calibra la tasa; después corre el barrido. Puedes pausar y recentrar en cualquier momento, y los fotogramas ya escritos se conservan.</translation>
     </message>
@@ -1043,47 +1230,107 @@
         <translation>Empezar el barrido</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="-285"/>
+        <location line="+213"/>
+        <source>Shows the spectral band over the video. Drag the band to move it and its corners to resize it.</source>
+        <translation>Muestra la banda espectral sobre el vídeo. Arrastra la banda para moverla y sus esquinas para redimensionarla.</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Identify lines</source>
+        <translation>Identificar líneas</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Runs the native line identification about twice a second and lists the names in the panel on the right. It uses the target line and the dispersion from Settings → Spectrum; the names are a pattern match, not a wavelength calibration.</source>
+        <translation>Ejecuta la identificación nativa de líneas unas dos veces por segundo y lista los nombres en el panel de la derecha. Usa la línea objetivo y la dispersión de Ajustes → Espectro; los nombres son una coincidencia de patrón, no una calibración de longitud de onda.</translation>
+    </message>
+    <message>
+        <location line="+124"/>
+        <source>Histogram</source>
+        <translation>Histograma</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Folds the brightness histogram. It reads only the spectral band, in log scale, so the dark background does not flatten the spectrum.</source>
+        <translation>Pliega el histograma de brillo. Lee solo la banda espectral, en escala logarítmica, para que el fondo oscuro no aplaste el espectro.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Fraction of the spectral band already at the maximum level. Those pixels carry no contrast; lower the exposure or raise the white handle so the spectrum is not clipped.</source>
+        <translation>Fracción de la banda espectral que ya está en el nivel máximo. Esos píxeles no llevan contraste; baja la exposición o sube el asa blanca para que el espectro no se recorte.</translation>
+    </message>
+    <message>
+        <location line="+118"/>
+        <source>Scan progress and quick recon</source>
+        <translation>Progreso del barrido y recon rápido</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The captured strip, the slit line and the quick recon. It opens by itself and stays open while a scan runs; it can be folded again when the scan ends.</source>
+        <translation>La franja capturada, la línea de la rendija y el recon rápido. Se abre solo y queda abierto mientras corre un barrido; se puede plegar otra vez al terminar.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>The percentage is of the planned sweep, so 100% means the plan finished, not that the image is done.</source>
+        <translation>El porcentaje es del barrido previsto, así que 100% significa que el plan terminó, no que la imagen esté hecha.</translation>
+    </message>
+    <message>
+        <location line="+106"/>
+        <source>Light preview: not calibrated, not exported.</source>
+        <translation>Vista previa ligera: sin calibrar, sin exportar.</translation>
+    </message>
+    <message>
+        <location line="+183"/>
+        <source>Telescope panel</source>
+        <translation>Panel de telescopio</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Camera panel</source>
+        <translation>Panel de cámara</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Stream health panel</source>
+        <translation>Panel de salud del flujo</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="-344"/>
         <source>Live video of the spectrum</source>
         <translation>Vídeo en vivo del espectro</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Simulated mount</source>
-        <translation>Montura simulada</translation>
-    </message>
-    <message>
-        <location line="+73"/>
+        <location line="+106"/>
         <location line="+5"/>
-        <location line="+1309"/>
+        <location line="+1898"/>
         <location line="+5"/>
         <source>Simulator (no hardware)</source>
         <translation>Simulador (sin hardware)</translation>
     </message>
     <message>
-        <location line="-1317"/>
+        <location line="-1906"/>
         <source>connected</source>
         <translation>conectada</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+2"/>
-        <location line="+1314"/>
+        <location line="+1903"/>
         <source>not connected</source>
         <translation>sin conexión</translation>
     </message>
     <message>
-        <location line="-1288"/>
+        <location line="-1877"/>
         <source>Location saved: latitude {lat:.4f}, longitude {lon:.4f}. The GOTO can now find the Sun.</source>
         <translation>Ubicación guardada: latitud {lat:.4f}, longitud {lon:.4f}. El GOTO ya puede encontrar el Sol.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+11"/>
         <source>You can set the observatory position any time in Tools, Settings.</source>
         <translation>Puedes definir la posición del observatorio en cualquier momento en Herramientas, Ajustes.</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+22"/>
         <source>Camera: --</source>
         <translation>Cámara: --</translation>
     </message>
@@ -1094,12 +1341,12 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+565"/>
+        <location line="+837"/>
         <source>Rate: --</source>
         <translation>Tasa: --</translation>
     </message>
     <message>
-        <location line="-563"/>
+        <location line="-835"/>
         <source>Frames per second received against the 120 fps budget. At 120 fps each frame has 8.3 ms; below it the scan stretches.</source>
         <translation>Fotogramas por segundo recibidos frente al presupuesto de 120 fps. A 120 fps cada fotograma dispone de 8,3 ms; por debajo, el barrido se estira.</translation>
     </message>
@@ -1115,43 +1362,33 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+558"/>
+        <location line="+830"/>
         <source>Dropped: --</source>
         <translation>Perdidos: --</translation>
     </message>
     <message>
-        <location line="-556"/>
+        <location line="-828"/>
         <source>Frames lost inside the SDK, as a count and a fraction. Each one is a gap in the SER; the budget is 0.1% per scan.</source>
         <translation>Fotogramas perdidos dentro del SDK, como recuento y como fracción. Cada uno es un hueco en el SER; el presupuesto es un 0,1% por barrido.</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+561"/>
+        <location line="+833"/>
         <source>Disk: --</source>
         <translation>Disco: --</translation>
     </message>
     <message>
-        <location line="-559"/>
+        <location line="-831"/>
         <source>Free space on the session disk. A recording does not start below 1 GB.</source>
         <translation>Espacio libre en el disco de la sesión. Una grabación no empieza por debajo de 1 GB.</translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+101"/>
         <source>Step reopened: the numbers already saved are kept, so you can correct one thing and continue.</source>
         <translation>Paso reabierto: se conservan los números ya guardados, así que puedes corregir una cosa y continuar.</translation>
     </message>
     <message>
-        <location line="+29"/>
-        <source>All four steps are done. Reopen any step from the rail to change something; nothing is locked.</source>
-        <translation>Los cuatro pasos están hechos. Reabre cualquier paso desde el raíl para cambiar algo; nada está bloqueado.</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Recommended next: {step}. You can go to any step at any time.</source>
-        <translation>Siguiente recomendado: {step}. Puedes ir a cualquier paso en cualquier momento.</translation>
-    </message>
-    <message>
-        <location line="+24"/>
+        <location line="+67"/>
         <source>Full range: 0 to 100%</source>
         <translation>Rango completo: 0 a 100%</translation>
     </message>
@@ -1171,7 +1408,7 @@
         <translation>Duro: 25 a 75%</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+27"/>
         <source>Simple scan</source>
         <translation>Barrido simple</translation>
     </message>
@@ -1181,12 +1418,12 @@
         <translation>Mosaico</translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+133"/>
         <source>The engine computes the plan when you press Prepare: rows, sweep rate and expected duration. Nothing runs until then.</source>
         <translation>El motor calcula el plan cuando pulsas Preparar: filas, tasa y duración prevista. Hasta entonces no corre nada.</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+245"/>
         <source>Camera: Simulator (no hardware)</source>
         <translation>Cámara: Simulador (sin hardware)</translation>
     </message>
@@ -1212,12 +1449,7 @@
         <translation>Montura: sin conexión</translation>
     </message>
     <message>
-        <location line="+167"/>
-        <source>{value:.1f}% of the range</source>
-        <translation>{value:.1f}% del rango</translation>
-    </message>
-    <message>
-        <location line="+49"/>
+        <location line="+220"/>
         <source>Dropped: {dropped} ({percent:.2f}%)</source>
         <translation>Perdidos: {dropped} ({percent:.2f}%)</translation>
     </message>
@@ -1239,7 +1471,7 @@
         <translation>Midiendo...</translation>
     </message>
     <message>
-        <location line="-407"/>
+        <location line="-588"/>
         <source>Plan: {rows} row(s), {duration:.0f} s per cycle at {rate:.0f} arcsec/s, about {frames} frames per cycle. {cycles} cycle(s) take about {total:.1f} min.</source>
         <translation>Plan: {rows} fila(s), {duration:.0f} s por ciclo a {rate:.0f} arcosegundos/s, unos {frames} fotogramas por ciclo. {cycles} ciclo(s) tardan unos {total:.1f} min.</translation>
     </message>
@@ -1249,7 +1481,7 @@
         <translation> El simulador usa una tasa fija, elegida para que la demo termine en segundos; la cámara real calibra la tasa durante la preparación.</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+232"/>
         <source>Camera: {model}</source>
         <translation>Cámara: {model}</translation>
     </message>
@@ -1284,12 +1516,7 @@
         <translation>No se pudo abrir la cámara. El estado en vivo y el diagnóstico de dispositivos dicen por qué.</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>Camera closed. The session and the telescope are untouched.</source>
-        <translation>Cámara cerrada. La sesión y el telescopio no se tocan.</translation>
-    </message>
-    <message>
-        <location line="+25"/>
+        <location line="+49"/>
         <source>The engine reported a problem. The device diagnostics and the log say why.</source>
         <translation>El motor informó de un problema. El diagnóstico de dispositivos y el registro dicen por qué.</translation>
     </message>
@@ -1304,7 +1531,7 @@
         <translation>La cámara no arrancó. Abre el panel de cámara y revisa el estado en vivo.</translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+73"/>
         <source>Rate: {fps:.0f} fps of {target:.0f}{suffix}</source>
         <translation>Tasa: {fps:.0f} fps de {target:.0f}{suffix}</translation>
     </message>
@@ -1400,11 +1627,12 @@
     </message>
     <message>
         <location line="+6"/>
+        <location line="+723"/>
         <source>Stopped</source>
         <translation>Parada</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-711"/>
         <source>Measuring: {samples} samples</source>
         <translation>Midiendo: {samples} muestras</translation>
     </message>
@@ -1467,7 +1695,7 @@
         <translation> Las muestras estaban demasiado cerca en ángulo horario para separar los dos errores: mide otra vez más tarde, hacia el este o el oeste.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+289"/>
         <source>Open a camera before applying a ROI: the rectangle is sent to the hardware, not only stored.</source>
         <translation>Abre una cámara antes de aplicar un ROI: el rectángulo se envía al hardware, no solo se guarda.</translation>
     </message>
@@ -1477,7 +1705,7 @@
         <translation>ROI aplicado a la cámara: {width} x {height} px en ({x}, {y}). La franja fija la tasa de fotogramas y el tamaño del SER.</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+91"/>
         <source>Open a camera first: the preparation needs frames and a mount.</source>
         <translation>Abre primero una cámara: la preparación necesita fotogramas y una montura.</translation>
     </message>
@@ -1497,27 +1725,42 @@
         <translation>Pulsa primero Preparar: el barrido necesita el Sol centrado y la tasa del plan.</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+51"/>
         <source>Cycle {cycle} of {total}: sweeping the slit across the disk...</source>
         <translation>Ciclo {cycle} de {total}: barriendo la rendija por el disco...</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+20"/>
         <source>Recentring the Sun before the next cycle...</source>
         <translation>Recentrando el Sol antes del siguiente ciclo...</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Sweeping...</source>
         <translation>Barriendo...</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Cycle {cycle} of {cycles}, row {row}: {percent}% complete. Dec error {dec:.1f} arcsec; a large value means part of the disk is outside the sweep.</source>
         <translation>Ciclo {cycle} de {cycles}, fila {row}: {percent}% completado. Error en Dec {dec:.1f} arcosegundos; un valor grande significa que parte del disco queda fuera del barrido.</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+73"/>
+        <source> Data folder: {folder}.</source>
+        <translation> Carpeta de datos: {folder}.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Finished</source>
+        <translation>Terminado</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Finished. The data folder holds the SER files and the log.</source>
+        <translation>Terminado. La carpeta de datos contiene los ficheros SER y el registro.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Finished in the simulator: the SER recording is disabled in the simulation, so this run was a dry run.</source>
         <translation>Terminado en el simulador: la grabación SER está desactivada en la simulación, así que esta tanda fue un modo seco.</translation>
     </message>
@@ -1527,7 +1770,12 @@
         <translation>Terminado sin ficheros SER: el registro dice por qué. Los fotogramas ya escritos, si hay alguno, se conservan.</translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+6"/>
+        <source>Data written to {folder}</source>
+        <translation>Datos escritos en {folder}</translation>
+    </message>
+    <message>
+        <location line="+131"/>
         <source>not open</source>
         <translation>sin abrir</translation>
     </message>
@@ -1557,12 +1805,7 @@
         <translation>Perfil: {path}</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Session: {path}</source>
-        <translation>Sesión: {path}</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Camera: {state}</source>
         <translation>Cámara: {state}</translation>
     </message>
@@ -1572,22 +1815,238 @@
         <translation>Montura: {state}</translation>
     </message>
     <message>
-        <location line="-517"/>
+        <location line="-824"/>
         <source>Polar alignment confirmed: the two measurements agree. The figures are in arcminutes on each screw.</source>
         <translation>Alineación polar confirmada: las dos medidas coinciden. Las cifras están en arcminutos en cada tornillo.</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-1190"/>
+        <source>Scroll to zoom; drag the ROI band to move it. The histogram handles set the stretch.</source>
+        <translation>Desplaza para hacer zoom; arrastra la banda del ROI para moverla. Las asas del histograma fijan el estiramiento.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Simulator</source>
+        <translation>Simulador</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Welcome to SolarScribe</source>
+        <translation>Bienvenido a SolarScribe</translation>
+    </message>
+    <message>
+        <location line="+292"/>
+        <source>All five steps are done. Reopen any step from the rail; nothing is locked.</source>
+        <translation>Los cinco pasos están hechos. Reabre cualquier paso desde el raíl; nada está bloqueado.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Next: {step}. Any step is open.</source>
+        <translation>Siguiente: {step}. Cualquier paso está abierto.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location filename="../main_window.ui" line="-1623"/>
+        <source>Focus</source>
+        <translation>Enfoque</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Manual: drag the histogram handles</source>
+        <translation>Manual: arrastra las asas del histograma</translation>
+    </message>
+    <message>
+        <location line="+100"/>
+        <source>Manual: black {low:.0f}%, white {high:.0f}%</source>
+        <translation>Manual: negro {low:.0f}%, blanco {high:.0f}%</translation>
+    </message>
+    <message>
+        <location line="+109"/>
+        <source>No active profile</source>
+        <translation>Sin perfil activo</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>No active profile. Choose one in the profile bar or save the current setup under a name.</source>
+        <translation>Sin perfil activo. Elige uno en la barra de perfiles o guarda la configuración actual con un nombre.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>The profile &apos;{name}&apos; could not be loaded.</source>
+        <translation>No se pudo cargar el perfil &apos;{name}&apos;.</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Profile &apos;{name}&apos; loaded: optics, camera and ROI presets. The camera stays as it is; apply a preset if the strip changed.</source>
+        <translation>Perfil &apos;{name}&apos; cargado: óptica, cámara y presets de ROI. La cámara se queda como está; aplica un preset si cambió la franja.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+7"/>
+        <source>Save profile as</source>
+        <translation>Guardar perfil como</translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <source>Profile name:</source>
+        <translation>Nombre del perfil:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>New profile</source>
+        <translation>Perfil nuevo</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>A profile named &apos;{name}&apos; already exists. Replace it?</source>
+        <translation>Ya existe un perfil llamado &apos;{name}&apos;. ¿Reemplazarlo?</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Profile saved as &apos;{name}&apos; and set active.</source>
+        <translation>Perfil guardado como &apos;{name}&apos; y dejado activo.</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>No active profile: the ROI preset was not saved. Choose or save a profile in the top bar.</source>
+        <translation>Sin perfil activo: no se guardó el preset de ROI. Elige o guarda un perfil en la barra superior.</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Named-profile storage is not available in this build; the single profile is used.</source>
+        <translation>El almacenamiento de perfiles con nombre no está disponible en esta compilación; se usa el perfil único.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The profile file is not configured. Check Settings.</source>
+        <translation>El fichero de perfiles no está configurado. Revisa Ajustes.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The profile &apos;{name}&apos; could not be changed. The log has the detail.</source>
+        <translation>No se pudo cambiar el perfil &apos;{name}&apos;. El registro tiene el detalle.</translation>
+    </message>
+    <message>
+        <location line="+131"/>
+        <source>Camera closed. The telescope is untouched.</source>
+        <translation>Cámara cerrada. El telescopio no se toca.</translation>
+    </message>
+    <message>
+        <location line="+114"/>
+        <location line="+1145"/>
+        <source>No frame yet</source>
+        <translation>Todavía no hay fotograma</translation>
+    </message>
+    <message>
+        <location line="-1141"/>
+        <source>{value:.1f}% clipped at white</source>
+        <translation>{value:.1f}% recortado en blanco</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../main_window.ui" line="+1175"/>
+        <source>No clipping</source>
+        <translation>Sin recorte</translation>
+    </message>
+    <message>
+        <location line="+242"/>
         <source>First measurement done. Turn the screws, then confirm.</source>
         <translation>Primera medida hecha. Gira los tornillos y luego confirma.</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+76"/>
+        <source>{value} · best {best}</source>
+        <translation>{value} · mejor {best}</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location filename="../main_window.ui" line="-948"/>
+        <source>Measure the slit tilt: rotate the slit until the line is parallel to Dec.</source>
+        <translation>Mide el tilt de la rendija: gira la rendija hasta que la línea sea paralela a Dec.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+10"/>
+        <source>The ROI must hold the band plus the drift and a {margin:g} px margin.</source>
+        <translation>El ROI debe contener la banda más la deriva y un margen de {margin:g} px.</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>The edge was not found</source>
+        <translation>No se encontró el borde</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Check that the Sun is on the slit, then measure again.</source>
+        <translation>Comprueba que el Sol está sobre la rendija y vuelve a medir.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>{deg:.2f} deg, {px:.1f} px drift</source>
+        <translation>{deg:.2f} grados, {px:.1f} px de deriva</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The edge is irregular ({value:.1f} px); measure again before trusting the tilt.</source>
+        <translation>El borde es irregular ({value:.1f} px); vuelve a medir antes de fiarte del tilt.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The slit is parallel to Dec within {tol:.1f} deg.</source>
+        <translation>La rendija es paralela a Dec dentro de {tol:.1f} grados.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Rotate the slit towards zero: it leans {deg:.2f} deg. The scan can still run with a taller ROI.</source>
+        <translation>Gira la rendija hacia cero: se inclina {deg:.2f} grados. El barrido puede correr con un ROI más alto.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The ROI must be at least {needed} px tall: band {band} + drift {drift:.1f} + margin {margin:g}.</source>
+        <translation>El ROI debe tener al menos {needed} px de alto: banda {band} + deriva {drift:.1f} + margen {margin:g}.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>The tilt meter needs a frame and the SHG module. Check the camera and the stream, then measure again.</source>
+        <translation>El medidor de tilt necesita un fotograma y el módulo SHG. Revisa la cámara y el flujo y vuelve a medir.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The tilt could not be measured: {reason}. Check that the Sun is on the slit and measure again.</source>
+        <translation>No se pudo medir el tilt: {reason}. Comprueba que el Sol está sobre la rendija y vuelve a medir.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Tilt {deg:.2f} deg, {px:.1f} px of drift. Rotate the slit towards zero; the ROI must be {needed} px tall. The scan can still run with that taller ROI.</source>
+        <translation>Tilt {deg:.2f} grados, {px:.1f} px de deriva. Gira la rendija hacia cero; el ROI debe tener {needed} px de alto. El barrido puede correr con ese ROI más alto.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Slit parallel to Dec within {tol:.1f} deg. The Focus step is done; the ROI can be tight.</source>
+        <translation>Rendija paralela a Dec dentro de {tol:.1f} grados. El paso Enfoque está hecho; el ROI puede ser ajustado.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source> The edge is irregular ({value:.1f} px), so treat the tilt with caution.</source>
+        <translation> El borde es irregular ({value:.1f} px), así que toma el tilt con cautela.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Best focus values reset: the next readings start a fresh comparison.</source>
+        <translation>Mejores valores de enfoque reiniciados: las siguientes lecturas empiezan una comparación nueva.</translation>
+    </message>
+    <message>
+        <location line="+135"/>
         <source>The ROI was not applied: the warnings in the step explain what the camera would reject.</source>
         <translation>No se aplicó el ROI: los avisos del paso explican qué rechazaría la cámara.</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+25"/>
+        <source> No active profile: the ROI preset was not saved.</source>
+        <translation> Sin perfil activo: no se guardó el preset de ROI.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>The tilt meter is not available in this build; the measured tilt stays at its last value.</source>
         <translation>El medidor de tilt no está disponible en esta compilación; el tilt medido se queda en su último valor.</translation>
     </message>
@@ -1597,7 +2056,12 @@
         <translation>Tilt medido: {deg:.2f} grados, {px:.1f} px de deriva. El ROI debe ser lo bastante alto para contener la banda más esta deriva.</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
+        <source>There is no active profile: save one in the top bar before saving a preset.</source>
+        <translation>No hay perfil activo: guarda uno en la barra superior antes de guardar un preset.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Save ROI preset</source>
         <translation>Guardar preset de ROI</translation>
     </message>
@@ -1638,7 +2102,6 @@
     </message>
     <message>
         <location line="+4"/>
-        <location filename="../main_window.ui" line="+3"/>
         <source>Runs the cycles in order. Every row is a SER file in the session folder; stopping keeps the frames already written.</source>
         <translation>Ejecuta los ciclos en orden. Cada fila es un fichero SER en la carpeta de la sesión; parar conserva los fotogramas ya escritos.</translation>
     </message>
@@ -1674,7 +2137,7 @@
     </message>
     <message>
         <location line="+13"/>
-        <location line="+32"/>
+        <location line="+40"/>
         <source>Waiting for the first frames...</source>
         <translation>Esperando los primeros fotogramas...</translation>
     </message>
@@ -1694,26 +2157,46 @@
         <translation>Barrido empezado. La parte sombreada del disco ya está capturada; el porcentaje es del barrido previsto, así que 100% significa que el plan terminó.</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+21"/>
+        <source>Cycle {cycle} of {total}, {percent}%</source>
+        <translation>Ciclo {cycle} de {total}, {percent}%</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>{percent}% of the planned sweep</source>
+        <translation>{percent}% del barrido previsto</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Starting</source>
+        <translation>Empezando</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Recentring</source>
+        <translation>Recentrando</translation>
+    </message>
+    <message>
+        <location line="+24"/>
         <source>Dropped frames: {dropped} of {total} ({percent:.2f}%). Each one is a gap in the SER.</source>
         <translation>Fotogramas perdidos: {dropped} de {total} ({percent:.2f}%). Cada uno es un hueco en el SER.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+87"/>
+        <location line="+91"/>
         <location line="+6"/>
         <source>Resume</source>
         <translation>Reanudar</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <location line="+88"/>
-        <location filename="../main_window.ui" line="+9"/>
+        <location line="-96"/>
+        <location line="+92"/>
+        <location filename="../main_window.ui" line="+574"/>
         <source>Pause</source>
         <translation>Pausa</translation>
     </message>
     <message>
-        <location line="-78"/>
+        <location line="-82"/>
         <source>Quick recon: {frames} frames, {rows} row(s). Light preview, not for measurement.</source>
         <translation>Recon rápido: {frames} fotogramas, {rows} fila(s). Vista previa ligera, no para medir.</translation>
     </message>
@@ -1743,27 +2226,40 @@
         <translation>No se pudo construir la vista previa con estos fotogramas.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>{frames} frames in {seconds:.0f} s. {reason}</source>
         <translation>{frames} fotogramas en {seconds:.0f} s. {reason}</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source> Session folder: {folder}.</source>
-        <translation> Carpeta de sesión: {folder}.</translation>
+        <location line="+232"/>
+        <source>New data folder: {folder}</source>
+        <translation>Carpeta de datos nueva: {folder}</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <location filename="../main_window.ui" line="+64"/>
+        <source>When a scan finishes, its result and the data folder appear here.</source>
+        <translation>Cuando termina un barrido, su resultado y la carpeta de datos aparecen aquí.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../main_window.ui" line="+444"/>
+        <source>Idle</source>
+        <translation>En reposo</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <location filename="../main_window.ui" line="+237"/>
+        <source>Open data folder</source>
+        <translation>Abrir carpeta de datos</translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Finished. The session folder holds the SER files and the log.</source>
-        <translation>Terminado. La carpeta de la sesión contiene los ficheros SER y el registro.</translation>
+        <source>Data folder opened: {folder}. The steps are as you left them.</source>
+        <translation>Carpeta de datos abierta: {folder}. Los pasos están como los dejaste.</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>Session written to {folder}</source>
-        <translation>Sesión escrita en {folder}</translation>
-    </message>
-    <message>
-        <location line="+23"/>
+        <location line="-238"/>
         <source>Simulator run, no file written.</source>
         <translation>Ejecución en el simulador, sin escribir ficheros.</translation>
     </message>
@@ -1783,7 +2279,7 @@
         <translation>Fallido: {reason}.</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+36"/>
         <source>Settings saved. Every value has a default, so a partial file still starts the app.</source>
         <translation>Ajustes guardados. Todos los valores tienen un defecto, así que un fichero parcial sigue arrancando la aplicación.</translation>
     </message>
@@ -1798,7 +2294,7 @@
         <translation>Preset &apos;{name}&apos; copiado al paso ROI. Aplícalo allí cuando estés listo.</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+16"/>
         <source>Device diagnostics</source>
         <translation>Diagnóstico de dispositivos</translation>
     </message>
@@ -1808,7 +2304,12 @@
         <translation>El informe de abajo dice a qué puede llegar esta compilación y a qué no. Es lo primero que conviene adjuntar a un informe de fallo.</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+26"/>
+        <source>Data folder: {path}</source>
+        <translation>Carpeta de datos: {path}</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>ROI capture: {rect}</source>
         <translation>ROI de captura: {rect}</translation>
     </message>
@@ -1824,11 +2325,29 @@
     </message>
     <message>
         <location line="+2"/>
+        <source>Spectrum: {target:.2f} Å target, {dispersion:.4f} Å/px, flip {flip}</source>
+        <translation>Espectro: objetivo {target:.2f} Å, {dispersion:.4f} Å/px, volteo {flip}</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Run &apos;python -m solarscribe --diagnostics&apos; for the backend and device list.</source>
         <translation>Ejecuta &apos;python -m solarscribe --diagnostics&apos; para la lista de backends y dispositivos.</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+10"/>
+        <source>1. Open the camera in the camera panel on the right.
+2. Find the Sun: connect the mount and press Point at the Sun and centre.
+3. Focus: sharpen the three focusers and measure the slit tilt; rotate the slit until it is parallel to Dec.
+4. ROI: drag the spectral band on the video, type the capture strip and press Apply this ROI.
+5. Scanning: prepare, then start. The quick recon tells you whether the take went well; the post-processing stays external.</source>
+        <translation>1. Abre la cámara en el panel de cámara de la derecha.
+2. Buscar el Sol: conecta la montura y pulsa Apuntar al Sol y centrar.
+3. Enfoque: afina los tres enfoques y mide el tilt de la rendija; gira la rendija hasta que sea paralela a Dec.
+4. ROI: arrastra la banda espectral sobre el vídeo, escribe la franja de captura y pulsa Aplicar este ROI.
+5. Barrido: prepara y luego empieza. El recon rápido te dice si la toma salió bien; el post-proceso sigue siendo externo.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>SolarScribe {version}
 
 Capture for the solar spectroheliograph. It records SER files and logs for the post-processing; it does not post-process.
@@ -1841,33 +2360,18 @@ Captura para el espectroheliógrafo solar. Escribe ficheros SER y registros para
 GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <source>New session: {folder}</source>
-        <translation>Sesión nueva: {folder}</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <location filename="../main_window.ui" line="+396"/>
+        <location line="+48"/>
+        <location filename="../main_window.ui" line="-141"/>
         <source>The preview appears as the scan advances.</source>
         <translation>La vista previa aparece a medida que avanza el barrido.</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <source>Open session</source>
-        <translation>Abrir sesión</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Session opened: {folder}. The steps are as you left them.</source>
-        <translation>Sesión abierta: {folder}. Los pasos están como los dejaste.</translation>
-    </message>
-    <message>
-        <location line="+28"/>
+        <location line="+58"/>
         <source>{what} is not available in this build. The simulator covers the interface until the engine lands.</source>
         <translation>{what} no está disponible en esta compilación. El simulador cubre la interfaz hasta que llegue el motor.</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+16"/>
         <source>Device discovery failed: {error}</source>
         <translation>El descubrimiento de dispositivos falló: {error}</translation>
     </message>
@@ -1967,7 +2471,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>el motor informó de un problema; el registro dice cuál</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="-383"/>
+        <location filename="../main_window.ui" line="-591"/>
         <source>Stop the scan</source>
         <translation>Parar el barrido</translation>
     </message>
@@ -1984,13 +2488,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Fotogramas perdidos: ninguno por ahora. Cada fotograma perdido es un hueco en el SER que la reconstrucción tiene que salvar.</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <location filename="../main_window.ui" line="+13"/>
-        <source>When a scan finishes, its result and the session folder appear here.</source>
-        <translation>Cuando termina un barrido, su resultado y la carpeta de la sesión aparecen aquí.</translation>
-    </message>
-    <message>
-        <location filename="../main_window.ui" line="+61"/>
+        <location filename="../main_window.ui" line="+84"/>
         <source>Brightness</source>
         <translation>Brillo</translation>
     </message>
@@ -2026,18 +2524,13 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Marca el centro de la rendija. El Sol debe quedar centrado en esta cruz antes de un barrido.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="-1200"/>
+        <location filename="../main_window.py" line="-1753"/>
         <location filename="../main_window.ui" line="+7"/>
         <source>ROI</source>
         <translation>ROI</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+6"/>
-        <source>Shows the capture ROI and the spectral band over the video. Drag the handles to edit them.</source>
-        <translation>Muestra el ROI de captura y la banda espectral sobre el vídeo. Arrastra las asas para editarlos.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location filename="../main_window.ui" line="+13"/>
         <source>Fit</source>
         <translation>Ajustar</translation>
     </message>
@@ -2047,37 +2540,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Encaja el fotograma completo en la vista. También vuelve a poner el zoom a 1x.</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <source>Scroll to zoom, drag the handles to move the ROI</source>
-        <translation>Desplaza para hacer zoom, arrastra las asas para mover el ROI</translation>
-    </message>
-    <message>
-        <location line="+32"/>
-        <source>Spectrum magnifier</source>
-        <translation>Ampliador del espectro</translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>Zoomed view of the spectral band: the slit image and the absorption lines must be straight and centred.</source>
-        <translation>Vista ampliada de la banda espectral: la imagen de la rendija y las líneas de absorción deben estar rectas y centradas.</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Brightness histogram</source>
-        <translation>Histograma de brillo</translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>The two markers are the stretch limits: below the first and above the second everything is clipped to black or white.</source>
-        <translation>Las dos marcas son los límites del estiramiento: por debajo de la primera y por encima de la segunda todo se recorta a negro o blanco.</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Scan progress and result</source>
-        <translation>Progreso y resultado del barrido</translation>
-    </message>
-    <message>
-        <location line="+30"/>
+        <location line="+364"/>
         <source>subtitle</source>
         <translation>subtitle</translation>
     </message>
@@ -2088,31 +2551,32 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
     <message>
         <location line="+3"/>
+        <location line="+39"/>
         <source>A light reconstruction to check the take. It is not exported and it does not replace post-processing.</source>
         <translation>Una reconstrucción ligera para comprobar la toma. No se exporta y no sustituye al post-proceso.</translation>
     </message>
     <message>
-        <location line="+36"/>
-        <source>A light, non-authoritative preview: the band averaged and stacked into a disk. It is not calibrated, not exported and not a substitute for post-processing.</source>
-        <translation>Una vista previa ligera y no autoritativa: la banda promediada y apilada en un disco. No está calibrada, no se exporta y no sustituye al post-proceso.</translation>
-    </message>
-    <message>
-        <location line="+36"/>
+        <location line="+29"/>
         <source>&amp;File</source>
         <translation>&amp;Archivo</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+7"/>
         <source>&amp;Tools</source>
         <translation>&amp;Herramientas</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>&amp;Help</source>
         <translation>&amp;Ayuda</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+7"/>
+        <source>Panels</source>
+        <translation>Paneles</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Telescope</source>
         <translation>Telescopio</translation>
     </message>
@@ -2122,33 +2586,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Salud del flujo</translation>
     </message>
     <message>
-        <location line="+38"/>
-        <source>New session</source>
-        <translation>Sesión nueva</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Open session…</source>
-        <translation>Abrir sesión…</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
-        <location line="-129"/>
-        <location line="+134"/>
-        <source>Open session folder</source>
-        <translation>Abrir carpeta de la sesión</translation>
-    </message>
-    <message>
-        <location line="-1284"/>
+        <location line="-1785"/>
         <source>Centring limit</source>
         <translation>Límite de centrado</translation>
     </message>
@@ -2158,12 +2596,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Cuánto puede acercarse al centro el método, en arcosegundos. Cerca del centro la señal de fracción brillante es plana, y la longitud de la cuerda tiene pendiente cero ahí, así que el centrado grueso no puede hacerlo mejor. El centrado fino del paso Escaneado termina el trabajo; esta cifra dice cuánto le queda.</translation>
     </message>
     <message>
-        <location line="+284"/>
-        <source>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Draw the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</source>
-        <translation>El ROI es la franja que entrega la cámara. Fija la tasa de fotogramas y exactamente lo que se escribe al SER, así que debe contener el espectro con sitio para el tilt. Dibuja la banda espectral sobre el vídeo y escribe el rectángulo de captura: el fotograma ya es el ROI de captura, así que un rectángulo mayor dibujado encima sería ficción.</translation>
-    </message>
-    <message>
-        <location line="+399"/>
+        <location line="+1027"/>
         <source>Recentre between cycles</source>
         <translation>Recentrar entre ciclos</translation>
     </message>
@@ -2173,7 +2606,22 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Antes de cada ciclo después del primero, la aplicación centra otra vez el Sol sobre la rendija. Cuesta unos minutos por sesión pero evita que la deriva recorte los barridos posteriores; el rebobinado en AR ocurre igualmente.</translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+23"/>
+        <source>Runs the cycles in order. Every row is a SER file in the data folder; stopping keeps the frames already written.</source>
+        <translation>Ejecuta los ciclos en orden. Cada fila es un fichero SER en la carpeta de datos; parar conserva los fotogramas ya escritos.</translation>
+    </message>
+    <message>
+        <location line="+80"/>
+        <source>Open the data folder</source>
+        <translation>Abrir la carpeta de datos</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Opens the folder that holds the SER files and the logs of this run, so the post-processing can pick them up.</source>
+        <translation>Abre la carpeta que contiene los ficheros SER y los registros de esta tanda, para que el post-proceso pueda recogerlos.</translation>
+    </message>
+    <message>
+        <location line="+24"/>
         <source>Reopen this step</source>
         <translation>Reabrir este paso</translation>
     </message>
@@ -2183,17 +2631,17 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Marca este paso completado como en curso otra vez. Se conservan los números ya guardados, así que puedes corregir una cosa sin rehacer la sesión.</translation>
     </message>
     <message>
-        <location line="+328"/>
-        <source>Opens the folder that holds the SER files and the logs of this session, so the post-processing can pick them up.</source>
-        <translation>Abre la carpeta que contiene los ficheros SER y los registros de esta sesión, para que el post-proceso pueda recogerlos.</translation>
-    </message>
-    <message>
-        <location line="+96"/>
+        <location line="+625"/>
         <source>Camera</source>
         <translation>Cámara</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+22"/>
+        <source>Opens the folder that holds the SER files and the logs of this run.</source>
+        <translation>Abre la carpeta que contiene los ficheros SER y los registros de esta tanda.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Quit</source>
         <translation>Salir</translation>
     </message>
@@ -2214,6 +2662,16 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
     <message>
         <location line="+5"/>
+        <source>Profiles…</source>
+        <translation>Perfiles…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Lists the named instrument profiles, switches the active one, or renames and deletes them.</source>
+        <translation>Lista los perfiles de instrumento con nombre, cambia el activo, o los renombra y los borra.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Sky calendar…</source>
         <translation>Calendario del cielo…</translation>
     </message>
@@ -2221,11 +2679,6 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <location line="+5"/>
         <source>ROI manager…</source>
         <translation>Gestor de ROI…</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Focus aid…</source>
-        <translation>Ayuda al enfoque…</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2243,27 +2696,160 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+1146"/>
-        <location filename="../main_window.ui" line="+5"/>
+        <location filename="../main_window.py" line="+1702"/>
+        <location filename="../main_window.ui" line="+38"/>
         <source>Quick start</source>
         <translation>Inicio rápido</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>1. Find the Sun: open the telescope panel, connect the mount and press Point at the Sun and centre.
-2. Polar alignment: start the measurement and leave the telescope tracking; it needs 20 to 40 minutes.
-3. ROI: draw the spectral band on the video and type the capture rectangle; press Apply this ROI.
-4. Scanning: prepare, then start. The quick recon tells you whether the take went well; the post-processing stays external.</source>
-        <translation>1. Buscar el Sol: abre el panel de telescopio, conecta la montura y pulsa Apuntar al Sol y centrar.
-2. Alineación polar: empieza la medición y deja el telescopio siguiendo; necesita de 20 a 40 minutos.
-3. ROI: dibuja la banda espectral sobre el vídeo y escribe el rectángulo de captura; pulsa Aplicar este ROI.
-4. Escaneado: prepara y luego empieza. El recon rápido te dice si la toma salió bien; el post-proceso sigue siendo externo.</translation>
-    </message>
-    <message>
-        <location line="+13"/>
+        <location line="+17"/>
         <location filename="../main_window.ui" line="+5"/>
         <source>About SolarScribe</source>
         <translation>Acerca de SolarScribe</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileManagerDialog</name>
+    <message>
+        <location filename="../profile_manager.py" line="+102"/>
+        <location line="+5"/>
+        <source> (active)</source>
+        <translation> (activo)</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <location line="+1"/>
+        <source>New profile</source>
+        <translation>Perfil nuevo</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Name for the new profile:</source>
+        <translation>Nombre del perfil nuevo:</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location line="+24"/>
+        <source>A profile named &apos;{name}&apos; already exists.</source>
+        <translation>Ya existe un perfil llamado &apos;{name}&apos;.</translation>
+    </message>
+    <message>
+        <location line="-5"/>
+        <source>Rename profile</source>
+        <translation>Renombrar perfil</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>New name:</source>
+        <translation>Nombre nuevo:</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>The last profile cannot be deleted.</source>
+        <translation>El último perfil no se puede borrar.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Delete profile</source>
+        <translation>Borrar perfil</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Delete the profile &apos;{name}&apos;? The saved optics and ROI presets of that profile are lost.</source>
+        <translation>¿Borrar el perfil &apos;{name}&apos;? Se pierden la óptica y los presets de ROI guardados de ese perfil.</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <location filename="../profile_manager.ui" line="+14"/>
+        <location line="+24"/>
+        <source>Profiles</source>
+        <translation>Perfiles</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Named-profile storage is not available in this build. The single profile is used.</source>
+        <translation>El almacenamiento de perfiles con nombre no está disponible en esta compilación. Se usa el perfil único.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The profile file is not configured. Check Settings.</source>
+        <translation>El fichero de perfiles no está configurado. Revisa Ajustes.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The profile could not be changed. The log has the detail.</source>
+        <translation>No se pudo cambiar el perfil. El registro tiene el detalle.</translation>
+    </message>
+    <message>
+        <location filename="../profile_manager.ui" line="-3"/>
+        <source>title</source>
+        <translation>title</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+20"/>
+        <source>hint</source>
+        <translation>hint</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <source>A profile stores the optics, the camera and the ROI presets for one instrument setup. The active profile is loaded at startup; switching profiles does not move the telescope or restart the camera.</source>
+        <translation>Un perfil guarda la óptica, la cámara y los presets de ROI de una configuración de instrumento. El perfil activo se carga al arrancar; cambiar de perfil no mueve el telescopio ni reinicia la cámara.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>The saved profiles. The active one is marked. Select a name to rename, delete or use it.</source>
+        <translation>Los perfiles guardados. El activo está marcado. Selecciona un nombre para renombrarlo, borrarlo o usarlo.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Named-profile storage is not available in this build; the single &apos;Default&apos; profile is used.</source>
+        <translation>El almacenamiento de perfiles con nombre no está disponible en esta compilación; se usa el perfil único &apos;Default&apos;.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>New from current</source>
+        <translation>Nuevo desde el actual</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Saves the current optics, camera and ROI presets under a new name. The new profile becomes active.</source>
+        <translation>Guarda la óptica, la cámara y los presets de ROI actuales con un nombre nuevo. El perfil nuevo queda activo.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Rename…</source>
+        <translation>Renombrar…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Changes the name of the selected profile. The saved values do not change.</source>
+        <translation>Cambia el nombre del perfil seleccionado. Los valores guardados no cambian.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Delete</source>
+        <translation>Borrar</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Removes the selected profile. The last profile cannot be deleted.</source>
+        <translation>Elimina el perfil seleccionado. El último perfil no se puede borrar.</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Use this profile</source>
+        <translation>Usar este perfil</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Loads the selected profile and makes it the active one. The camera stays connected; apply a ROI preset if the strip changed.</source>
+        <translation>Carga el perfil seleccionado y lo deja activo. La cámara sigue conectada; aplica un preset de ROI si cambió la franja.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Close</source>
+        <translation>Cerrar</translation>
     </message>
 </context>
 <context>
@@ -2357,12 +2943,22 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Escala: no disponible hasta que el perfil tenga la óptica.</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>{value:.2f} arcsec per pixel. The profile&apos;s focal length and pixel size are what turn this ROI&apos;s pixels into sky.</source>
-        <translation>{value:.2f} arcosegundos por píxel. La focal y el tamaño de píxel del perfil son lo que convierte los píxeles de este ROI en cielo.</translation>
+        <location line="+4"/>
+        <source>{value:.2f} arcsec per pixel.</source>
+        <translation>{value:.2f} arcosegundos por píxel.</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+77"/>
+        <source>{fps} fps, {mb} MB/s (target {target} fps).</source>
+        <translation>{fps} fps, {mb} MB/s (objetivo {target} fps).</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> Simulator.</source>
+        <translation> Simulador.</translation>
+    </message>
+    <message>
+        <location line="-73"/>
         <source>No problems found: this ROI can be scanned.</source>
         <translation>Sin problemas: este ROI se puede barrer.</translation>
     </message>
@@ -2396,16 +2992,6 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <location line="+17"/>
         <source>Rate: not estimated until the camera is connected.</source>
         <translation>Tasa: sin estimar hasta que se conecte la cámara.</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>About {fps} fps and {mb} MB/s. The budget is {target} fps for the reference strip; below it the scan takes longer.</source>
-        <translation>Unos {fps} fps y {mb} MB/s. El presupuesto es {target} fps para la franja de referencia; por debajo, el barrido tarda más.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source> The simulator repaints slower on purpose; this is what the real camera would need.</source>
-        <translation> El simulador se repinta más despacio a propósito; esto es lo que necesitaría la cámara real.</translation>
     </message>
 </context>
 <context>
@@ -2544,13 +3130,13 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.py" line="+459"/>
+        <location filename="../session.py" line="+475"/>
         <source>The camera did not start. The device diagnostics say why; the telescope and the session are unaffected.</source>
         <translation>La cámara no arrancó. El diagnóstico de dispositivos dice por qué; el telescopio y la sesión no se ven afectados.</translation>
     </message>
     <message>
         <location line="+73"/>
-        <location line="+41"/>
+        <location line="+49"/>
         <source>The camera refused the change. The log has the technical detail; the previous ROI is still in the model.</source>
         <translation>La cámara rechazó el cambio. El registro tiene el detalle técnico; el ROI anterior sigue en el modelo.</translation>
     </message>
@@ -2631,6 +3217,36 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <location line="+1"/>
         <source>Fallback solar diameter in arcseconds when no ephemeris is available. 1920&quot; is the mean apparent diameter, about 32&apos;.</source>
         <translation>Diámetro solar de respaldo en arcosegundos cuando no hay efeméride. 1920&quot; es el diámetro aparente medio, unos 32&apos;.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wavelength the grating is tuned to, in angstroms. 6562.81 A is H-alpha (Fraunhofer C): a known line anchors the pixel-to-wavelength mapping, and if it is wrong every other line name slides with it.</source>
+        <translation>Longitud de onda a la que está sintonizada la rejilla, en ángstroms. 6562,81 A es H-alpha (Fraunhofer C): una línea conocida ancla la correspondencia píxel a longitud de onda, y si está mal, todos los demás nombres de línea se desplazan con ella.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Angstroms per pixel along the dispersion axis. 0 means unknown and disables identification: without a scale a pixel distance cannot become a wavelength. Measure it from a known line pair or from the spectrograph geometry, not from a guess.</source>
+        <translation>Ángstroms por píxel a lo largo del eje de dispersión. 0 significa desconocido y desactiva la identificación: sin una escala, una distancia en píxeles no puede convertirse en longitud de onda. Mídela con un par de líneas conocido o con la geometría del espectrógrafo, no a ojo.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Dispersion direction. True when the wavelength decreases with the pixel index, which a mirrored grating or camera produces; an unflagged flip names the detected lines backwards.</source>
+        <translation>Dirección de la dispersión. Verdadero cuando la longitud de onda disminuye con el índice de píxel, algo que produce una rejilla o cámara reflejada; un volteo sin marcar nombra las líneas detectadas al revés.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>How close a detected dip must be to a catalog line, in angstroms. 0.5 A is the scale at which a low-resolution SHG separates neighbours: tighter misses a slightly shifted line, looser names the wrong one.</source>
+        <translation>Cuánto puede distar una depresión detectada de una línea del catálogo, en ángstroms. 0,5 A es la escala a la que un SHG de baja resolución separa vecinas: más ajustado pierde una línea ligeramente desplazada, más holgado nombra la equivocada.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Confidence below which the UI warns that the identification is not trustworthy. 0.35 is an F1 score over the strong catalog lines and the detected dips; the names are a pattern match, not a wavelength calibration, so a low score has to be said out loud.</source>
+        <translation>Confianza por debajo de la cual la interfaz avisa de que la identificación no es fiable. 0,35 es una puntuación F1 sobre las líneas fuertes del catálogo y las depresiones detectadas; los nombres son una coincidencia de patrón, no una calibración de longitud de onda, así que una puntuación baja hay que decirla en voz alta.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Half-width, in pixels, of the search that refines the anchor line. It absorbs a wavelength calibration error of a couple of pixels without jumping to a neighbouring line; 0 disables the refinement.</source>
+        <translation>Semiancho, en píxeles, de la búsqueda que refina la línea ancla. Absorbe un error de calibración en longitud de onda de un par de píxeles sin saltar a una línea vecina; 0 desactiva el refinamiento.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3237,6 +3853,11 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Alineación polar</translation>
     </message>
     <message>
+        <location line="+2"/>
+        <source>Spectrum</source>
+        <translation>Espectro</translation>
+    </message>
+    <message>
         <location line="+8"/>
         <source>The two rectangles and the last tilt. The ROI is in sensor pixels; the band is in frame pixels.</source>
         <translation>Los dos rectángulos y el último tilt. El ROI está en píxeles de sensor; la banda, en píxeles de frame.</translation>
@@ -3247,7 +3868,12 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>El presupuesto del ADR-013. Son las cifras con las que compara el panel de salud.</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
+        <source>Line identification. The target line anchors the wavelength scale and the dispersion turns pixels into angstroms. Both are inputs, so a wrong one names the lines wrongly.</source>
+        <translation>Identificación de líneas. La línea objetivo ancla la escala de longitud de onda y la dispersión convierte píxeles en ángstroms. Las dos son entradas, así que una equivocada nombra mal las líneas.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Every value has a default, so a partial file still starts the app.</source>
         <translation>Todos los valores tienen un defecto, así que un fichero parcial sigue arrancando la aplicación.</translation>
     </message>
@@ -3445,31 +4071,199 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
 </context>
 <context>
+    <name>SpectrumPanel</name>
+    <message>
+        <location filename="../spectrum_panel.py" line="+131"/>
+        <source>Spectral lines</source>
+        <translation>Líneas espectrales</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Off</source>
+        <translation>Apagado</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Anchor: --</source>
+        <translation>Ancla: --</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Confidence: --</source>
+        <translation>Confianza: --</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Line</source>
+        <translation>Línea</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Å</source>
+        <translation>Å</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Row</source>
+        <translation>Fila</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Names sorted by their row in the frame. The row is where the line sits in the video; the spectral band starts at the top of the strip, and the row includes that offset.</source>
+        <translation>Nombres ordenados por su fila en el fotograma. La fila es donde está la línea en el vídeo; la banda espectral empieza en la parte superior de la franja, y la fila incluye ese desplazamiento.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Set the dispersion and the target line in Settings → Spectrum.</source>
+        <translation>Define la dispersión y la línea objetivo en Ajustes → Espectro.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The target line is the anchor: the grating is tuned to it. The row is where the strongest matching dip was found.</source>
+        <translation>La línea objetivo es el ancla: la rejilla está sintonizada con ella. La fila es donde se encontró la depresión coincidente más fuerte.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>An F1 score over the strong catalog lines in the window and the detected dips. It says how well the pattern supports the names, not how accurate a wavelength is.</source>
+        <translation>Una puntuación F1 sobre las líneas fuertes del catálogo en la ventana y las depresiones detectadas. Dice cuánto sostiene el patrón los nombres, no cuánto de exacta es una longitud de onda.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Reading the spectrum...</source>
+        <translation>Leyendo el espectro...</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Identification is off: the dispersion is 0 in Settings → Spectrum. It is how many angstroms one pixel covers; without it a pixel distance cannot become a wavelength.</source>
+        <translation>La identificación está apagada: la dispersión vale 0 en Ajustes → Espectro. Es cuántos ángstroms cubre un píxel; sin ella, una distancia en píxeles no puede convertirse en longitud de onda.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>No spectrum on screen. Open the camera and start the stream.</source>
+        <translation>No hay espectro en pantalla. Abre la cámara y arranca el flujo.</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Naming is not trustworthy: confidence {value:.2f} is below the {minimum:.2f} minimum. No names are shown. Check the target line and the dispersion in Settings → Spectrum.</source>
+        <translation>Los nombres no son fiables: la confianza {value:.2f} está por debajo del mínimo {minimum:.2f}. No se muestran nombres. Revisa la línea objetivo y la dispersión en Ajustes → Espectro.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>1 line named, sorted by row.</source>
+        <translation>1 línea nombrada, ordenada por fila.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>{count} lines named, sorted by row.</source>
+        <translation>{count} líneas nombradas, ordenadas por fila.</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Anchor: {name} {wave:.2f} Å at row {row}</source>
+        <translation>Ancla: {name} {wave:.2f} Å en la fila {row}</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Anchor: {wave:.2f} Å at row {row}</source>
+        <translation>Ancla: {wave:.2f} Å en la fila {row}</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Confidence {value:.2f} (0 to 1): the share of catalog lines found and detected dips named. It is a pattern match, not a wavelength calibration.</source>
+        <translation>Confianza {value:.2f} (0 a 1): la proporción de líneas del catálogo encontradas y de depresiones detectadas con nombre. Es una coincidencia de patrón, no una calibración de longitud de onda.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>The spectral band has no pixels. Check the band in the ROI step.</source>
+        <translation>La banda espectral no tiene píxeles. Revisa la banda en el paso ROI.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>No absorption line found in the band. Check the focus, the exposure and the spectral band.</source>
+        <translation>No se encontró ninguna línea de absorción en la banda. Revisa el enfoque, la exposición y la banda espectral.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>No catalog line matched the detected dips ({count}). The dispersion or the target line is probably wrong; check Settings → Spectrum.</source>
+        <translation>Ninguna línea del catálogo coincidió con las depresiones detectadas ({count}). Probablemente la dispersión o la línea objetivo están mal; revisa Ajustes → Espectro.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The target line is missing. Set it in Settings → Spectrum.</source>
+        <translation>Falta la línea objetivo. Defínela en Ajustes → Espectro.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The dispersion is zero, so identification is off. Set it in Settings → Spectrum.</source>
+        <translation>La dispersión es cero, así que la identificación está apagada. Defínela en Ajustes → Espectro.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The identification could not run. Check the log and Settings → Spectrum.</source>
+        <translation>No se pudo ejecutar la identificación. Revisa el registro y Ajustes → Espectro.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source> (telluric)</source>
+        <translation> (telúrica)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Depth {depth:.0f}% of the local continuum. Residual {distance:.2f} Å from the catalog rest wavelength. {kind}.</source>
+        <translation>Profundidad {depth:.0f}% del continuo local. Residuo {distance:.2f} Å frente a la longitud de onda en reposo del catálogo. {kind}.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>telluric (Earth&apos;s atmosphere)</source>
+        <translation>telúrica (atmósfera terrestre)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>solar</source>
+        <translation>solar</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Rest wavelength in angstroms (Å). The measured line is {distance:.2f} Å from it.</source>
+        <translation>Longitud de onda en reposo en ángstroms (Å). La línea medida está a {distance:.2f} Å de ella.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Row in the frame; the spectral band starts at row {band}.</source>
+        <translation>Fila en el fotograma; la banda espectral empieza en la fila {band}.</translation>
+    </message>
+</context>
+<context>
     <name>StepRail</name>
     <message>
-        <location filename="../step_rail.py" line="+78"/>
+        <location filename="../step_rail.py" line="+83"/>
         <source>Go to this step. Steps never block: you can come back at any time and the state is saved as you go.</source>
         <translation>Ir a este paso. Los pasos nunca bloquean: puedes volver en cualquier momento y el estado se guarda sobre la marcha.</translation>
     </message>
     <message>
-        <location line="+34"/>
-        <source>Find the Sun</source>
-        <translation>Buscar el Sol</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Polar alignment</source>
-        <translation>Alineación polar</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+42"/>
         <source>ROI</source>
         <translation>ROI</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Scanning</source>
-        <translation>Escaneado</translation>
+        <location line="-6"/>
+        <source>Find Sun</source>
+        <translation>Buscar Sol</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Polar</source>
+        <translation>Polar</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Focus</source>
+        <translation>Enfoque</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Scan</source>
+        <translation>Barrido</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -3523,84 +4317,39 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Verde significa conectado, ámbar significa aún sin conectar, rojo significa que el último comando falló.</translation>
     </message>
     <message>
-        <location filename="../telescope_panel.py" line="+118"/>
-        <source>Fine: 1 arcsec/s</source>
-        <translation>Fino: 1 arcosegundo/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slow: 5 arcsec/s</source>
-        <translation>Lento: 5 arcosegundos/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sidereal: 15 arcsec/s</source>
-        <translation>Sidéreo: 15 arcosegundos/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Fast: 60 arcsec/s</source>
-        <translation>Rápido: 60 arcosegundos/s</translation>
-    </message>
-    <message>
-        <location line="+49"/>
+        <location filename="../telescope_panel.py" line="+173"/>
         <source>Mount</source>
         <translation>Montura</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location line="+395"/>
+        <location line="+324"/>
         <source>No mount found</source>
         <translation>No se encontró ninguna montura</translation>
     </message>
     <message>
-        <location line="-368"/>
+        <location line="-297"/>
         <source>No mount</source>
         <translation>Sin montura</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+11"/>
         <location filename="../telescope_panel.ui" line="+7"/>
         <source>Not connected</source>
         <translation>Sin conexión</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <source>Connected</source>
         <translation>Conectada</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>{value:.5f} h</source>
-        <translation>{value:.5f} h</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>{value:+.4f} deg</source>
-        <translation>{value:+.4f}°</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Stopped</source>
-        <translation>Parada</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Parked</source>
-        <translation>Aparcada</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Unparked</source>
-        <translation>Desaparcada</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location line="+22"/>
         <source>Unpark</source>
         <translation>Desaparcar</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+6"/>
         <source>Discovery is not available in this build. The simulator is used instead.</source>
         <translation>El descubrimiento no está disponible en esta compilación. Se usa el simulador en su lugar.</translation>
     </message>
@@ -3630,17 +4379,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Conectada. Revisa la posición y el seguimiento antes de moverla.</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Declination must be between -90 and +90 degrees.</source>
-        <translation>La declinación debe estar entre -90 y +90 grados.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Slewing to RA {ra:.4f} h, Dec {dec:+.3f} deg. The Sun is not here unless you computed it.</source>
-        <translation>Desplazándose a AR {ra:.4f} h, Dec {dec:+.3f} grados. El Sol no está aquí salvo que lo hayas calculado.</translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>The Sun&apos;s position is not available: set your observatory latitude and longitude in Tools, Settings (Observatory), and the ephemeris module must be present.</source>
         <translation>La posición del Sol no está disponible: define la latitud y la longitud del observatorio en Herramientas, Ajustes (Observatorio), y el módulo de efemérides debe estar presente.</translation>
     </message>
@@ -3650,12 +4389,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Desplazándose al Sol (AR {ra:.4f} h, Dec {dec:+.2f} grados). Cuando pare, céntralo sobre la rendija.</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>Synced: the mount now believes it is here. Only do this when the Sun really is centred.</source>
-        <translation>Sincronizada: la montura cree que está aquí. Hazlo solo cuando el Sol esté realmente centrado.</translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Moving at {rate} arcsec/s. Release to stop.</source>
         <translation>Moviéndose a {rate} arcosegundos/s. Suelta para parar.</translation>
     </message>
@@ -3690,12 +4424,27 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Aparcada. La óptica está segura para dejarla.</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>GOTO cancelled. The mount stays where it is.</source>
-        <translation>GOTO cancelado. La montura se queda donde está.</translation>
+        <location line="-260"/>
+        <source>Fine 1″/s</source>
+        <translation>Fino 1″/s</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+1"/>
+        <source>Slow 5″/s</source>
+        <translation>Lento 5″/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal 15″/s</source>
+        <translation>Sidéreo 15″/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fast 60″/s</source>
+        <translation>Rápido 60″/s</translation>
+    </message>
+    <message>
+        <location line="+275"/>
         <source>Connect the mount first.</source>
         <translation>Conecta primero la montura.</translation>
     </message>
@@ -3705,7 +4454,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>La montura no está conectada.</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+29"/>
         <source>Disconnect</source>
         <translation>Desconectar</translation>
     </message>
@@ -3716,7 +4465,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Conectar</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -3771,111 +4520,18 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Vuelve a buscar monturas. El descubrimiento habla con la capa de dispositivos y puede tardar un momento.</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>Where it points</source>
-        <translation>Dónde apunta</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>RA</source>
-        <translation>AR</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <location line="+20"/>
-        <source>number</source>
-        <translation>number</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <location line="+20"/>
-        <source>--</source>
-        <translation>--</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <source>Right ascension in hours. The scan sweeps along this axis, so it must move smoothly while tracking.</source>
-        <translation>Ascensión recta en horas. El barrido recorre este eje, así que debe moverse con suavidad mientras sigue.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Dec</source>
-        <translation>Dec</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Declination in degrees. The Sun sits at about +10 to +23 degrees depending on the season.</source>
-        <translation>Declinación en grados. El Sol está entre unos +10 y +23 grados según la estación.</translation>
-    </message>
-    <message>
-        <location filename="../telescope_panel.py" line="-298"/>
-        <location filename="../telescope_panel.ui" line="+7"/>
-        <location line="+197"/>
+        <location line="+100"/>
         <source>Tracking</source>
         <translation>Seguimiento</translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location line="+1"/>
-        <location filename="../telescope_panel.ui" line="-190"/>
-        <location line="+17"/>
-        <source>Unknown</source>
-        <translation>Desconocido</translation>
-    </message>
-    <message>
-        <location filename="../telescope_panel.ui" line="-14"/>
-        <source>Whether the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</source>
-        <translation>Si la montura sigue el cielo. El barrido añade su recorrido encima de esto, así que sin seguimiento el disco se emborrona.</translation>
-    </message>
-    <message>
-        <location filename="../telescope_panel.py" line="+30"/>
-        <location filename="../telescope_panel.ui" line="+7"/>
-        <location line="+190"/>
+        <location filename="../telescope_panel.py" line="-233"/>
+        <location filename="../telescope_panel.ui" line="+23"/>
         <source>Park</source>
         <translation>Aparcado</translation>
     </message>
     <message>
-        <location filename="../telescope_panel.ui" line="-180"/>
-        <source>Whether the mount is in its park position. Park before closing the observatory so the optics are safe.</source>
-        <translation>Si la montura está en su posición de aparcado. Aparca antes de cerrar el observatorio para que la óptica esté segura.</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Go to a position</source>
-        <translation>Ir a una posición</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>RA (h)</source>
-        <translation>AR (h)</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Dec (deg)</source>
-        <translation>Dec (grados)</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Go to</source>
-        <translation>Ir</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Slews to the coordinates above. The mount stops tracking while it slews and resumes afterwards.</source>
-        <translation>Se desplaza a las coordenadas de arriba. La montura deja de seguir mientras se mueve y reanuda después.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Sync here</source>
-        <translation>Sincronizar aquí</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Tells the mount that it is really at the coordinates above. Use it when you have centred the Sun by hand.</source>
-        <translation>Dice a la montura que está realmente en las coordenadas de arriba. Úsalo cuando hayas centrado el Sol a mano.</translation>
-    </message>
-    <message>
-        <location line="+10"/>
+        <location filename="../telescope_panel.ui" line="-114"/>
         <source>Go to the Sun</source>
         <translation>Ir al Sol</translation>
     </message>
@@ -3886,11 +4542,11 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Move by hand</source>
-        <translation>Mover a mano</translation>
+        <source>Nudge</source>
+        <translation>Empujón</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+9"/>
         <source>N</source>
         <translation>N</translation>
     </message>
@@ -3951,23 +4607,13 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
     </message>
     <message>
         <location line="+15"/>
-        <source>Keeps the Sun still in the frame while the mount follows the sky.</source>
-        <translation>Mantiene el Sol quieto en el fotograma mientras la montura sigue el cielo.</translation>
+        <source>Keeps the Sun still in the frame while the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</source>
+        <translation>Mantiene el Sol quieto en el fotograma mientras la montura sigue el cielo. El barrido añade su recorrido encima de esto, así que sin seguimiento el disco se emborrona.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+23"/>
         <source>Moves to the park position and stops tracking. Use it before closing the observatory.</source>
         <translation>Se mueve a la posición de aparcado y deja de seguir. Úsalo antes de cerrar el observatorio.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Abort slew</source>
-        <translation>Abortar el giro</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Cancels a GOTO without parking. The mount stays where it is.</source>
-        <translation>Cancela un GOTO sin aparcar. La montura se queda donde está.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -4028,7 +4674,7 @@ GPL v3. Hermano de NightScribe, con sus patrones y su tema oscuro.</translation>
         <translation>Longitud con el este positivo. Fija el ángulo horario, así que un error se convierte en un error de apuntado al este o al oeste.</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+7"/>
         <source>Camera: searching</source>
         <translation>Cámara: buscando</translation>
     </message>

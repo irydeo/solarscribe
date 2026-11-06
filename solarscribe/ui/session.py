@@ -11,7 +11,7 @@
 #
 ############################################################
 
-# The session the window paints: four steps, two rectangles and the settings.
+# The session the window paints: five steps, two rectangles and the settings.
 #
 # The rule of ARCHITECTURE 2.4: the session state does NOT live in ui (ADR-023).
 # It is config.schema.SessionState, saved by config/store.py as
@@ -87,6 +87,10 @@ class Session(QObject):
         self.state = state if state is not None else SessionState()
         self._settings_path = Path(settings_path) if settings_path else None
         self._profile_path = Path(profile_path) if profile_path else None
+        # The window sets this to the named-profile adapter when ADR-027 is
+        # available; the session then saves a preset through the store instead
+        # of the old single profile.json.
+        self.profile_saver = None
         self.autosave = bool(autosave)
         self.demo = bool(demo)
         self.constraints = FALLBACK_CONSTRAINTS
@@ -409,8 +413,7 @@ class Session(QObject):
                    if item.name != name]
         presets.append(preset)
         self.profile = replace(self.profile, roi_presets=tuple(presets))
-        if self._profile_path is not None:
-            store.save_profile(self.profile, self._profile_path)
+        self._persist_profile()
         self.changed.emit()
         return preset
 
@@ -421,6 +424,19 @@ class Session(QObject):
         # still presses Apply and the scan cannot start on a rectangle the
         # camera has not received.
         self.set_roi(preset.capture, preset.band)
+
+    # @args: profile - the named profile to use; path - the file its ROI
+    #        presets are saved to, or None to keep the current path
+    # @return: none. The harness follows the same Profile object, so the next
+    #          plan uses the new optics instead of the old instrument
+    def set_profile(self, profile, path=None) -> None:
+        self.profile = profile
+        if path is not None:
+            self._profile_path = Path(path)
+        if self.harness is not None and hasattr(self.harness, "profile"):
+            self.harness.profile = profile
+        self.changed.emit()
+        self.roiChanged.emit()
 
     # @args: settings - the Settings the settings dialog produced
     def update_settings(self, settings) -> None:
@@ -539,7 +555,7 @@ class Session(QObject):
 
     # @args: none. Writes the two rectangles back to the named profile preset
     def save_current_preset(self) -> None:
-        if self._profile_path is None:
+        if self._profile_path is None and self.profile_saver is None:
             return
         name = str(self.value("roi", "preset") or "default")
         preset = model_to_preset(self.roi, name)
@@ -547,7 +563,15 @@ class Session(QObject):
                    if item.name != name]
         presets.append(preset)
         self.profile = replace(self.profile, roi_presets=tuple(presets))
-        store.save_profile(self.profile, self._profile_path)
+        self._persist_profile()
+
+    # @args: none. Writes the profile through the named store when the window
+    #        supplied one, or to the old single file otherwise
+    def _persist_profile(self) -> None:
+        if self.profile_saver is not None:
+            self.profile_saver(self.profile)
+        elif self._profile_path is not None:
+            store.save_profile(self.profile, self._profile_path)
 
     # @args: error - a DeviceError from the camera
     # @return: a sentence with no raw SDK code (ADR-014)

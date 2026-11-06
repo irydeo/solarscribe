@@ -9,6 +9,11 @@ una salvedad de integración en el recon de la ventana**. Las 22 filas de parida
 tienen módulo y prueba, incluidas las tres que estaban a medias. No se ha hecho
 commit.
 
+> Actualización 2026-11-07: la salvedad del recon está cerrada (la ventana ya
+> llama a `shg.recon.quick_recon` y usa `SimCamera(pattern="solar")`) y las
+> pruebas de tiempo frágiles están endurecidas. Ver
+> [`QE-GATE-2026-11-07.md`](QE-GATE-2026-11-07.md).
+
 ---
 
 ## Español

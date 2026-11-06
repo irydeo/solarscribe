@@ -276,10 +276,8 @@ class RoiEditor(QObject):
             self._set_state(self._scale_label, "muted")
             return
         scale *= max(1, int(self.session.roi.binning))
-        self._scale_label.setText(self.tr(
-            "{value:.2f} arcsec per pixel. The profile's focal length and pixel "
-            "size are what turn this ROI's pixels into sky."
-        ).format(value=scale))
+        self._scale_label.setText(self.tr("{value:.2f} arcsec per pixel.").format(
+            value=scale))
         self._set_state(self._scale_label, "ok")
 
     # @args: none. Rebuilds the warning sentence from the current findings
@@ -355,16 +353,13 @@ class RoiEditor(QObject):
             self._set_state(self._rate_label, "muted")
             return
         fps, mb_s = estimate
-        text = self.tr(
-            "About {fps} fps and {mb} MB/s. The budget is {target} fps for the "
-            "reference strip; below it the scan takes longer."
-        ).format(fps=int(fps), mb=int(mb_s), target=target)
+        text = self.tr("{fps} fps, {mb} MB/s (target {target} fps).").format(
+            fps=int(fps), mb=int(mb_s), target=target)
         if self.session.is_simulated():
             # The simulator repaints slowly on purpose; the estimate is the
             # geometry of the rectangle, not the demo's frame rate, and saying so
             # stops the two numbers from looking contradictory.
-            text += self.tr(" The simulator repaints slower on purpose; this is "
-                            "what the real camera would need.")
+            text += self.tr(" Simulator.")
         self._rate_label.setText(text)
         self._set_state(self._rate_label, "ok" if fps >= target else "warning")
 

@@ -114,7 +114,7 @@ def stylesheet() -> str:
         background: transparent;
     }}
     QLabel[role="title"] {{
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
         color: {p.text};
     }}
@@ -131,6 +131,11 @@ def stylesheet() -> str:
         font-size: 15px;
         font-weight: 600;
         color: {p.accent};
+    }}
+    QLabel[role="metric"] {{
+        font-size: 14px;
+        font-weight: 600;
+        color: {p.text};
     }}
     QLabel[state="ok"] {{ color: {p.ok}; }}
     QLabel[state="warning"] {{ color: {p.warning}; }}
@@ -171,6 +176,23 @@ def stylesheet() -> str:
         background: {p.surface_alt};
         border: 1px solid {p.accent};
     }}
+    QToolButton[rail="true"] {{
+        padding: 1px 6px;
+        font-size: 12px;
+        text-align: center;
+        border-radius: 6px;
+    }}
+    QToolButton[strip="true"] {{
+        background: transparent;
+        color: {p.text};
+        border: none;
+        border-radius: 0;
+        padding: 2px 6px;
+        font-weight: 600;
+        text-align: left;
+    }}
+    QToolButton[strip="true"]:hover {{ background: {p.surface_alt}; }}
+    QToolButton[strip="true"]:checked {{ background: transparent; }}
     QToolButton[stepStatus="done"] {{ border-color: {p.ok}; }}
     QToolButton[stepStatus="current"] {{
         background: {p.surface_alt};
@@ -210,8 +232,8 @@ def stylesheet() -> str:
         background: transparent;
         border: 1px solid {p.border};
         border-radius: 9px;
-        margin-top: 14px;
-        padding: 10px 10px 8px 10px;
+        margin-top: 10px;
+        padding: 6px 6px 4px 6px;
         font-weight: 600;
     }}
     QGroupBox::title {{
@@ -229,13 +251,29 @@ def stylesheet() -> str:
     }}
     QDockWidget::title {{
         background: {p.surface};
-        padding: 6px 10px;
+        padding: 4px 8px;
         border: 1px solid {p.border};
         border-bottom: none;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
     }}
     QDockWidget > QWidget {{ background: {p.surface}; }}
+
+    QWidget#profileBar {{
+        background: {p.surface};
+        border-bottom: 1px solid {p.border};
+    }}
+    QWidget#histogramStrip, QWidget#scanStrip {{
+        background: {p.surface};
+        border-top: 1px solid {p.border};
+    }}
+    QWidget#histogramBody, QWidget#scanBody {{ background: {p.surface}; }}
+    QWidget#spectrumFrame {{
+        background: {p.surface};
+        border-left: 1px solid {p.border};
+        border-top: 1px solid {p.border};
+        border-bottom: 1px solid {p.border};
+    }}
 
     QTabWidget::pane {{
         border: 1px solid {p.border};

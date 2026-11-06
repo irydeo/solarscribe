@@ -27,22 +27,17 @@
     </message>
     <message>
         <location line="+30"/>
-        <location line="+85"/>
+        <location line="+86"/>
         <source>{model} (simulator)</source>
         <translation>{model} (simulator)</translation>
     </message>
     <message>
-        <location line="-78"/>
+        <location line="-79"/>
         <source>No camera was found. The simulator should always be there; if it is not, the device layer is not in this build.</source>
         <translation>No camera was found. The simulator should always be there; if it is not, the device layer is not in this build.</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Found {count} camera(s). Choose one and press Use this camera.</source>
-        <translation>Found {count} camera(s). Choose one and press Use this camera.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+11"/>
         <source>Discovery failed. Check the device diagnostics for the backend list; the log has the technical detail.</source>
         <translation>Discovery failed. Check the device diagnostics for the backend list; the log has the technical detail.</translation>
     </message>
@@ -52,14 +47,14 @@
         <translation>Choose a camera first.</translation>
     </message>
     <message>
-        <location line="+32"/>
-        <source>Simulator, streaming</source>
-        <translation>Simulator, streaming</translation>
+        <location line="-21"/>
+        <source>Found {count} camera(s). Choose one and press Open.</source>
+        <translation>Found {count} camera(s). Choose one and press Open.</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Simulator, stopped</source>
-        <translation>Simulator, stopped</translation>
+        <location line="+55"/>
+        <source>Simulator</source>
+        <translation>Simulator</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -138,8 +133,8 @@
     </message>
     <message>
         <location line="+12"/>
-        <source>Use this camera</source>
-        <translation>Use this camera</translation>
+        <source>Open</source>
+        <translation>Open</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -213,88 +208,6 @@
         <location line="+6"/>
         <source>Press Find to see the cameras. The simulator is always available and is labelled as such.</source>
         <translation>Press Find to see the cameras. The simulator is always available and is labelled as such.</translation>
-    </message>
-</context>
-<context>
-    <name>FocusAidDialog</name>
-    <message>
-        <location filename="../focus_aid.ui" line="+14"/>
-        <location line="+24"/>
-        <source>Focus aid</source>
-        <translation>Focus aid</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>title</source>
-        <translation>title</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <location line="+62"/>
-        <source>hint</source>
-        <translation>hint</translation>
-    </message>
-    <message>
-        <location line="-56"/>
-        <source>A sharp image has more contrast: the spectrum&apos;s dark lines are deeper and the edge is crisper. These two numbers follow the live frame, so turn the focuser until the standard deviation stops rising.</source>
-        <translation>A sharp image has more contrast: the spectrum&apos;s dark lines are deeper and the edge is crisper. These two numbers follow the live frame, so turn the focuser until the standard deviation stops rising.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Live frame</source>
-        <translation>Live frame</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Mean level</source>
-        <translation>Mean level</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <location line="+20"/>
-        <source>number</source>
-        <translation>number</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <location line="+20"/>
-        <source>--</source>
-        <translation>--</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <source>Average brightness of the frame, as a fraction of the maximum. Around a quarter of the range fills the histogram without clipping.</source>
-        <translation>Average brightness of the frame, as a fraction of the maximum. Around a quarter of the range fills the histogram without clipping.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Contrast</source>
-        <translation>Contrast</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Standard deviation of the frame, as a fraction of the maximum. Higher means more contrast, which is what correct focus produces.</source>
-        <translation>Standard deviation of the frame, as a fraction of the maximum. Higher means more contrast, which is what correct focus produces.</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>This is a live indicator, not a measurement: seeing moves it. Judge the trend over several seconds, not a single reading, and do not touch the focus while a scan is running.</source>
-        <translation>This is a live indicator, not a measurement: seeing moves it. Judge the trend over several seconds, not a single reading, and do not touch the focus while a scan is running.</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Close</source>
-        <translation>Close</translation>
-    </message>
-    <message>
-        <location filename="../focus_aid.py" line="+54"/>
-        <source>{value:.1f}% of full range</source>
-        <translation>{value:.1f}% of full range</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>{value:.2f}% of full range</source>
-        <translation>{value:.2f}% of full range</translation>
     </message>
 </context>
 <context>
@@ -468,17 +381,17 @@
 <context>
     <name>HistogramWidget</name>
     <message>
-        <location filename="../histogram.py" line="+49"/>
-        <source>Counts per brightness level. The markers are the black and white points of the stretch: below the first and above the second, the viewer clips.</source>
-        <translation>Counts per brightness level. The markers are the black and white points of the stretch: below the first and above the second, the viewer clips.</translation>
+        <location filename="../histogram.py" line="+68"/>
+        <source>Counts per brightness level of the spectral band. The handles are the black and white points: below the black point and above the white point the viewer clips. Drag a handle, or click near one, to move the nearest. The numbers under the bars are the levels in camera counts (DN).</source>
+        <translation>Counts per brightness level of the spectral band. The handles are the black and white points: below the black point and above the white point the viewer clips. Drag a handle, or click near one, to move the nearest. The numbers under the bars are the levels in camera counts (DN).</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+121"/>
         <source>Waiting for the first frame</source>
         <translation>Waiting for the first frame</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+33"/>
         <source>black</source>
         <translation>black</translation>
     </message>
@@ -486,6 +399,16 @@
         <location line="+1"/>
         <source>white</source>
         <translation>white</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>black {value}</source>
+        <translation>black {value}</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>white {value}</source>
+        <translation>white {value}</translation>
     </message>
 </context>
 <context>
@@ -506,7 +429,7 @@
         <translation>Connect the camera and start the stream. The ROI step draws the spectral band over this view.</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+38"/>
         <source>Spectral band: drag to move, corners to resize</source>
         <translation>Spectral band: drag to move, corners to resize</translation>
     </message>
@@ -620,49 +543,84 @@
         <translation>SolarScribe</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+55"/>
+        <source>Profile</source>
+        <translation>Profile</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A profile stores the optics, the camera and the ROI presets for one instrument setup. The active profile is loaded at startup.</source>
+        <translation>A profile stores the optics, the camera and the ROI presets for one instrument setup. The active profile is loaded at startup.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>The active profile. Switching reloads its optics and ROI presets and keeps the camera connected.</source>
+        <translation>The active profile. Switching reloads its optics and ROI presets and keeps the camera connected.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Save as…</source>
+        <translation>Save as…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Stores the current optics, camera and ROI presets under a new profile name and makes it active.</source>
+        <translation>Stores the current optics, camera and ROI presets under a new profile name and makes it active.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Manage…</source>
+        <translation>Manage…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Lists the profiles, switches the active one, or renames and deletes them.</source>
+        <translation>Lists the profiles, switches the active one, or renames and deletes them.</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <location line="+69"/>
+        <location line="+45"/>
+        <location line="+111"/>
+        <location line="+58"/>
+        <location line="+122"/>
+        <location line="+58"/>
+        <location line="+211"/>
+        <location line="+16"/>
         <location line="+42"/>
-        <location line="+128"/>
         <location line="+55"/>
-        <location line="+13"/>
-        <location line="+119"/>
-        <location line="+55"/>
-        <location line="+229"/>
-        <location line="+13"/>
+        <location line="+231"/>
+        <location line="+16"/>
+        <location line="+16"/>
         <location line="+68"/>
-        <location line="+82"/>
+        <location line="+85"/>
         <location line="+83"/>
         <location line="+13"/>
         <location line="+13"/>
-        <location line="+163"/>
-        <location line="+60"/>
-        <location line="+39"/>
-        <location line="+70"/>
+        <location line="+310"/>
+        <location line="+137"/>
+        <location line="+93"/>
         <location line="+13"/>
         <source>hint</source>
         <translation>hint</translation>
     </message>
     <message>
-        <location line="-1252"/>
-        <source>Recommended next: Find the Sun. You can go to any step at any time.</source>
-        <translation>Recommended next: Find the Sun. You can go to any step at any time.</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <location line="+183"/>
-        <location line="+187"/>
-        <location line="+310"/>
+        <location line="-1761"/>
+        <location line="+166"/>
+        <location line="+180"/>
+        <location line="+327"/>
+        <location line="+331"/>
         <source>title</source>
         <translation>title</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+490"/>
-        <location filename="../main_window.ui" line="-677"/>
+        <location filename="../main_window.py" line="+627"/>
+        <location filename="../main_window.ui" line="-1001"/>
         <source>Find the Sun</source>
         <translation>Find the Sun</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+13"/>
+        <location filename="../main_window.ui" line="+16"/>
         <source>The Sun has to sit on the slit before anything can be measured. The app computes where the Sun is from your observatory position; the telescope panel on the right lets you nudge it by hand.</source>
         <translation>The Sun has to sit on the slit before anything can be measured. The app computes where the Sun is from your observatory position; the telescope panel on the right lets you nudge it by hand.</translation>
     </message>
@@ -680,31 +638,37 @@
         <location line="+7"/>
         <location line="+20"/>
         <location line="+20"/>
+        <location line="+126"/>
         <location line="+20"/>
-        <location line="+136"/>
-        <location line="+17"/>
         <location line="+20"/>
+        <location line="+1276"/>
         <source>muted</source>
         <translation>muted</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+1192"/>
-        <location line="+1"/>
+        <location filename="../main_window.py" line="+919"/>
+        <location line="+832"/>
         <location line="+1"/>
         <location line="+1"/>
         <location line="+2"/>
         <location line="+1"/>
-        <location filename="../main_window.ui" line="-230"/>
+        <location filename="../main_window.ui" line="-1479"/>
         <location line="+20"/>
         <location line="+20"/>
+        <location line="+146"/>
         <location line="+20"/>
-        <location line="+153"/>
+        <location line="+143"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
         <location line="+20"/>
         <source>Not measured yet</source>
         <translation>Not measured yet</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="-230"/>
+        <location filename="../main_window.ui" line="-490"/>
         <source>Measured from the bright fraction of the frame. A missing Sun means the spectrum is dark and the scan cannot start.</source>
         <translation>Measured from the bright fraction of the frame. A missing Sun means the spectrum is dark and the scan cannot start.</translation>
     </message>
@@ -717,16 +681,6 @@
         <location line="+13"/>
         <source>How far the Sun is from the slit centre, in arcseconds. Close to zero means the slit crosses the middle of the disk; a large error cuts the scan short.</source>
         <translation>How far the Sun is from the slit centre, in arcseconds. Close to zero means the slit crosses the middle of the disk; a large error cuts the scan short.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Slit signal</source>
-        <translation>Slit signal</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>How much light is reaching the slit, as a fraction of the brightest possible frame. Too low means the Sun is off the slit or the exposure is short.</source>
-        <translation>How much light is reaching the slit, as a fraction of the brightest possible frame. Too low means the Sun is off the slit or the exposure is short.</translation>
     </message>
     <message>
         <location line="+33"/>
@@ -749,28 +703,13 @@
         <translation>Stops every axis at once. Use it whenever the telescope is moving somewhere you did not intend.</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>The coarse centring uses the bright fraction of the frame. Near the centre it is flat, so it gets you close and the Scanning step finishes the job.</source>
-        <translation>The coarse centring uses the bright fraction of the frame. Near the centre it is flat, so it gets you close and the Scanning step finishes the job.</translation>
-    </message>
-    <message>
-        <location filename="../main_window.py" line="-1196"/>
-        <location filename="../main_window.ui" line="+42"/>
+        <location filename="../main_window.py" line="-1754"/>
+        <location filename="../main_window.ui" line="+55"/>
         <source>Polar alignment</source>
         <translation>Polar alignment</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+13"/>
-        <source>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun&apos;s drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error.</source>
-        <translation>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun&apos;s drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error.</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</source>
-        <translation>Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location filename="../main_window.ui" line="+23"/>
         <source>Live measurement</source>
         <translation>Live measurement</translation>
     </message>
@@ -780,13 +719,13 @@
         <translation>State</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+1194"/>
+        <location filename="../main_window.py" line="+1752"/>
         <location filename="../main_window.ui" line="+10"/>
         <source>Not started</source>
         <translation>Not started</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+7"/>
+        <location filename="../main_window.ui" line="+10"/>
         <source>Azimuth error</source>
         <translation>Azimuth error</translation>
     </message>
@@ -826,17 +765,12 @@
         <translation>Stop the measurement</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>The assistant subtracts the Sun&apos;s own motion from the measured drift. A second measurement confirms the first one; the step is done when the two agree.</source>
-        <translation>The assistant subtracts the Sun&apos;s own motion from the measured drift. A second measurement confirms the first one; the step is done when the two agree.</translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+382"/>
         <source>Capture ROI</source>
         <translation>Capture ROI</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+25"/>
         <source>A preset saved for this camera and optic. Applying it restores both rectangles at once.</source>
         <translation>A preset saved for this camera and optic. Applying it restores both rectangles at once.</translation>
     </message>
@@ -846,12 +780,7 @@
         <translation>Save preset</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>Capture ROI, sensor pixels</source>
-        <translation>Capture ROI, sensor pixels</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+12"/>
         <source>The rectangle the camera reads out. Its width and height fix the frame rate and the SER size.</source>
         <translation>The rectangle the camera reads out. Its width and height fix the frame rate and the SER size.</translation>
     </message>
@@ -869,65 +798,62 @@
     </message>
     <message>
         <location line="+7"/>
-        <location line="+77"/>
+        <location line="+80"/>
         <source>Width</source>
         <translation>Width</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-70"/>
         <source>Width of the delivered frame. Wider means a lower frame rate and a bigger SER.</source>
         <translation>Width of the delivered frame. Wider means a lower frame rate and a bigger SER.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+74"/>
+        <location line="+80"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <location line="-64"/>
+        <location line="-70"/>
         <source>Top edge on the sensor, in binned pixels.</source>
         <translation>Top edge on the sensor, in binned pixels.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+71"/>
+        <location line="+80"/>
         <source>Height</source>
         <translation>Height</translation>
     </message>
     <message>
-        <location line="-61"/>
+        <location line="-70"/>
         <source>Height of the delivered frame. It must hold the spectral band plus the tilt drift.</source>
         <translation>Height of the delivered frame. It must hold the spectral band plus the tilt drift.</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Spectral band, frame pixels</source>
-        <translation>Spectral band, frame pixels</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+13"/>
         <source>The useful strip of the dispersed spectrum inside the frame. If it does not fit, the order is clipped.</source>
         <translation>The useful strip of the dispersed spectrum inside the frame. If it does not fit, the order is clipped.</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+79"/>
         <source>Tilt</source>
         <translation>Tilt</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location line="+25"/>
+        <location line="-325"/>
+        <location line="+332"/>
         <source>number</source>
         <translation>number</translation>
     </message>
     <message>
-        <location line="-22"/>
+        <location filename="../main_window.py" line="-798"/>
+        <location filename="../main_window.ui" line="-329"/>
+        <location line="+332"/>
         <source>Not measured</source>
         <translation>Not measured</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../main_window.ui" line="+3"/>
         <source>How far the spectral line leans across the frame, in degrees and in pixels of drift. A tilted line skews the reconstruction and needs a taller ROI.</source>
         <translation>How far the spectral line leans across the frame, in degrees and in pixels of drift. A tilted line skews the reconstruction and needs a taller ROI.</translation>
     </message>
@@ -937,12 +863,7 @@
         <translation>Measure tilt</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Fits a line to the slit edge of the current frame. If the edge is not straight, the app says so instead of showing a number.</source>
-        <translation>Fits a line to the slit edge of the current frame. If the edge is not straight, the app says so instead of showing a number.</translation>
-    </message>
-    <message>
-        <location line="+12"/>
+        <location line="+18"/>
         <source>Rate: not estimated</source>
         <translation>Rate: not estimated</translation>
     </message>
@@ -952,7 +873,7 @@
         <translation>Estimated frames per second and data rate of this ROI. It must reach the target rate, or the scan will be too slow to finish before the Sun moves.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+13"/>
         <source>Scale: not available until the profile has the optics.</source>
         <translation>Scale: not available until the profile has the optics.</translation>
     </message>
@@ -977,13 +898,279 @@
         <translation>Sends the rectangles to the camera. The stream restarts with the new ROI; a recording in progress is closed cleanly first.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="-1191"/>
+        <location filename="../main_window.py" line="-949"/>
         <location filename="../main_window.ui" line="+42"/>
         <source>Scanning</source>
         <translation>Scanning</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+13"/>
+        <location filename="../main_window.ui" line="-1108"/>
+        <source>Optics, camera and ROI presets, loaded at startup.</source>
+        <translation>Optics, camera and ROI presets, loaded at startup.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The active profile is the one whose optics, camera data and ROI presets the app uses. It is separate from the observatory position, which lives in Settings and the welcome assistant.</source>
+        <translation>The active profile is the one whose optics, camera data and ROI presets the app uses. It is separate from the observatory position, which lives in Settings and the welcome assistant.</translation>
+    </message>
+    <message>
+        <location line="+69"/>
+        <source>Next: Find the Sun. Any step is open.</source>
+        <translation>Next: Find the Sun. Any step is open.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The rail recommends, it never blocks. Open any step at any time; the state is saved silently.</source>
+        <translation>The rail recommends, it never blocks. Open any step at any time; the state is saved silently.</translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Get the Sun onto the slit. The app can point and centre it.</source>
+        <translation>Get the Sun onto the slit. The app can point and centre it.</translation>
+    </message>
+    <message>
+        <location line="+111"/>
+        <source>The coarse stage gets close; the scan step finishes the centring.</source>
+        <translation>The coarse stage gets close; the scan step finishes the centring.</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun&apos;s drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error. Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</source>
+        <translation>Polaris is not visible by day, so the Sun itself is the reference. The assistant samples the Sun&apos;s drift and tells you which screw to turn. It is precise because it is slow: 20 to 40 minutes separates the azimuth error from the altitude error. Best moment: measure altitude near the meridian, and azimuth towards the east or the west.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Measure the Sun&apos;s drift and turn the screws it names.</source>
+        <translation>Measure the Sun&apos;s drift and turn the screws it names.</translation>
+    </message>
+    <message>
+        <location line="+122"/>
+        <source>The assistant subtracts the Sun&apos;s own motion; a second measurement confirms the first.</source>
+        <translation>The assistant subtracts the Sun&apos;s own motion; a second measurement confirms the first.</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>The SHG-700 has three focusers that interact, so the observer iterates: spectrograph, collimator and telescope. The slit also has to be parallel to the declination axis; the tilt figure says how far it is and how tall the ROI must be.</source>
+        <translation>The SHG-700 has three focusers that interact, so the observer iterates: spectrograph, collimator and telescope. The slit also has to be parallel to the declination axis; the tilt figure says how far it is and how tall the ROI must be.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Sharpen the three focusers and make the slit parallel to Dec.</source>
+        <translation>Sharpen the three focusers and make the slit parallel to Dec.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Spectrograph: absorption lines</source>
+        <translation>Spectrograph: absorption lines</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Focuser 1: turn the camera focus until the absorption lines are as contrasted and sharp as possible. The figures update live and the best is the running hold since the last reset.</source>
+        <translation>Focuser 1: turn the camera focus until the absorption lines are as contrasted and sharp as possible. The figures update live and the best is the running hold since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Line contrast</source>
+        <translation>Line contrast</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+20"/>
+        <location line="+20"/>
+        <source>metric</source>
+        <translation>metric</translation>
+    </message>
+    <message>
+        <location line="-138"/>
+        <source>How much the absorption lines stand out from the continuum. Higher is better; the exposure cancels out because both terms scale. The second number is the best since the last reset.</source>
+        <translation>How much the absorption lines stand out from the continuum. Higher is better; the exposure cancels out because both terms scale. The second number is the best since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Line sharpness</source>
+        <translation>Line sharpness</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How fast the brightness changes across an absorption line. Higher is sharper; a defocused line is smooth. The second number is the best since the last reset.</source>
+        <translation>How fast the brightness changes across an absorption line. Higher is sharper; a defocused line is smooth. The second number is the best since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Collimator: slit edge</source>
+        <translation>Collimator: slit edge</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Focuser 2: turn the collimator until the physical slit edge is sharp and straight. A straight edge is also what the tilt measurement wants.</source>
+        <translation>Focuser 2: turn the collimator until the physical slit edge is sharp and straight. A straight edge is also what the tilt measurement wants.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Edge sharpness</source>
+        <translation>Edge sharpness</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How strong the step at the slit edge is. Higher is sharper. The second number is the best since the last reset.</source>
+        <translation>How strong the step at the slit edge is. Higher is sharper. The second number is the best since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Edge wobble</source>
+        <translation>Edge wobble</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How much the slit edge wanders along the slit, in grid cells. Lower is straighter; a straight edge is what the tilt wants. The second number is the best (lowest) since the last reset.</source>
+        <translation>How much the slit edge wanders along the slit, in grid cells. Lower is straighter; a straight edge is what the tilt wants. The second number is the best (lowest) since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Telescope: surface detail</source>
+        <translation>Telescope: surface detail</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Focuser 3: turn the telescope focus until the solar surface detail is contrasted and abundant. The figures update live and the best is the running hold since the last reset.</source>
+        <translation>Focuser 3: turn the telescope focus until the solar surface detail is contrasted and abundant. The figures update live and the best is the running hold since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Detail contrast</source>
+        <translation>Detail contrast</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How much the solar surface detail stands out. Higher is better; the exposure cancels out. The second number is the best since the last reset.</source>
+        <translation>How much the solar surface detail stands out. Higher is better; the exposure cancels out. The second number is the best since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Detail sharpness</source>
+        <translation>Detail sharpness</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How fast the surface detail changes. Higher is sharper. The second number is the best since the last reset.</source>
+        <translation>How fast the surface detail changes. Higher is sharper. The second number is the best since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Detail count</source>
+        <translation>Detail count</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>How many surface structures the profile finds. More is closer to focus. The second number is the best since the last reset.</source>
+        <translation>How many surface structures the profile finds. More is closer to focus. The second number is the best since the last reset.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Slit to Dec</source>
+        <translation>Slit to Dec</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>How far the spectral line leans across the frame, in degrees and in pixels of drift. Zero means the slit is parallel to the declination axis, which is what the scan wants.</source>
+        <translation>How far the spectral line leans across the frame, in degrees and in pixels of drift. Zero means the slit is parallel to the declination axis, which is what the scan wants.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Rotate the slit until the tilt is near zero. The scan can still run with a tilt; the ROI must then be taller, because the tilted line covers more rows.</source>
+        <translation>Rotate the slit until the tilt is near zero. The scan can still run with a tilt; the ROI must then be taller, because the tilted line covers more rows.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>The ROI must hold the band plus the drift and a 2 px margin.</source>
+        <translation>The ROI must hold the band plus the drift and a 2 px margin.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The ROI has to hold the spectral band plus the drift the tilt produces plus a 2 px margin (ADR-022). A smaller ROI would crop the order.</source>
+        <translation>The ROI has to hold the spectral band plus the drift the tilt produces plus a 2 px margin (ADR-022). A smaller ROI would crop the order.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Measure the slit tilt</source>
+        <translation>Measure the slit tilt</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Fits a line to the slit edge of the current frame and reports the tilt and the ROI height it needs. If the edge is not straight, it says so and warns that the tilt is provisional.</source>
+        <translation>Fits a line to the slit edge of the current frame and reports the tilt and the ROI height it needs. If the edge is not straight, it says so and warns that the tilt is provisional.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Reset the best values</source>
+        <translation>Reset the best values</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Clears the best figures so the next focuser position is compared with a fresh baseline. The live readings keep updating.</source>
+        <translation>Clears the best figures so the next focuser position is compared with a fresh baseline. The live readings keep updating.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Focus is a judgement: compare with the best, then measure the tilt.</source>
+        <translation>Focus is a judgement: compare with the best, then measure the tilt.</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>The strip the camera delivers sets the frame rate and the SER. It must hold the spectrum and the tilt.</source>
+        <translation>The strip the camera delivers sets the frame rate and the SER. It must hold the spectrum and the tilt.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Drag the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</source>
+        <translation>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Drag the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Capture strip, sensor px</source>
+        <translation>Capture strip, sensor px</translation>
+    </message>
+    <message>
+        <location line="+83"/>
+        <source>Spectral band, frame px</source>
+        <translation>Spectral band, frame px</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Left edge of the band inside the frame, in frame pixels.</source>
+        <translation>Left edge of the band inside the frame, in frame pixels.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Width of the usable spectrum. It can be narrower than the frame.</source>
+        <translation>Width of the usable spectrum. It can be narrower than the frame.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Top edge of the band inside the frame, in frame pixels.</source>
+        <translation>Top edge of the band inside the frame, in frame pixels.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Height of the usable spectrum. The histogram and the quick recon read only this strip.</source>
+        <translation>Height of the usable spectrum. The histogram and the quick recon read only this strip.</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Fits a line to the slit edge of the current frame. The guided alignment lives in the Focus step; this quick measure keeps the ROI height honest when you jump straight here. If the edge is not straight, it says so.</source>
+        <translation>Fits a line to the slit edge of the current frame. The guided alignment lives in the Focus step; this quick measure keeps the ROI height honest when you jump straight here. If the edge is not straight, it says so.</translation>
+    </message>
+    <message>
+        <location line="+115"/>
+        <source>Prepare centres and calibrates; the scan writes one SER per row.</source>
+        <translation>Prepare centres and calibrates; the scan writes one SER per row.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>One sweep writes one SER per row. The preparation centres the Sun on the slit and calibrates the sweep rate; then the scan runs. You can pause and recentre at any time, and the frames already written are kept.</source>
         <translation>One sweep writes one SER per row. The preparation centres the Sun on the slit and calibrates the sweep rate; then the scan runs. You can pause and recentre at any time, and the frames already written are kept.</translation>
     </message>
@@ -1043,47 +1230,107 @@
         <translation>Start the scan</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="-285"/>
+        <location line="+213"/>
+        <source>Shows the spectral band over the video. Drag the band to move it and its corners to resize it.</source>
+        <translation>Shows the spectral band over the video. Drag the band to move it and its corners to resize it.</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Identify lines</source>
+        <translation>Identify lines</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Runs the native line identification about twice a second and lists the names in the panel on the right. It uses the target line and the dispersion from Settings → Spectrum; the names are a pattern match, not a wavelength calibration.</source>
+        <translation>Runs the native line identification about twice a second and lists the names in the panel on the right. It uses the target line and the dispersion from Settings → Spectrum; the names are a pattern match, not a wavelength calibration.</translation>
+    </message>
+    <message>
+        <location line="+124"/>
+        <source>Histogram</source>
+        <translation>Histogram</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Folds the brightness histogram. It reads only the spectral band, in log scale, so the dark background does not flatten the spectrum.</source>
+        <translation>Folds the brightness histogram. It reads only the spectral band, in log scale, so the dark background does not flatten the spectrum.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Fraction of the spectral band already at the maximum level. Those pixels carry no contrast; lower the exposure or raise the white handle so the spectrum is not clipped.</source>
+        <translation>Fraction of the spectral band already at the maximum level. Those pixels carry no contrast; lower the exposure or raise the white handle so the spectrum is not clipped.</translation>
+    </message>
+    <message>
+        <location line="+118"/>
+        <source>Scan progress and quick recon</source>
+        <translation>Scan progress and quick recon</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The captured strip, the slit line and the quick recon. It opens by itself and stays open while a scan runs; it can be folded again when the scan ends.</source>
+        <translation>The captured strip, the slit line and the quick recon. It opens by itself and stays open while a scan runs; it can be folded again when the scan ends.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>The percentage is of the planned sweep, so 100% means the plan finished, not that the image is done.</source>
+        <translation>The percentage is of the planned sweep, so 100% means the plan finished, not that the image is done.</translation>
+    </message>
+    <message>
+        <location line="+106"/>
+        <source>Light preview: not calibrated, not exported.</source>
+        <translation>Light preview: not calibrated, not exported.</translation>
+    </message>
+    <message>
+        <location line="+183"/>
+        <source>Telescope panel</source>
+        <translation>Telescope panel</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Camera panel</source>
+        <translation>Camera panel</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Stream health panel</source>
+        <translation>Stream health panel</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="-344"/>
         <source>Live video of the spectrum</source>
         <translation>Live video of the spectrum</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Simulated mount</source>
-        <translation>Simulated mount</translation>
-    </message>
-    <message>
-        <location line="+73"/>
+        <location line="+106"/>
         <location line="+5"/>
-        <location line="+1309"/>
+        <location line="+1898"/>
         <location line="+5"/>
         <source>Simulator (no hardware)</source>
         <translation>Simulator (no hardware)</translation>
     </message>
     <message>
-        <location line="-1317"/>
+        <location line="-1906"/>
         <source>connected</source>
         <translation>connected</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+2"/>
-        <location line="+1314"/>
+        <location line="+1903"/>
         <source>not connected</source>
         <translation>not connected</translation>
     </message>
     <message>
-        <location line="-1288"/>
+        <location line="-1877"/>
         <source>Location saved: latitude {lat:.4f}, longitude {lon:.4f}. The GOTO can now find the Sun.</source>
         <translation>Location saved: latitude {lat:.4f}, longitude {lon:.4f}. The GOTO can now find the Sun.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+11"/>
         <source>You can set the observatory position any time in Tools, Settings.</source>
         <translation>You can set the observatory position any time in Tools, Settings.</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+22"/>
         <source>Camera: --</source>
         <translation>Camera: --</translation>
     </message>
@@ -1094,12 +1341,12 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+565"/>
+        <location line="+837"/>
         <source>Rate: --</source>
         <translation>Rate: --</translation>
     </message>
     <message>
-        <location line="-563"/>
+        <location line="-835"/>
         <source>Frames per second received against the 120 fps budget. At 120 fps each frame has 8.3 ms; below it the scan stretches.</source>
         <translation>Frames per second received against the 120 fps budget. At 120 fps each frame has 8.3 ms; below it the scan stretches.</translation>
     </message>
@@ -1115,43 +1362,33 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+558"/>
+        <location line="+830"/>
         <source>Dropped: --</source>
         <translation>Dropped: --</translation>
     </message>
     <message>
-        <location line="-556"/>
+        <location line="-828"/>
         <source>Frames lost inside the SDK, as a count and a fraction. Each one is a gap in the SER; the budget is 0.1% per scan.</source>
         <translation>Frames lost inside the SDK, as a count and a fraction. Each one is a gap in the SER; the budget is 0.1% per scan.</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+561"/>
+        <location line="+833"/>
         <source>Disk: --</source>
         <translation>Disk: --</translation>
     </message>
     <message>
-        <location line="-559"/>
+        <location line="-831"/>
         <source>Free space on the session disk. A recording does not start below 1 GB.</source>
         <translation>Free space on the session disk. A recording does not start below 1 GB.</translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+101"/>
         <source>Step reopened: the numbers already saved are kept, so you can correct one thing and continue.</source>
         <translation>Step reopened: the numbers already saved are kept, so you can correct one thing and continue.</translation>
     </message>
     <message>
-        <location line="+29"/>
-        <source>All four steps are done. Reopen any step from the rail to change something; nothing is locked.</source>
-        <translation>All four steps are done. Reopen any step from the rail to change something; nothing is locked.</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Recommended next: {step}. You can go to any step at any time.</source>
-        <translation>Recommended next: {step}. You can go to any step at any time.</translation>
-    </message>
-    <message>
-        <location line="+24"/>
+        <location line="+67"/>
         <source>Full range: 0 to 100%</source>
         <translation>Full range: 0 to 100%</translation>
     </message>
@@ -1171,7 +1408,7 @@
         <translation>Hard: 25 to 75%</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+27"/>
         <source>Simple scan</source>
         <translation>Simple scan</translation>
     </message>
@@ -1181,12 +1418,12 @@
         <translation>Mosaic</translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+133"/>
         <source>The engine computes the plan when you press Prepare: rows, sweep rate and expected duration. Nothing runs until then.</source>
         <translation>The engine computes the plan when you press Prepare: rows, sweep rate and expected duration. Nothing runs until then.</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+245"/>
         <source>Camera: Simulator (no hardware)</source>
         <translation>Camera: Simulator (no hardware)</translation>
     </message>
@@ -1212,12 +1449,7 @@
         <translation>Mount: not connected</translation>
     </message>
     <message>
-        <location line="+167"/>
-        <source>{value:.1f}% of the range</source>
-        <translation>{value:.1f}% of the range</translation>
-    </message>
-    <message>
-        <location line="+49"/>
+        <location line="+220"/>
         <source>Dropped: {dropped} ({percent:.2f}%)</source>
         <translation>Dropped: {dropped} ({percent:.2f}%)</translation>
     </message>
@@ -1239,7 +1471,7 @@
         <translation>Measuring...</translation>
     </message>
     <message>
-        <location line="-407"/>
+        <location line="-588"/>
         <source>Plan: {rows} row(s), {duration:.0f} s per cycle at {rate:.0f} arcsec/s, about {frames} frames per cycle. {cycles} cycle(s) take about {total:.1f} min.</source>
         <translation>Plan: {rows} row(s), {duration:.0f} s per cycle at {rate:.0f} arcsec/s, about {frames} frames per cycle. {cycles} cycle(s) take about {total:.1f} min.</translation>
     </message>
@@ -1249,7 +1481,7 @@
         <translation> The simulator uses a fixed rate, chosen so the demo finishes in seconds; the real camera calibrates the rate during preparation.</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+232"/>
         <source>Camera: {model}</source>
         <translation>Camera: {model}</translation>
     </message>
@@ -1284,12 +1516,7 @@
         <translation>The camera could not be opened. The live state and the device diagnostics say why.</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>Camera closed. The session and the telescope are untouched.</source>
-        <translation>Camera closed. The session and the telescope are untouched.</translation>
-    </message>
-    <message>
-        <location line="+25"/>
+        <location line="+49"/>
         <source>The engine reported a problem. The device diagnostics and the log say why.</source>
         <translation>The engine reported a problem. The device diagnostics and the log say why.</translation>
     </message>
@@ -1304,7 +1531,7 @@
         <translation>The camera did not start. Open the camera panel and check the live state.</translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+73"/>
         <source>Rate: {fps:.0f} fps of {target:.0f}{suffix}</source>
         <translation>Rate: {fps:.0f} fps of {target:.0f}{suffix}</translation>
     </message>
@@ -1400,11 +1627,12 @@
     </message>
     <message>
         <location line="+6"/>
+        <location line="+723"/>
         <source>Stopped</source>
         <translation>Stopped</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-711"/>
         <source>Measuring: {samples} samples</source>
         <translation>Measuring: {samples} samples</translation>
     </message>
@@ -1467,7 +1695,7 @@
         <translation> The samples were too close in hour angle to separate the two errors: measure again later, towards the east or west.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+289"/>
         <source>Open a camera before applying a ROI: the rectangle is sent to the hardware, not only stored.</source>
         <translation>Open a camera before applying a ROI: the rectangle is sent to the hardware, not only stored.</translation>
     </message>
@@ -1477,7 +1705,7 @@
         <translation>ROI applied to the camera: {width} x {height} px at ({x}, {y}). The strip sets the frame rate and the SER size.</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+91"/>
         <source>Open a camera first: the preparation needs frames and a mount.</source>
         <translation>Open a camera first: the preparation needs frames and a mount.</translation>
     </message>
@@ -1497,27 +1725,42 @@
         <translation>Press Prepare first: the scan needs the centred Sun and the sweep rate from the plan.</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+51"/>
         <source>Cycle {cycle} of {total}: sweeping the slit across the disk...</source>
         <translation>Cycle {cycle} of {total}: sweeping the slit across the disk...</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+20"/>
         <source>Recentring the Sun before the next cycle...</source>
         <translation>Recentring the Sun before the next cycle...</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Sweeping...</source>
         <translation>Sweeping...</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Cycle {cycle} of {cycles}, row {row}: {percent}% complete. Dec error {dec:.1f} arcsec; a large value means part of the disk is outside the sweep.</source>
         <translation>Cycle {cycle} of {cycles}, row {row}: {percent}% complete. Dec error {dec:.1f} arcsec; a large value means part of the disk is outside the sweep.</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+73"/>
+        <source> Data folder: {folder}.</source>
+        <translation> Data folder: {folder}.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Finished</source>
+        <translation>Finished</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Finished. The data folder holds the SER files and the log.</source>
+        <translation>Finished. The data folder holds the SER files and the log.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Finished in the simulator: the SER recording is disabled in the simulation, so this run was a dry run.</source>
         <translation>Finished in the simulator: the SER recording is disabled in the simulation, so this run was a dry run.</translation>
     </message>
@@ -1527,7 +1770,12 @@
         <translation>Finished without SER files: the log says why. The frames already written, if any, are kept.</translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+6"/>
+        <source>Data written to {folder}</source>
+        <translation>Data written to {folder}</translation>
+    </message>
+    <message>
+        <location line="+131"/>
         <source>not open</source>
         <translation>not open</translation>
     </message>
@@ -1557,12 +1805,7 @@
         <translation>Profile: {path}</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Session: {path}</source>
-        <translation>Session: {path}</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Camera: {state}</source>
         <translation>Camera: {state}</translation>
     </message>
@@ -1572,22 +1815,238 @@
         <translation>Mount: {state}</translation>
     </message>
     <message>
-        <location line="-517"/>
+        <location line="-824"/>
         <source>Polar alignment confirmed: the two measurements agree. The figures are in arcminutes on each screw.</source>
         <translation>Polar alignment confirmed: the two measurements agree. The figures are in arcminutes on each screw.</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-1190"/>
+        <source>Scroll to zoom; drag the ROI band to move it. The histogram handles set the stretch.</source>
+        <translation>Scroll to zoom; drag the ROI band to move it. The histogram handles set the stretch.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Simulator</source>
+        <translation>Simulator</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Welcome to SolarScribe</source>
+        <translation>Welcome to SolarScribe</translation>
+    </message>
+    <message>
+        <location line="+292"/>
+        <source>All five steps are done. Reopen any step from the rail; nothing is locked.</source>
+        <translation>All five steps are done. Reopen any step from the rail; nothing is locked.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Next: {step}. Any step is open.</source>
+        <translation>Next: {step}. Any step is open.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location filename="../main_window.ui" line="-1623"/>
+        <source>Focus</source>
+        <translation>Focus</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Manual: drag the histogram handles</source>
+        <translation>Manual: drag the histogram handles</translation>
+    </message>
+    <message>
+        <location line="+100"/>
+        <source>Manual: black {low:.0f}%, white {high:.0f}%</source>
+        <translation>Manual: black {low:.0f}%, white {high:.0f}%</translation>
+    </message>
+    <message>
+        <location line="+109"/>
+        <source>No active profile</source>
+        <translation>No active profile</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>No active profile. Choose one in the profile bar or save the current setup under a name.</source>
+        <translation>No active profile. Choose one in the profile bar or save the current setup under a name.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>The profile &apos;{name}&apos; could not be loaded.</source>
+        <translation>The profile &apos;{name}&apos; could not be loaded.</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Profile &apos;{name}&apos; loaded: optics, camera and ROI presets. The camera stays as it is; apply a preset if the strip changed.</source>
+        <translation>Profile &apos;{name}&apos; loaded: optics, camera and ROI presets. The camera stays as it is; apply a preset if the strip changed.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+7"/>
+        <source>Save profile as</source>
+        <translation>Save profile as</translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <source>Profile name:</source>
+        <translation>Profile name:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>New profile</source>
+        <translation>New profile</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>A profile named &apos;{name}&apos; already exists. Replace it?</source>
+        <translation>A profile named &apos;{name}&apos; already exists. Replace it?</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Profile saved as &apos;{name}&apos; and set active.</source>
+        <translation>Profile saved as &apos;{name}&apos; and set active.</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>No active profile: the ROI preset was not saved. Choose or save a profile in the top bar.</source>
+        <translation>No active profile: the ROI preset was not saved. Choose or save a profile in the top bar.</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Named-profile storage is not available in this build; the single profile is used.</source>
+        <translation>Named-profile storage is not available in this build; the single profile is used.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The profile file is not configured. Check Settings.</source>
+        <translation>The profile file is not configured. Check Settings.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The profile &apos;{name}&apos; could not be changed. The log has the detail.</source>
+        <translation>The profile &apos;{name}&apos; could not be changed. The log has the detail.</translation>
+    </message>
+    <message>
+        <location line="+131"/>
+        <source>Camera closed. The telescope is untouched.</source>
+        <translation>Camera closed. The telescope is untouched.</translation>
+    </message>
+    <message>
+        <location line="+114"/>
+        <location line="+1145"/>
+        <source>No frame yet</source>
+        <translation>No frame yet</translation>
+    </message>
+    <message>
+        <location line="-1141"/>
+        <source>{value:.1f}% clipped at white</source>
+        <translation>{value:.1f}% clipped at white</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../main_window.ui" line="+1175"/>
+        <source>No clipping</source>
+        <translation>No clipping</translation>
+    </message>
+    <message>
+        <location line="+242"/>
         <source>First measurement done. Turn the screws, then confirm.</source>
         <translation>First measurement done. Turn the screws, then confirm.</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+76"/>
+        <source>{value} · best {best}</source>
+        <translation>{value} · best {best}</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location filename="../main_window.ui" line="-948"/>
+        <source>Measure the slit tilt: rotate the slit until the line is parallel to Dec.</source>
+        <translation>Measure the slit tilt: rotate the slit until the line is parallel to Dec.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+10"/>
+        <source>The ROI must hold the band plus the drift and a {margin:g} px margin.</source>
+        <translation>The ROI must hold the band plus the drift and a {margin:g} px margin.</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>The edge was not found</source>
+        <translation>The edge was not found</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Check that the Sun is on the slit, then measure again.</source>
+        <translation>Check that the Sun is on the slit, then measure again.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>{deg:.2f} deg, {px:.1f} px drift</source>
+        <translation>{deg:.2f} deg, {px:.1f} px drift</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The edge is irregular ({value:.1f} px); measure again before trusting the tilt.</source>
+        <translation>The edge is irregular ({value:.1f} px); measure again before trusting the tilt.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The slit is parallel to Dec within {tol:.1f} deg.</source>
+        <translation>The slit is parallel to Dec within {tol:.1f} deg.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Rotate the slit towards zero: it leans {deg:.2f} deg. The scan can still run with a taller ROI.</source>
+        <translation>Rotate the slit towards zero: it leans {deg:.2f} deg. The scan can still run with a taller ROI.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The ROI must be at least {needed} px tall: band {band} + drift {drift:.1f} + margin {margin:g}.</source>
+        <translation>The ROI must be at least {needed} px tall: band {band} + drift {drift:.1f} + margin {margin:g}.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>The tilt meter needs a frame and the SHG module. Check the camera and the stream, then measure again.</source>
+        <translation>The tilt meter needs a frame and the SHG module. Check the camera and the stream, then measure again.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The tilt could not be measured: {reason}. Check that the Sun is on the slit and measure again.</source>
+        <translation>The tilt could not be measured: {reason}. Check that the Sun is on the slit and measure again.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Tilt {deg:.2f} deg, {px:.1f} px of drift. Rotate the slit towards zero; the ROI must be {needed} px tall. The scan can still run with that taller ROI.</source>
+        <translation>Tilt {deg:.2f} deg, {px:.1f} px of drift. Rotate the slit towards zero; the ROI must be {needed} px tall. The scan can still run with that taller ROI.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Slit parallel to Dec within {tol:.1f} deg. The Focus step is done; the ROI can be tight.</source>
+        <translation>Slit parallel to Dec within {tol:.1f} deg. The Focus step is done; the ROI can be tight.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source> The edge is irregular ({value:.1f} px), so treat the tilt with caution.</source>
+        <translation> The edge is irregular ({value:.1f} px), so treat the tilt with caution.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Best focus values reset: the next readings start a fresh comparison.</source>
+        <translation>Best focus values reset: the next readings start a fresh comparison.</translation>
+    </message>
+    <message>
+        <location line="+135"/>
         <source>The ROI was not applied: the warnings in the step explain what the camera would reject.</source>
         <translation>The ROI was not applied: the warnings in the step explain what the camera would reject.</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+25"/>
+        <source> No active profile: the ROI preset was not saved.</source>
+        <translation> No active profile: the ROI preset was not saved.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>The tilt meter is not available in this build; the measured tilt stays at its last value.</source>
         <translation>The tilt meter is not available in this build; the measured tilt stays at its last value.</translation>
     </message>
@@ -1597,7 +2056,12 @@
         <translation>Tilt measured: {deg:.2f} deg, {px:.1f} px of drift. The ROI must be tall enough to hold the band plus this drift.</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
+        <source>There is no active profile: save one in the top bar before saving a preset.</source>
+        <translation>There is no active profile: save one in the top bar before saving a preset.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Save ROI preset</source>
         <translation>Save ROI preset</translation>
     </message>
@@ -1638,7 +2102,6 @@
     </message>
     <message>
         <location line="+4"/>
-        <location filename="../main_window.ui" line="+3"/>
         <source>Runs the cycles in order. Every row is a SER file in the session folder; stopping keeps the frames already written.</source>
         <translation>Runs the cycles in order. Every row is a SER file in the session folder; stopping keeps the frames already written.</translation>
     </message>
@@ -1674,7 +2137,7 @@
     </message>
     <message>
         <location line="+13"/>
-        <location line="+32"/>
+        <location line="+40"/>
         <source>Waiting for the first frames...</source>
         <translation>Waiting for the first frames...</translation>
     </message>
@@ -1694,26 +2157,46 @@
         <translation>Scan started. The shaded part of the disk is already captured; the percentage is of the planned sweep, so 100% means the plan finished.</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+21"/>
+        <source>Cycle {cycle} of {total}, {percent}%</source>
+        <translation>Cycle {cycle} of {total}, {percent}%</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>{percent}% of the planned sweep</source>
+        <translation>{percent}% of the planned sweep</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Starting</source>
+        <translation>Starting</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Recentring</source>
+        <translation>Recentring</translation>
+    </message>
+    <message>
+        <location line="+24"/>
         <source>Dropped frames: {dropped} of {total} ({percent:.2f}%). Each one is a gap in the SER.</source>
         <translation>Dropped frames: {dropped} of {total} ({percent:.2f}%). Each one is a gap in the SER.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+87"/>
+        <location line="+91"/>
         <location line="+6"/>
         <source>Resume</source>
         <translation>Resume</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <location line="+88"/>
-        <location filename="../main_window.ui" line="+9"/>
+        <location line="-96"/>
+        <location line="+92"/>
+        <location filename="../main_window.ui" line="+574"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location line="-78"/>
+        <location line="-82"/>
         <source>Quick recon: {frames} frames, {rows} row(s). Light preview, not for measurement.</source>
         <translation>Quick recon: {frames} frames, {rows} row(s). Light preview, not for measurement.</translation>
     </message>
@@ -1743,27 +2226,40 @@
         <translation>The preview could not be built from these frames.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>{frames} frames in {seconds:.0f} s. {reason}</source>
         <translation>{frames} frames in {seconds:.0f} s. {reason}</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source> Session folder: {folder}.</source>
-        <translation> Session folder: {folder}.</translation>
+        <location line="+232"/>
+        <source>New data folder: {folder}</source>
+        <translation>New data folder: {folder}</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <location filename="../main_window.ui" line="+64"/>
+        <source>When a scan finishes, its result and the data folder appear here.</source>
+        <translation>When a scan finishes, its result and the data folder appear here.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../main_window.ui" line="+444"/>
+        <source>Idle</source>
+        <translation>Idle</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <location filename="../main_window.ui" line="+237"/>
+        <source>Open data folder</source>
+        <translation>Open data folder</translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Finished. The session folder holds the SER files and the log.</source>
-        <translation>Finished. The session folder holds the SER files and the log.</translation>
+        <source>Data folder opened: {folder}. The steps are as you left them.</source>
+        <translation>Data folder opened: {folder}. The steps are as you left them.</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>Session written to {folder}</source>
-        <translation>Session written to {folder}</translation>
-    </message>
-    <message>
-        <location line="+23"/>
+        <location line="-238"/>
         <source>Simulator run, no file written.</source>
         <translation>Simulator run, no file written.</translation>
     </message>
@@ -1783,7 +2279,7 @@
         <translation>Failed: {reason}.</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+36"/>
         <source>Settings saved. Every value has a default, so a partial file still starts the app.</source>
         <translation>Settings saved. Every value has a default, so a partial file still starts the app.</translation>
     </message>
@@ -1798,7 +2294,7 @@
         <translation>Preset &apos;{name}&apos; copied into the ROI step. Apply it there when you are ready.</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+16"/>
         <source>Device diagnostics</source>
         <translation>Device diagnostics</translation>
     </message>
@@ -1808,7 +2304,12 @@
         <translation>The report below says what this build can and cannot reach. It is the first thing to attach to a bug report.</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+26"/>
+        <source>Data folder: {path}</source>
+        <translation>Data folder: {path}</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>ROI capture: {rect}</source>
         <translation>ROI capture: {rect}</translation>
     </message>
@@ -1824,11 +2325,29 @@
     </message>
     <message>
         <location line="+2"/>
+        <source>Spectrum: {target:.2f} Å target, {dispersion:.4f} Å/px, flip {flip}</source>
+        <translation>Spectrum: {target:.2f} Å target, {dispersion:.4f} Å/px, flip {flip}</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Run &apos;python -m solarscribe --diagnostics&apos; for the backend and device list.</source>
         <translation>Run &apos;python -m solarscribe --diagnostics&apos; for the backend and device list.</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+10"/>
+        <source>1. Open the camera in the camera panel on the right.
+2. Find the Sun: connect the mount and press Point at the Sun and centre.
+3. Focus: sharpen the three focusers and measure the slit tilt; rotate the slit until it is parallel to Dec.
+4. ROI: drag the spectral band on the video, type the capture strip and press Apply this ROI.
+5. Scanning: prepare, then start. The quick recon tells you whether the take went well; the post-processing stays external.</source>
+        <translation>1. Open the camera in the camera panel on the right.
+2. Find the Sun: connect the mount and press Point at the Sun and centre.
+3. Focus: sharpen the three focusers and measure the slit tilt; rotate the slit until it is parallel to Dec.
+4. ROI: drag the spectral band on the video, type the capture strip and press Apply this ROI.
+5. Scanning: prepare, then start. The quick recon tells you whether the take went well; the post-processing stays external.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
         <source>SolarScribe {version}
 
 Capture for the solar spectroheliograph. It records SER files and logs for the post-processing; it does not post-process.
@@ -1841,33 +2360,18 @@ Capture for the solar spectroheliograph. It records SER files and logs for the p
 GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <source>New session: {folder}</source>
-        <translation>New session: {folder}</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <location filename="../main_window.ui" line="+396"/>
+        <location line="+48"/>
+        <location filename="../main_window.ui" line="-141"/>
         <source>The preview appears as the scan advances.</source>
         <translation>The preview appears as the scan advances.</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <source>Open session</source>
-        <translation>Open session</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Session opened: {folder}. The steps are as you left them.</source>
-        <translation>Session opened: {folder}. The steps are as you left them.</translation>
-    </message>
-    <message>
-        <location line="+28"/>
+        <location line="+58"/>
         <source>{what} is not available in this build. The simulator covers the interface until the engine lands.</source>
         <translation>{what} is not available in this build. The simulator covers the interface until the engine lands.</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+16"/>
         <source>Device discovery failed: {error}</source>
         <translation>Device discovery failed: {error}</translation>
     </message>
@@ -1967,7 +2471,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>the engine reported a problem; the log says which</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="-383"/>
+        <location filename="../main_window.ui" line="-591"/>
         <source>Stop the scan</source>
         <translation>Stop the scan</translation>
     </message>
@@ -1984,13 +2488,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Dropped frames: none so far. Every dropped frame is a gap in the SER that the reconstruction has to bridge.</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <location filename="../main_window.ui" line="+13"/>
-        <source>When a scan finishes, its result and the session folder appear here.</source>
-        <translation>When a scan finishes, its result and the session folder appear here.</translation>
-    </message>
-    <message>
-        <location filename="../main_window.ui" line="+61"/>
+        <location filename="../main_window.ui" line="+84"/>
         <source>Brightness</source>
         <translation>Brightness</translation>
     </message>
@@ -2026,18 +2524,13 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Marks the centre of the slit. The Sun should be centred on this cross before a scan.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="-1200"/>
+        <location filename="../main_window.py" line="-1753"/>
         <location filename="../main_window.ui" line="+7"/>
         <source>ROI</source>
         <translation>ROI</translation>
     </message>
     <message>
-        <location filename="../main_window.ui" line="+6"/>
-        <source>Shows the capture ROI and the spectral band over the video. Drag the handles to edit them.</source>
-        <translation>Shows the capture ROI and the spectral band over the video. Drag the handles to edit them.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location filename="../main_window.ui" line="+13"/>
         <source>Fit</source>
         <translation>Fit</translation>
     </message>
@@ -2047,37 +2540,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Fits the whole frame in the view. It also resets the zoom to 1x.</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <source>Scroll to zoom, drag the handles to move the ROI</source>
-        <translation>Scroll to zoom, drag the handles to move the ROI</translation>
-    </message>
-    <message>
-        <location line="+32"/>
-        <source>Spectrum magnifier</source>
-        <translation>Spectrum magnifier</translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>Zoomed view of the spectral band: the slit image and the absorption lines must be straight and centred.</source>
-        <translation>Zoomed view of the spectral band: the slit image and the absorption lines must be straight and centred.</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Brightness histogram</source>
-        <translation>Brightness histogram</translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>The two markers are the stretch limits: below the first and above the second everything is clipped to black or white.</source>
-        <translation>The two markers are the stretch limits: below the first and above the second everything is clipped to black or white.</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Scan progress and result</source>
-        <translation>Scan progress and result</translation>
-    </message>
-    <message>
-        <location line="+30"/>
+        <location line="+364"/>
         <source>subtitle</source>
         <translation>subtitle</translation>
     </message>
@@ -2088,31 +2551,32 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
     </message>
     <message>
         <location line="+3"/>
+        <location line="+39"/>
         <source>A light reconstruction to check the take. It is not exported and it does not replace post-processing.</source>
         <translation>A light reconstruction to check the take. It is not exported and it does not replace post-processing.</translation>
     </message>
     <message>
-        <location line="+36"/>
-        <source>A light, non-authoritative preview: the band averaged and stacked into a disk. It is not calibrated, not exported and not a substitute for post-processing.</source>
-        <translation>A light, non-authoritative preview: the band averaged and stacked into a disk. It is not calibrated, not exported and not a substitute for post-processing.</translation>
-    </message>
-    <message>
-        <location line="+36"/>
+        <location line="+29"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+7"/>
         <source>&amp;Tools</source>
         <translation>&amp;Tools</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>&amp;Help</source>
         <translation>&amp;Help</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+7"/>
+        <source>Panels</source>
+        <translation>Panels</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Telescope</source>
         <translation>Telescope</translation>
     </message>
@@ -2122,33 +2586,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Stream health</translation>
     </message>
     <message>
-        <location line="+38"/>
-        <source>New session</source>
-        <translation>New session</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Open session…</source>
-        <translation>Open session…</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
-        <location line="-129"/>
-        <location line="+134"/>
-        <source>Open session folder</source>
-        <translation>Open session folder</translation>
-    </message>
-    <message>
-        <location line="-1284"/>
+        <location line="-1785"/>
         <source>Centring limit</source>
         <translation>Centring limit</translation>
     </message>
@@ -2158,12 +2596,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>How close to the centre the method can resolve, in arcseconds. Near the centre the bright-fraction signal is flat, and the chord length has zero slope there, so the coarse centring cannot do better than this. The fine centring in the Scanning step finishes the job; this figure says how much is left for it.</translation>
     </message>
     <message>
-        <location line="+284"/>
-        <source>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Draw the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</source>
-        <translation>The ROI is the strip the camera delivers. It sets the frame rate and exactly what is written to the SER, so it has to hold the spectrum with room for the tilt. Draw the spectral band on the video and type the capture rectangle: the frame is already the capture ROI, so a bigger rectangle drawn over it would be fiction.</translation>
-    </message>
-    <message>
-        <location line="+399"/>
+        <location line="+1027"/>
         <source>Recentre between cycles</source>
         <translation>Recentre between cycles</translation>
     </message>
@@ -2173,7 +2606,22 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Before every cycle after the first, the app centres the Sun on the slit again. It costs a few minutes per session but stops the drift from cutting the later sweeps; the RA rewind happens either way.</translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+23"/>
+        <source>Runs the cycles in order. Every row is a SER file in the data folder; stopping keeps the frames already written.</source>
+        <translation>Runs the cycles in order. Every row is a SER file in the data folder; stopping keeps the frames already written.</translation>
+    </message>
+    <message>
+        <location line="+80"/>
+        <source>Open the data folder</source>
+        <translation>Open the data folder</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Opens the folder that holds the SER files and the logs of this run, so the post-processing can pick them up.</source>
+        <translation>Opens the folder that holds the SER files and the logs of this run, so the post-processing can pick them up.</translation>
+    </message>
+    <message>
+        <location line="+24"/>
         <source>Reopen this step</source>
         <translation>Reopen this step</translation>
     </message>
@@ -2183,17 +2631,17 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Marks this completed step as in progress again. The numbers already saved are kept, so you can correct one thing without redoing the session.</translation>
     </message>
     <message>
-        <location line="+328"/>
-        <source>Opens the folder that holds the SER files and the logs of this session, so the post-processing can pick them up.</source>
-        <translation>Opens the folder that holds the SER files and the logs of this session, so the post-processing can pick them up.</translation>
-    </message>
-    <message>
-        <location line="+96"/>
+        <location line="+625"/>
         <source>Camera</source>
         <translation>Camera</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+22"/>
+        <source>Opens the folder that holds the SER files and the logs of this run.</source>
+        <translation>Opens the folder that holds the SER files and the logs of this run.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Quit</source>
         <translation>Quit</translation>
     </message>
@@ -2214,6 +2662,16 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
     </message>
     <message>
         <location line="+5"/>
+        <source>Profiles…</source>
+        <translation>Profiles…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Lists the named instrument profiles, switches the active one, or renames and deletes them.</source>
+        <translation>Lists the named instrument profiles, switches the active one, or renames and deletes them.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Sky calendar…</source>
         <translation>Sky calendar…</translation>
     </message>
@@ -2221,11 +2679,6 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <location line="+5"/>
         <source>ROI manager…</source>
         <translation>ROI manager…</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Focus aid…</source>
-        <translation>Focus aid…</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2243,27 +2696,160 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="+1146"/>
-        <location filename="../main_window.ui" line="+5"/>
+        <location filename="../main_window.py" line="+1702"/>
+        <location filename="../main_window.ui" line="+38"/>
         <source>Quick start</source>
         <translation>Quick start</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>1. Find the Sun: open the telescope panel, connect the mount and press Point at the Sun and centre.
-2. Polar alignment: start the measurement and leave the telescope tracking; it needs 20 to 40 minutes.
-3. ROI: draw the spectral band on the video and type the capture rectangle; press Apply this ROI.
-4. Scanning: prepare, then start. The quick recon tells you whether the take went well; the post-processing stays external.</source>
-        <translation>1. Find the Sun: open the telescope panel, connect the mount and press Point at the Sun and centre.
-2. Polar alignment: start the measurement and leave the telescope tracking; it needs 20 to 40 minutes.
-3. ROI: draw the spectral band on the video and type the capture rectangle; press Apply this ROI.
-4. Scanning: prepare, then start. The quick recon tells you whether the take went well; the post-processing stays external.</translation>
-    </message>
-    <message>
-        <location line="+13"/>
+        <location line="+17"/>
         <location filename="../main_window.ui" line="+5"/>
         <source>About SolarScribe</source>
         <translation>About SolarScribe</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileManagerDialog</name>
+    <message>
+        <location filename="../profile_manager.py" line="+102"/>
+        <location line="+5"/>
+        <source> (active)</source>
+        <translation> (active)</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <location line="+1"/>
+        <source>New profile</source>
+        <translation>New profile</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Name for the new profile:</source>
+        <translation>Name for the new profile:</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location line="+24"/>
+        <source>A profile named &apos;{name}&apos; already exists.</source>
+        <translation>A profile named &apos;{name}&apos; already exists.</translation>
+    </message>
+    <message>
+        <location line="-5"/>
+        <source>Rename profile</source>
+        <translation>Rename profile</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>New name:</source>
+        <translation>New name:</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>The last profile cannot be deleted.</source>
+        <translation>The last profile cannot be deleted.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Delete profile</source>
+        <translation>Delete profile</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Delete the profile &apos;{name}&apos;? The saved optics and ROI presets of that profile are lost.</source>
+        <translation>Delete the profile &apos;{name}&apos;? The saved optics and ROI presets of that profile are lost.</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <location filename="../profile_manager.ui" line="+14"/>
+        <location line="+24"/>
+        <source>Profiles</source>
+        <translation>Profiles</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Named-profile storage is not available in this build. The single profile is used.</source>
+        <translation>Named-profile storage is not available in this build. The single profile is used.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The profile file is not configured. Check Settings.</source>
+        <translation>The profile file is not configured. Check Settings.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The profile could not be changed. The log has the detail.</source>
+        <translation>The profile could not be changed. The log has the detail.</translation>
+    </message>
+    <message>
+        <location filename="../profile_manager.ui" line="-3"/>
+        <source>title</source>
+        <translation>title</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+20"/>
+        <source>hint</source>
+        <translation>hint</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <source>A profile stores the optics, the camera and the ROI presets for one instrument setup. The active profile is loaded at startup; switching profiles does not move the telescope or restart the camera.</source>
+        <translation>A profile stores the optics, the camera and the ROI presets for one instrument setup. The active profile is loaded at startup; switching profiles does not move the telescope or restart the camera.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>The saved profiles. The active one is marked. Select a name to rename, delete or use it.</source>
+        <translation>The saved profiles. The active one is marked. Select a name to rename, delete or use it.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Named-profile storage is not available in this build; the single &apos;Default&apos; profile is used.</source>
+        <translation>Named-profile storage is not available in this build; the single &apos;Default&apos; profile is used.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>New from current</source>
+        <translation>New from current</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Saves the current optics, camera and ROI presets under a new name. The new profile becomes active.</source>
+        <translation>Saves the current optics, camera and ROI presets under a new name. The new profile becomes active.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Rename…</source>
+        <translation>Rename…</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Changes the name of the selected profile. The saved values do not change.</source>
+        <translation>Changes the name of the selected profile. The saved values do not change.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Delete</source>
+        <translation>Delete</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Removes the selected profile. The last profile cannot be deleted.</source>
+        <translation>Removes the selected profile. The last profile cannot be deleted.</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Use this profile</source>
+        <translation>Use this profile</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Loads the selected profile and makes it the active one. The camera stays connected; apply a ROI preset if the strip changed.</source>
+        <translation>Loads the selected profile and makes it the active one. The camera stays connected; apply a ROI preset if the strip changed.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Close</source>
+        <translation>Close</translation>
     </message>
 </context>
 <context>
@@ -2357,12 +2943,22 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Scale: not available until the profile has the optics.</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>{value:.2f} arcsec per pixel. The profile&apos;s focal length and pixel size are what turn this ROI&apos;s pixels into sky.</source>
-        <translation>{value:.2f} arcsec per pixel. The profile&apos;s focal length and pixel size are what turn this ROI&apos;s pixels into sky.</translation>
+        <location line="+4"/>
+        <source>{value:.2f} arcsec per pixel.</source>
+        <translation>{value:.2f} arcsec per pixel.</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+77"/>
+        <source>{fps} fps, {mb} MB/s (target {target} fps).</source>
+        <translation>{fps} fps, {mb} MB/s (target {target} fps).</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> Simulator.</source>
+        <translation> Simulator.</translation>
+    </message>
+    <message>
+        <location line="-73"/>
         <source>No problems found: this ROI can be scanned.</source>
         <translation>No problems found: this ROI can be scanned.</translation>
     </message>
@@ -2396,16 +2992,6 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <location line="+17"/>
         <source>Rate: not estimated until the camera is connected.</source>
         <translation>Rate: not estimated until the camera is connected.</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>About {fps} fps and {mb} MB/s. The budget is {target} fps for the reference strip; below it the scan takes longer.</source>
-        <translation>About {fps} fps and {mb} MB/s. The budget is {target} fps for the reference strip; below it the scan takes longer.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source> The simulator repaints slower on purpose; this is what the real camera would need.</source>
-        <translation> The simulator repaints slower on purpose; this is what the real camera would need.</translation>
     </message>
 </context>
 <context>
@@ -2544,13 +3130,13 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
 <context>
     <name>Session</name>
     <message>
-        <location filename="../session.py" line="+459"/>
+        <location filename="../session.py" line="+475"/>
         <source>The camera did not start. The device diagnostics say why; the telescope and the session are unaffected.</source>
         <translation>The camera did not start. The device diagnostics say why; the telescope and the session are unaffected.</translation>
     </message>
     <message>
         <location line="+73"/>
-        <location line="+41"/>
+        <location line="+49"/>
         <source>The camera refused the change. The log has the technical detail; the previous ROI is still in the model.</source>
         <translation>The camera refused the change. The log has the technical detail; the previous ROI is still in the model.</translation>
     </message>
@@ -2631,6 +3217,36 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <location line="+1"/>
         <source>Fallback solar diameter in arcseconds when no ephemeris is available. 1920&quot; is the mean apparent diameter, about 32&apos;.</source>
         <translation>Fallback solar diameter in arcseconds when no ephemeris is available. 1920&quot; is the mean apparent diameter, about 32&apos;.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wavelength the grating is tuned to, in angstroms. 6562.81 A is H-alpha (Fraunhofer C): a known line anchors the pixel-to-wavelength mapping, and if it is wrong every other line name slides with it.</source>
+        <translation>Wavelength the grating is tuned to, in angstroms. 6562.81 A is H-alpha (Fraunhofer C): a known line anchors the pixel-to-wavelength mapping, and if it is wrong every other line name slides with it.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Angstroms per pixel along the dispersion axis. 0 means unknown and disables identification: without a scale a pixel distance cannot become a wavelength. Measure it from a known line pair or from the spectrograph geometry, not from a guess.</source>
+        <translation>Angstroms per pixel along the dispersion axis. 0 means unknown and disables identification: without a scale a pixel distance cannot become a wavelength. Measure it from a known line pair or from the spectrograph geometry, not from a guess.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Dispersion direction. True when the wavelength decreases with the pixel index, which a mirrored grating or camera produces; an unflagged flip names the detected lines backwards.</source>
+        <translation>Dispersion direction. True when the wavelength decreases with the pixel index, which a mirrored grating or camera produces; an unflagged flip names the detected lines backwards.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>How close a detected dip must be to a catalog line, in angstroms. 0.5 A is the scale at which a low-resolution SHG separates neighbours: tighter misses a slightly shifted line, looser names the wrong one.</source>
+        <translation>How close a detected dip must be to a catalog line, in angstroms. 0.5 A is the scale at which a low-resolution SHG separates neighbours: tighter misses a slightly shifted line, looser names the wrong one.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Confidence below which the UI warns that the identification is not trustworthy. 0.35 is an F1 score over the strong catalog lines and the detected dips; the names are a pattern match, not a wavelength calibration, so a low score has to be said out loud.</source>
+        <translation>Confidence below which the UI warns that the identification is not trustworthy. 0.35 is an F1 score over the strong catalog lines and the detected dips; the names are a pattern match, not a wavelength calibration, so a low score has to be said out loud.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Half-width, in pixels, of the search that refines the anchor line. It absorbs a wavelength calibration error of a couple of pixels without jumping to a neighbouring line; 0 disables the refinement.</source>
+        <translation>Half-width, in pixels, of the search that refines the anchor line. It absorbs a wavelength calibration error of a couple of pixels without jumping to a neighbouring line; 0 disables the refinement.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3237,6 +3853,11 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Polar alignment</translation>
     </message>
     <message>
+        <location line="+2"/>
+        <source>Spectrum</source>
+        <translation>Spectrum</translation>
+    </message>
+    <message>
         <location line="+8"/>
         <source>The two rectangles and the last tilt. The ROI is in sensor pixels; the band is in frame pixels.</source>
         <translation>The two rectangles and the last tilt. The ROI is in sensor pixels; the band is in frame pixels.</translation>
@@ -3247,7 +3868,12 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>The budget of ADR-013. These are the figures the health panel compares against.</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
+        <source>Line identification. The target line anchors the wavelength scale and the dispersion turns pixels into angstroms. Both are inputs, so a wrong one names the lines wrongly.</source>
+        <translation>Line identification. The target line anchors the wavelength scale and the dispersion turns pixels into angstroms. Both are inputs, so a wrong one names the lines wrongly.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Every value has a default, so a partial file still starts the app.</source>
         <translation>Every value has a default, so a partial file still starts the app.</translation>
     </message>
@@ -3445,31 +4071,199 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
     </message>
 </context>
 <context>
+    <name>SpectrumPanel</name>
+    <message>
+        <location filename="../spectrum_panel.py" line="+131"/>
+        <source>Spectral lines</source>
+        <translation>Spectral lines</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Off</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Anchor: --</source>
+        <translation>Anchor: --</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Confidence: --</source>
+        <translation>Confidence: --</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Line</source>
+        <translation>Line</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Å</source>
+        <translation>Å</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Row</source>
+        <translation>Row</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Names sorted by their row in the frame. The row is where the line sits in the video; the spectral band starts at the top of the strip, and the row includes that offset.</source>
+        <translation>Names sorted by their row in the frame. The row is where the line sits in the video; the spectral band starts at the top of the strip, and the row includes that offset.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Set the dispersion and the target line in Settings → Spectrum.</source>
+        <translation>Set the dispersion and the target line in Settings → Spectrum.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The target line is the anchor: the grating is tuned to it. The row is where the strongest matching dip was found.</source>
+        <translation>The target line is the anchor: the grating is tuned to it. The row is where the strongest matching dip was found.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>An F1 score over the strong catalog lines in the window and the detected dips. It says how well the pattern supports the names, not how accurate a wavelength is.</source>
+        <translation>An F1 score over the strong catalog lines in the window and the detected dips. It says how well the pattern supports the names, not how accurate a wavelength is.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Reading the spectrum...</source>
+        <translation>Reading the spectrum...</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Identification is off: the dispersion is 0 in Settings → Spectrum. It is how many angstroms one pixel covers; without it a pixel distance cannot become a wavelength.</source>
+        <translation>Identification is off: the dispersion is 0 in Settings → Spectrum. It is how many angstroms one pixel covers; without it a pixel distance cannot become a wavelength.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>No spectrum on screen. Open the camera and start the stream.</source>
+        <translation>No spectrum on screen. Open the camera and start the stream.</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Naming is not trustworthy: confidence {value:.2f} is below the {minimum:.2f} minimum. No names are shown. Check the target line and the dispersion in Settings → Spectrum.</source>
+        <translation>Naming is not trustworthy: confidence {value:.2f} is below the {minimum:.2f} minimum. No names are shown. Check the target line and the dispersion in Settings → Spectrum.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>1 line named, sorted by row.</source>
+        <translation>1 line named, sorted by row.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>{count} lines named, sorted by row.</source>
+        <translation>{count} lines named, sorted by row.</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Anchor: {name} {wave:.2f} Å at row {row}</source>
+        <translation>Anchor: {name} {wave:.2f} Å at row {row}</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Anchor: {wave:.2f} Å at row {row}</source>
+        <translation>Anchor: {wave:.2f} Å at row {row}</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Confidence {value:.2f} (0 to 1): the share of catalog lines found and detected dips named. It is a pattern match, not a wavelength calibration.</source>
+        <translation>Confidence {value:.2f} (0 to 1): the share of catalog lines found and detected dips named. It is a pattern match, not a wavelength calibration.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>The spectral band has no pixels. Check the band in the ROI step.</source>
+        <translation>The spectral band has no pixels. Check the band in the ROI step.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>No absorption line found in the band. Check the focus, the exposure and the spectral band.</source>
+        <translation>No absorption line found in the band. Check the focus, the exposure and the spectral band.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>No catalog line matched the detected dips ({count}). The dispersion or the target line is probably wrong; check Settings → Spectrum.</source>
+        <translation>No catalog line matched the detected dips ({count}). The dispersion or the target line is probably wrong; check Settings → Spectrum.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The target line is missing. Set it in Settings → Spectrum.</source>
+        <translation>The target line is missing. Set it in Settings → Spectrum.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The dispersion is zero, so identification is off. Set it in Settings → Spectrum.</source>
+        <translation>The dispersion is zero, so identification is off. Set it in Settings → Spectrum.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The identification could not run. Check the log and Settings → Spectrum.</source>
+        <translation>The identification could not run. Check the log and Settings → Spectrum.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source> (telluric)</source>
+        <translation> (telluric)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Depth {depth:.0f}% of the local continuum. Residual {distance:.2f} Å from the catalog rest wavelength. {kind}.</source>
+        <translation>Depth {depth:.0f}% of the local continuum. Residual {distance:.2f} Å from the catalog rest wavelength. {kind}.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>telluric (Earth&apos;s atmosphere)</source>
+        <translation>telluric (Earth&apos;s atmosphere)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>solar</source>
+        <translation>solar</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Rest wavelength in angstroms (Å). The measured line is {distance:.2f} Å from it.</source>
+        <translation>Rest wavelength in angstroms (Å). The measured line is {distance:.2f} Å from it.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Row in the frame; the spectral band starts at row {band}.</source>
+        <translation>Row in the frame; the spectral band starts at row {band}.</translation>
+    </message>
+</context>
+<context>
     <name>StepRail</name>
     <message>
-        <location filename="../step_rail.py" line="+78"/>
+        <location filename="../step_rail.py" line="+83"/>
         <source>Go to this step. Steps never block: you can come back at any time and the state is saved as you go.</source>
         <translation>Go to this step. Steps never block: you can come back at any time and the state is saved as you go.</translation>
     </message>
     <message>
-        <location line="+34"/>
-        <source>Find the Sun</source>
-        <translation>Find the Sun</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Polar alignment</source>
-        <translation>Polar alignment</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+42"/>
         <source>ROI</source>
         <translation>ROI</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Scanning</source>
-        <translation>Scanning</translation>
+        <location line="-6"/>
+        <source>Find Sun</source>
+        <translation>Find Sun</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Polar</source>
+        <translation>Polar</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Focus</source>
+        <translation>Focus</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Scan</source>
+        <translation>Scan</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -3523,84 +4317,39 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Green means connected, amber means not connected yet, red means the last command failed.</translation>
     </message>
     <message>
-        <location filename="../telescope_panel.py" line="+118"/>
-        <source>Fine: 1 arcsec/s</source>
-        <translation>Fine: 1 arcsec/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slow: 5 arcsec/s</source>
-        <translation>Slow: 5 arcsec/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sidereal: 15 arcsec/s</source>
-        <translation>Sidereal: 15 arcsec/s</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Fast: 60 arcsec/s</source>
-        <translation>Fast: 60 arcsec/s</translation>
-    </message>
-    <message>
-        <location line="+49"/>
+        <location filename="../telescope_panel.py" line="+173"/>
         <source>Mount</source>
         <translation>Mount</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location line="+395"/>
+        <location line="+324"/>
         <source>No mount found</source>
         <translation>No mount found</translation>
     </message>
     <message>
-        <location line="-368"/>
+        <location line="-297"/>
         <source>No mount</source>
         <translation>No mount</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+11"/>
         <location filename="../telescope_panel.ui" line="+7"/>
         <source>Not connected</source>
         <translation>Not connected</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <source>Connected</source>
         <translation>Connected</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>{value:.5f} h</source>
-        <translation>{value:.5f} h</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>{value:+.4f} deg</source>
-        <translation>{value:+.4f} deg</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Stopped</source>
-        <translation>Stopped</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Parked</source>
-        <translation>Parked</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Unparked</source>
-        <translation>Unparked</translation>
-    </message>
-    <message>
-        <location line="+6"/>
+        <location line="+22"/>
         <source>Unpark</source>
         <translation>Unpark</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+6"/>
         <source>Discovery is not available in this build. The simulator is used instead.</source>
         <translation>Discovery is not available in this build. The simulator is used instead.</translation>
     </message>
@@ -3630,17 +4379,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Connected. Check the position and the tracking before moving it.</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Declination must be between -90 and +90 degrees.</source>
-        <translation>Declination must be between -90 and +90 degrees.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Slewing to RA {ra:.4f} h, Dec {dec:+.3f} deg. The Sun is not here unless you computed it.</source>
-        <translation>Slewing to RA {ra:.4f} h, Dec {dec:+.3f} deg. The Sun is not here unless you computed it.</translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+18"/>
         <source>The Sun&apos;s position is not available: set your observatory latitude and longitude in Tools, Settings (Observatory), and the ephemeris module must be present.</source>
         <translation>The Sun&apos;s position is not available: set your observatory latitude and longitude in Tools, Settings (Observatory), and the ephemeris module must be present.</translation>
     </message>
@@ -3650,12 +4389,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Slewing to the Sun (RA {ra:.4f} h, Dec {dec:+.2f} deg). When it stops, centre it on the slit.</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>Synced: the mount now believes it is here. Only do this when the Sun really is centred.</source>
-        <translation>Synced: the mount now believes it is here. Only do this when the Sun really is centred.</translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Moving at {rate} arcsec/s. Release to stop.</source>
         <translation>Moving at {rate} arcsec/s. Release to stop.</translation>
     </message>
@@ -3690,12 +4424,27 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Parked. The optics are safe to leave.</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>GOTO cancelled. The mount stays where it is.</source>
-        <translation>GOTO cancelled. The mount stays where it is.</translation>
+        <location line="-260"/>
+        <source>Fine 1″/s</source>
+        <translation>Fine 1″/s</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+1"/>
+        <source>Slow 5″/s</source>
+        <translation>Slow 5″/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sidereal 15″/s</source>
+        <translation>Sidereal 15″/s</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fast 60″/s</source>
+        <translation>Fast 60″/s</translation>
+    </message>
+    <message>
+        <location line="+275"/>
         <source>Connect the mount first.</source>
         <translation>Connect the mount first.</translation>
     </message>
@@ -3705,7 +4454,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>The mount is not connected.</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+29"/>
         <source>Disconnect</source>
         <translation>Disconnect</translation>
     </message>
@@ -3716,7 +4465,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Connect</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+17"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -3771,111 +4520,18 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Searches again for mounts. Discovery talks to the device layer and can take a moment.</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>Where it points</source>
-        <translation>Where it points</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>RA</source>
-        <translation>RA</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <location line="+20"/>
-        <source>number</source>
-        <translation>number</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <location line="+20"/>
-        <source>--</source>
-        <translation>--</translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <source>Right ascension in hours. The scan sweeps along this axis, so it must move smoothly while tracking.</source>
-        <translation>Right ascension in hours. The scan sweeps along this axis, so it must move smoothly while tracking.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Dec</source>
-        <translation>Dec</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Declination in degrees. The Sun sits at about +10 to +23 degrees depending on the season.</source>
-        <translation>Declination in degrees. The Sun sits at about +10 to +23 degrees depending on the season.</translation>
-    </message>
-    <message>
-        <location filename="../telescope_panel.py" line="-298"/>
-        <location filename="../telescope_panel.ui" line="+7"/>
-        <location line="+197"/>
+        <location line="+100"/>
         <source>Tracking</source>
         <translation>Tracking</translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location line="+1"/>
-        <location filename="../telescope_panel.ui" line="-190"/>
-        <location line="+17"/>
-        <source>Unknown</source>
-        <translation>Unknown</translation>
-    </message>
-    <message>
-        <location filename="../telescope_panel.ui" line="-14"/>
-        <source>Whether the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</source>
-        <translation>Whether the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</translation>
-    </message>
-    <message>
-        <location filename="../telescope_panel.py" line="+30"/>
-        <location filename="../telescope_panel.ui" line="+7"/>
-        <location line="+190"/>
+        <location filename="../telescope_panel.py" line="-233"/>
+        <location filename="../telescope_panel.ui" line="+23"/>
         <source>Park</source>
         <translation>Park</translation>
     </message>
     <message>
-        <location filename="../telescope_panel.ui" line="-180"/>
-        <source>Whether the mount is in its park position. Park before closing the observatory so the optics are safe.</source>
-        <translation>Whether the mount is in its park position. Park before closing the observatory so the optics are safe.</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Go to a position</source>
-        <translation>Go to a position</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>RA (h)</source>
-        <translation>RA (h)</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Dec (deg)</source>
-        <translation>Dec (deg)</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Go to</source>
-        <translation>Go to</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Slews to the coordinates above. The mount stops tracking while it slews and resumes afterwards.</source>
-        <translation>Slews to the coordinates above. The mount stops tracking while it slews and resumes afterwards.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Sync here</source>
-        <translation>Sync here</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Tells the mount that it is really at the coordinates above. Use it when you have centred the Sun by hand.</source>
-        <translation>Tells the mount that it is really at the coordinates above. Use it when you have centred the Sun by hand.</translation>
-    </message>
-    <message>
-        <location line="+10"/>
+        <location filename="../telescope_panel.ui" line="-114"/>
         <source>Go to the Sun</source>
         <translation>Go to the Sun</translation>
     </message>
@@ -3886,11 +4542,11 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
     </message>
     <message>
         <location line="+7"/>
-        <source>Move by hand</source>
-        <translation>Move by hand</translation>
+        <source>Nudge</source>
+        <translation>Nudge</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+9"/>
         <source>N</source>
         <translation>N</translation>
     </message>
@@ -3951,23 +4607,13 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
     </message>
     <message>
         <location line="+15"/>
-        <source>Keeps the Sun still in the frame while the mount follows the sky.</source>
-        <translation>Keeps the Sun still in the frame while the mount follows the sky.</translation>
+        <source>Keeps the Sun still in the frame while the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</source>
+        <translation>Keeps the Sun still in the frame while the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+23"/>
         <source>Moves to the park position and stops tracking. Use it before closing the observatory.</source>
         <translation>Moves to the park position and stops tracking. Use it before closing the observatory.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Abort slew</source>
-        <translation>Abort slew</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Cancels a GOTO without parking. The mount stays where it is.</source>
-        <translation>Cancels a GOTO without parking. The mount stays where it is.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -4028,7 +4674,7 @@ GPL v3. Sibling of NightScribe, with its patterns and its dark theme.</translati
         <translation>Longitude east positive. It sets the hour angle, so an error turns into an east or west pointing error.</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+7"/>
         <source>Camera: searching</source>
         <translation>Camera: searching</translation>
     </message>

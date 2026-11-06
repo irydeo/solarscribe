@@ -17,6 +17,8 @@
 # deterministic frames, sequence numbers, injectable drops and a mount that
 # really integrates its rate.
 
+import time
+
 import numpy as np
 import pytest
 
@@ -138,18 +140,60 @@ def test_sim_camera_injectable_drops_count_and_open_sequence_holes():
     cam.stop_stream()
 
 
-def test_sim_camera_streams_on_a_thread_at_the_configured_rate():
-    cam = SimCamera(width=32, height=16, fps=200.0)
-    cam.open()
+# @args: cam - an open simulator camera; seconds - measurement window;
+#        start_timeout - how long to wait for the thread to produce two frames
+# @return: (rate_fps, frames) for one window; rate 0.0 when the thread starved
+def _measure_stream_rate(cam, seconds=0.25, start_timeout=2.0):
     frames = []
     cam.start_stream(frames.append)
-    # 200 fps means about 20 frames in 100 ms; a wide window keeps it robust
-    # under a loaded CI machine without making the suite slow.
-    import time
-    time.sleep(0.15)
-    cam.stop_stream()
-    assert len(frames) >= 8
-    assert all(f.sequence == i for i, f in enumerate(frames))
+    try:
+        deadline = time.monotonic() + start_timeout
+        while len(frames) < 2 and time.monotonic() < deadline:
+            time.sleep(0.005)
+        if len(frames) < 2:
+            return 0.0, frames
+        first = len(frames)
+        time.sleep(seconds)
+    finally:
+        cam.stop_stream()
+    window = frames[first:]
+    if len(window) < 2:
+        return 0.0, frames
+    span = window[-1].timestamp - window[0].timestamp
+    return ((len(window) - 1) / span if span > 0 else 0.0), frames
+
+
+def test_sim_camera_streams_on_a_thread_at_the_configured_rate():
+    # The thread rate is a machine-load-sensitive number, so the test measures
+    # two short windows and keeps the best one. A loaded CI machine loses one
+    # window and still passes; a real regression to a slow rate fails both.
+    # The floor is half the configured 200 fps: it is a broad tolerance that
+    # still catches a 10 fps or a 50 fps regression, which is what this test is
+    # for. The strict ADR-013 budget lives in tests/perf, not here.
+    cam = SimCamera(width=32, height=16, fps=200.0)
+    cam.open()
+    attempts = []
+    try:
+        for _ in range(2):
+            attempts.append(_measure_stream_rate(cam))
+    finally:
+        cam.close()
+
+    rates = [rate for rate, _frames in attempts]
+    best = max(rates)
+    assert best >= 100.0, (
+        f"the simulator streamed at {rates[0]:.1f} and {rates[1]:.1f} fps in "
+        f"two windows; the configured rate is 200 fps and the floor is "
+        f"100 fps (half the target, so a real rate regression fails both)"
+    )
+
+    # The sequence must stay contiguous inside each window: the rate tolerance
+    # is about load, not about silently dropping frames.
+    for _rate, frames in attempts:
+        assert frames
+        sequences = [frame.sequence for frame in frames]
+        assert sequences == list(range(sequences[0], sequences[0] + len(sequences)))
+
 
 
 def test_sim_frame_satisfies_the_frame_contract():

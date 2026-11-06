@@ -31,3 +31,6 @@
 | [023](ADR-023-contract-modules-and-roi-home.md) | Módulos de contrato y hogar del modelo de ROI / Contract modules and the home of the ROI model |
 | [024](ADR-024-config-reconciliation-and-store.md) | Reconciliación del INI con nightscribe-scan y contrato de configuración / INI reconciliation with nightscribe-scan and configuration contract |
 | [025](ADR-025-solar-polar-alignment-guidance-erratum.md) | Corrección de la guía de alineación polar solar / Solar polar alignment guidance erratum |
+| [026](ADR-026-simplified-image-first-layout.md) | Interfaz simplificada, la imagen primero / Simplified image-first interface |
+| [027](ADR-027-named-profiles.md) | Perfiles con nombre / Named profiles |
+| [028](ADR-028-five-step-rail.md) | Raíl de cinco pasos con Focus / Five-step rail with Focus |

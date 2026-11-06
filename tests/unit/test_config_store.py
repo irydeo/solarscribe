@@ -191,6 +191,24 @@ def test_new_keys_are_marked_as_solarscribe():
         assert key_of(section, name).origin == "new"
 
 
+def test_spectrum_section_pins_native_line_identification():
+    # shg identifies lines from the tuned wavelength and the dispersion, so the
+    # settings dialog has to expose both. 0 angstrom per pixel disables the
+    # identification: a pixel distance cannot become a wavelength without a
+    # scale, which is why the default is "unknown", not a guessed figure.
+    expected = {
+        "target_wavelength_angstrom": 6562.81,   # H-alpha, Fraunhofer C
+        "dispersion_angstrom_px": 0.0,           # 0 = unknown, identification off
+        "flip": False,                           # wavelength decreases with px?
+        "line_tolerance_angstrom": 0.5,          # catalog match window
+        "min_confidence": 0.35,                  # below it the UI warns
+        "anchor_search_px": 2.0,                 # anchor refinement half-width
+    }
+    for name, default in expected.items():
+        assert default_value("spectrum", name) == default
+        assert key_of("spectrum", name).origin == "new"
+
+
 def test_duplicate_behaviours_are_gone_and_the_legacy_names_survive():
     # general.dry_run and scan.mode duplicated scan.enable_capture and
     # scan.enable_mosaic: two truths for one switch. They were replaced, not
@@ -508,6 +526,320 @@ def test_profile_broken_json_returns_the_defaults(tmp_path):
     path.write_text("{not json", encoding="utf-8")
     profile = store.load_profile(path)
     assert profile.telescope.focal_length_mm == 714.0
+
+
+def test_profiles_missing_file_starts_with_the_default_profile(tmp_path):
+    # The UI must always have a visible, named profile to show at startup, so a
+    # fresh install is one profile called "default", already active.
+    loaded = store.load_profiles(tmp_path / "profiles.json")
+    assert store.profile_names(loaded) == ("default",)
+    assert loaded.active == "default"
+    assert store.active_profile(loaded).telescope.focal_length_mm == 714.0
+
+
+def test_profiles_round_trip_names_active_and_presets(tmp_path):
+    # One file holds every name plus the active selection. The order of the
+    # names is the order of the file: the UI lists profiles in the user's order,
+    # not in an arbitrary sorted one.
+    first = Profile(telescope=TelescopeData(focal_length_mm=900.0))
+    second = Profile(
+        camera=CameraData(model="Touptek"),
+        roi_presets=(RoiPreset(name="wide", capture=(0, 0, 3480, 300),
+                               band=(0, 40, 3480, 160)),),
+    )
+    state = store.ProfileStore(
+        active="wide", profiles={"SHG-700": first, "wide": second}
+    )
+    path = tmp_path / "deep" / "profiles.json"
+
+    store.save_profiles(state, path)
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    assert raw["version"] == 2
+    assert raw["active"] == "wide"
+    assert raw["profiles"]["wide"]["version"] == 2
+    assert not list(path.parent.glob("*.tmp"))
+
+    loaded = store.load_profiles(path)
+    assert store.profile_names(loaded) == ("SHG-700", "wide")
+    assert loaded.active == "wide"
+    active = store.active_profile(loaded)
+    assert active.camera.model == "Touptek"
+    assert active.preset("wide").capture == (0, 0, 3480, 300)
+
+
+def test_profiles_load_a_hand_written_store(tmp_path):
+    # Strings for numbers, an unknown key and a profile body that is not even a
+    # dict: the names survive, the unreadable parts fall back to defaults.
+    path = tmp_path / "profiles.json"
+    path.write_text(
+        json.dumps({
+            "version": 2,
+            "active": " home ",
+            "profiles": {
+                "home": {
+                    "telescope": {"focal_length_mm": "850"},
+                    "camera": {"pixel_size_um": "2.4"},
+                    "future_key": "ignored",
+                },
+                "broken": "not a profile",
+            },
+        }),
+        encoding="utf-8",
+    )
+    loaded = store.load_profiles(path)
+    assert store.profile_names(loaded) == ("home", "broken")
+    assert loaded.active == "home"                      # the active name is trimmed
+    active = store.active_profile(loaded)
+    assert active.telescope.focal_length_mm == 850.0
+    assert active.camera.pixel_size_um == 2.4
+    assert loaded.profiles["broken"].telescope.focal_length_mm == 714.0
+
+
+def test_profiles_unknown_active_is_preserved_without_an_active_profile(tmp_path):
+    # A typo in "active" must not silently switch to another instrument: the
+    # name stays in the file, the UI can say it is missing, and no profile is
+    # reported as active until the user chooses one.
+    path = tmp_path / "profiles.json"
+    path.write_text(
+        json.dumps({
+            "version": 2,
+            "active": "ghost",
+            "profiles": {"home": {"telescope": {"focal_length_mm": 900}}},
+        }),
+        encoding="utf-8",
+    )
+    loaded = store.load_profiles(path)
+    assert loaded.active == "ghost"
+    assert store.active_profile(loaded) is None
+    assert store.profile_names(loaded) == ("home",)
+
+
+def test_profiles_migrate_the_single_profile_file(tmp_path):
+    # The old profile.json becomes the "default" profile, active. Loading is a
+    # read: the legacy file is not touched and profiles.json is not created
+    # until the app saves.
+    legacy = tmp_path / "profile.json"
+    store.save_profile(
+        Profile(telescope=TelescopeData(focal_length_mm=910.0)), legacy
+    )
+    path = tmp_path / "profiles.json"
+
+    loaded = store.load_profiles(path, legacy_path=legacy)
+
+    assert store.profile_names(loaded) == ("default",)
+    assert loaded.active == "default"
+    assert store.active_profile(loaded).telescope.focal_length_mm == 910.0
+    assert not path.exists()
+
+
+def test_profiles_migrate_the_sibling_profile_file_by_default(tmp_path):
+    # The startup call is load_profiles(paths.profiles_path()) with no extra
+    # argument; the old profile.json lives next to it, so the fallback must be
+    # automatic or the UI has to remember a second path (ADR-027).
+    legacy = tmp_path / "profile.json"
+    store.save_profile(
+        Profile(telescope=TelescopeData(focal_length_mm=915.0)), legacy
+    )
+    loaded = store.load_profiles(tmp_path / "profiles.json")
+    assert store.active_profile(loaded).telescope.focal_length_mm == 915.0
+
+
+def test_profiles_file_wins_over_the_legacy_single_profile(tmp_path):
+    # Once profiles.json exists it is the truth; an old profile.json left on
+    # disk must not override the user's named profiles.
+    legacy = tmp_path / "profile.json"
+    store.save_profile(
+        Profile(telescope=TelescopeData(focal_length_mm=910.0)), legacy
+    )
+    path = tmp_path / "profiles.json"
+    store.save_profiles(
+        store.ProfileStore(
+            active="new",
+            profiles={"new": Profile(telescope=TelescopeData(focal_length_mm=500.0))},
+        ),
+        path,
+    )
+
+    loaded = store.load_profiles(path, legacy_path=legacy)
+
+    assert store.profile_names(loaded) == ("new",)
+    assert store.active_profile(loaded).telescope.focal_length_mm == 500.0
+
+
+def test_profiles_migrate_a_nightscribe_v1_named_store(tmp_path):
+    # The prototype's file is already named profiles: every name and the active
+    # one must survive, with its CONSTANT-named instrument data translated.
+    path = tmp_path / "nightscribe-profiles.json"
+    path.write_text(
+        json.dumps({
+            "version": 1,
+            "active": "C9",
+            "profiles": {
+                "C9": {
+                    "meta": {"camera": "Touptek", "aperture_mm": 102},
+                    "config": {"FOCAL_LENGTH": 910, "PIXEL_SIZE": 3,
+                               "MOSAIC_SLIT_LENGTH_MM": 10},
+                },
+                "wide": {"config": {"FOCAL_LENGTH": 750}},
+            },
+        }),
+        encoding="utf-8",
+    )
+
+    loaded = store.load_profiles(path)
+
+    assert store.profile_names(loaded) == ("C9", "wide")
+    active = store.active_profile(loaded)
+    assert active.telescope.focal_length_mm == 910.0
+    assert active.telescope.aperture_mm == 102.0
+    assert active.telescope.slit_length_mm == 10.0
+    assert active.camera.model == "Touptek"
+    assert active.camera.pixel_size_um == 3.0
+    assert loaded.profiles["wide"].telescope.focal_length_mm == 750.0
+
+
+def test_profile_set_active_returns_a_new_store(tmp_path):
+    # The named operations are pure: the caller keeps the old store until it
+    # decides to save, and an unknown name is an error, not a silent no-op.
+    base = store.ProfileStore(
+        active="home",
+        profiles={"home": Profile(), "wide": Profile(
+            telescope=TelescopeData(focal_length_mm=900.0))},
+    )
+    changed = store.set_active_profile(base, "wide")
+    assert base.active == "home"
+    assert changed.active == "wide"
+    assert store.active_profile(changed).telescope.focal_length_mm == 900.0
+    assert store.set_active_profile(base, " wide ").active == "wide"
+    with pytest.raises(KeyError):
+        store.set_active_profile(base, "ghost")
+
+
+def test_profile_save_named_adds_replaces_and_can_activate():
+    base = store.ProfileStore()
+    added = store.save_named_profile(base, " home ", Profile(
+        telescope=TelescopeData(focal_length_mm=900.0)))
+    assert store.profile_names(added) == ("home",)      # the name is trimmed
+    assert added.active == "home"                       # the first one is active
+    other = store.save_named_profile(added, "wide", Profile(), make_active=True)
+    assert other.active == "wide"
+    replaced = store.save_named_profile(
+        other, "home", Profile(telescope=TelescopeData(focal_length_mm=920.0)))
+    assert replaced.profiles["home"].telescope.focal_length_mm == 920.0
+    assert replaced.active == "wide"                    # replacing is not switching
+    with pytest.raises(ValueError):
+        store.save_named_profile(base, "   ", Profile())
+
+
+def test_profile_rename_moves_the_active_selection():
+    base = store.ProfileStore(
+        active="home",
+        profiles={"home": Profile(
+            telescope=TelescopeData(focal_length_mm=900.0)), "wide": Profile()},
+    )
+    renamed = store.rename_profile(base, "home", "SHG-700")
+    assert store.profile_names(renamed) == ("SHG-700", "wide")  # order kept
+    assert renamed.active == "SHG-700"
+    assert renamed.profiles["SHG-700"].telescope.focal_length_mm == 900.0
+    with pytest.raises(KeyError):
+        store.rename_profile(base, "ghost", "other")
+    with pytest.raises(ValueError):
+        store.rename_profile(base, "wide", "home")      # the name already exists
+    with pytest.raises(ValueError):
+        store.rename_profile(base, "wide", "   ")
+    # Renaming to itself is a no-op, not a conflict with itself.
+    assert store.rename_profile(base, "home", "home").active == "home"
+
+
+def test_profile_delete_clears_the_active_when_it_is_deleted():
+    base = store.ProfileStore(
+        active="home", profiles={"home": Profile(), "wide": Profile()}
+    )
+    # Deleting another profile must not touch the active selection.
+    assert store.delete_profile(base, "wide").active == "home"
+    deleted = store.delete_profile(base, "home")
+    assert store.profile_names(deleted) == ("wide",)
+    assert deleted.active == ""
+    assert store.active_profile(deleted) is None
+    with pytest.raises(KeyError):
+        store.delete_profile(base, "ghost")
+    # Deleting the last profile is allowed: the store is empty, not magically
+    # repopulated with a new "default".
+    empty = store.delete_profile(deleted, "wide")
+    assert empty.profiles == {}
+    assert empty.active == ""
+
+
+def test_profiles_saved_empty_store_stays_empty(tmp_path):
+    # A file that exists is the user's decision. Only a missing file gets the
+    # startup default; an explicitly empty store must not resurrect it.
+    path = tmp_path / "profiles.json"
+    store.save_profiles(store.ProfileStore(active="", profiles={}), path)
+    loaded = store.load_profiles(path)
+    assert loaded.profiles == {}
+    assert store.active_profile(loaded) is None
+
+
+def test_profiles_accept_a_single_profile_document(tmp_path):
+    # A profile.json (or an exported profile) passed as the profiles file is
+    # wrapped as "default", so the caller does not need to know which file it
+    # has.
+    path = tmp_path / "profiles.json"
+    store.save_profile(
+        Profile(telescope=TelescopeData(focal_length_mm=880.0)), path
+    )
+    loaded = store.load_profiles(path)
+    assert store.profile_names(loaded) == ("default",)
+    assert store.active_profile(loaded).telescope.focal_length_mm == 880.0
+
+
+def test_profiles_broken_file_falls_back_to_the_legacy_profile(tmp_path):
+    # A truncated profiles.json is not readable, so the old single profile is
+    # the best recoverable instrument; with no legacy there is the default.
+    path = tmp_path / "profiles.json"
+    path.write_text("{not json", encoding="utf-8")
+    legacy = tmp_path / "profile.json"
+    store.save_profile(
+        Profile(telescope=TelescopeData(focal_length_mm=930.0)), legacy
+    )
+    recovered = store.load_profiles(path, legacy_path=legacy)
+    assert store.active_profile(recovered).telescope.focal_length_mm == 930.0
+    # With no profiles.json and no sibling profile.json, the startup default.
+    fallback = store.load_profiles(tmp_path / "elsewhere" / "profiles.json")
+    assert store.active_profile(fallback).telescope.focal_length_mm == 714.0
+
+
+def test_profiles_path_lives_next_to_the_settings_file():
+    assert paths.profiles_path() == paths.config_dir() / "profiles.json"
+
+
+def test_session_state_round_trip_migrates_a_saved_four_step_file(tmp_path):
+    # The Focus step was added after the first sessions were saved. An old file
+    # has no "focus" key, so it loads as PENDING and the next save writes the
+    # five steps in rail order. No step is renamed, so the old ones keep their
+    # status and metrics.
+    path = tmp_path / SESSION_STATE_FILE
+    path.write_text(
+        json.dumps({
+            "steps": {
+                "find_sun": {"status": "done", "metrics": {"dec_error_arcsec": 8}},
+                "polar": {"status": "done"},
+                "roi": {"status": "current"},
+                "scan": {"status": "pending"},
+            },
+            "session_dir": "/tmp/old-session",
+        }),
+        encoding="utf-8",
+    )
+    loaded = store.load_session_state(path)
+    assert SESSION_STEPS == ("find_sun", "polar", "focus", "roi", "scan")
+    assert loaded.steps["focus"].status is StepStatus.PENDING
+    assert loaded.steps["find_sun"].status is StepStatus.DONE
+    assert loaded.steps["roi"].status is StepStatus.CURRENT
+    store.save_session_state(loaded, path)
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert tuple(saved["steps"]) == SESSION_STEPS
 
 
 def test_session_state_without_a_file_starts_pending(tmp_path):

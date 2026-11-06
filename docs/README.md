@@ -138,7 +138,7 @@ solarscribe/ui/i18n/solarscribe_es.ts`) y compila:
   `QCoreApplication.translate("Settings", ...)`, so `lupdate` extracts them into
   the `Settings` context. When a key or its text changes, update both the schema
   and `settings_text.py`.
-- **Current state (2026-11-06)**: the catalogues hold every string the interface
+- **Current state (2026-11-07)**: the catalogues hold every string the interface
   has today, with 0 unfinished entries in Spanish and English. Re-run the two
   commands after touching a `.ui` or a `self.tr()` string; the number grows with
   the interface.
@@ -171,7 +171,7 @@ solarscribe/ui/i18n/solarscribe_es.ts`) y compila:
   `QCoreApplication.translate("Settings", ...)`, así que `lupdate` los extrae al
   contexto `Settings`. Cuando cambie una clave o su texto, actualiza el esquema y
   `settings_text.py`.
-- **Estado actual (2026-11-06)**: los catálogos contienen todas las cadenas que
+- **Estado actual (2026-11-07)**: los catálogos contienen todas las cadenas que
   la interfaz tiene hoy, con 0 sin traducir en español y en inglés. Vuelve a
   ejecutar los dos comandos tras tocar un `.ui` o una cadena de `self.tr()`; el
   número crece con la interfaz.

@@ -7,11 +7,11 @@ is meant to run. It is written from the design and the contracts, so it can be
 read before the code exists. Sections marked **Planned** describe agreed
 behaviour, not something you can run today.
 
-> **Status of this guide (2026-11-06)**: the real capture, centring and scan
-> engines are wired into the interface and run against a solar-spectrum
-> simulator; real camera and mount capture is not validated yet. The guide is
-> written with the contracts, so the behaviour is specified before every corner
-> of the hardware is proven.
+> **Status of this guide (2026-11-07)**: the real engines and the five-step
+> interface are wired: capture, centring, focus, scan, spectral lines and named
+> profiles run against a solar-spectrum simulator; real camera and mount capture
+> is not validated yet. The guide is written with the contracts, so the behaviour
+> is specified before every corner of the hardware is proven.
 
 ---
 
@@ -49,10 +49,10 @@ This is a young repository, and pretending otherwise would waste your time.
 | --- | --- |
 | Package skeleton and layer layout | **Available** |
 | Contract modules (`devices`, `capture`, `shg`, `config`) | **Available** |
-| Configuration schema, profile and session state | **Available**: reading and writing with defaults, atomic writes and a v1 to v2 profile migration |
+| Configuration schema, named profiles and session state | **Available**: reading and writing with defaults, atomic writes, v1 to v2 migration and a `profiles.json` store |
 | Dependency-rule test (`tests/unit/test_layers.py`) | **Available** |
 | GUI, camera panel and simulator | **Available**: the window starts, discovery finds the simulator, and the camera opens and streams |
-| Real engines wired into the window | **Wired (simulator)**: centring, ROI, preparation, scan and the preview run against the simulator |
+| Real engines wired into the window | **Wired (simulator)**: centring, Focus, ROI, preparation, scan, spectral lines, quick recon and named profiles run against the simulator |
 | Real camera and mount capture | **Planned (MVP)**: the drivers and engines exist, not validated on hardware yet |
 | Installers for Windows and Linux | **Not available yet** |
 | ES/EN catalogues and this guide | **Available**; every extractable string is translated, 0 unfinished |
@@ -83,7 +83,7 @@ first things to attach to a bug report.
 | **Available** | It works in the current source tree. |
 | **Wired (simulator)** | The real engine is connected to the interface and runs against the simulator; the hardware path is still Planned (MVP). |
 | **Planned (MVP)** | Agreed in the design and the contracts; it is part of the first usable release. |
-| **Planned (phase 2)** | Agreed, but after the MVP (more camera backends, focus aid, device diagnostics). |
+| **Planned (phase 2)** | Agreed, but after the MVP (more camera backends in phase 2, a direct serial mount fallback in phase 3). |
 | **Planned (phase 3)** | Hardening and extra mount backends. |
 | **Design only** | The decision exists; the shape may still change. |
 
@@ -136,10 +136,13 @@ path is a source install; the installers on GitHub Releases are planned.
 power camera + mount
         |
         v
-welcome / settings: location, profile, language
+profile bar: choose, save or manage a named profile
         |
         v
-camera panel: find a camera, open it, restore the ROI preset from the profile
+welcome / settings: location, language; settings hold the spectrum inputs
+        |
+        v
+camera panel: find a camera, open it, restore the active profile's ROI preset
         |
         v
 1. Find the Sun: GOTO by ephemeris, coarse and fine centring on the slit
@@ -148,51 +151,64 @@ camera panel: find a camera, open it, restore the ROI preset from the profile
 2. Polar alignment: drift samples of the Sun's Dec, azimuth and altitude hints
         |
         v
-3. ROI: capture strip, spectral band, tilt, validation, estimated FPS and data rate
+3. Focus: three focusers and the slit-to-Dec tilt, with live metrics
         |
         v
-4. Scanning: preparation (fine centring + rate calibration), simple scan or mosaic,
+4. ROI: capture strip, spectral band, validation, estimated FPS and data rate
+        |
+        v
+5. Scanning: preparation (fine centring + rate calibration), simple scan or mosaic,
    three cycles by default, live progress and drop counters
         |
         v
 SER + scan_log.csv + scan_stats.jsonl + session_meta.json
         |
         v
-quick recon on screen + session summary + open session folder
+histogram, scan strip and quick recon + open data folder
 ```
 
 ---
 
 ## 4. Session flow
 
-### 4.1 The rail, not a wizard
+### 4.1 Image first, rail second
 
-The main view is a **session by steps**. A horizontal rail shows the state of
-each step (pending, current, done, skipped). Navigation is free: the rail guides,
-it does not lock. Every control stays visible; there is no separate expert mode.
-The state is saved silently after every change, and a completed step can be
-reopened.
+The viewer takes most of the window and grows with it. The five-step rail is a
+single 28 px line, the side panel is capped at 330 px, and the bottom bands fold:
+the brightness histogram and the scan strip are 24 px headers until you open
+them. Maximising the window gives the extra space to the image, not to the
+panels.
 
-This matters because a session is a sequence of setup decisions, and a form with
-every control at once does not tell a newcomer where to start. It also matters
-because an experienced observer must be able to jump straight to the ROI when the
-Sun is already on the slit.
+The rail still works like a session: it shows each step's state in words
+(pending, current, done, skipped), navigation is free, it recommends without
+locking, the state is saved silently after every change, and a completed step can
+be reopened. The right side holds the camera, telescope and stream-health panels;
+they collapse from their title bars or from **Tools → Panels**.
 
-**Status**: Wired (simulator). The rail, the free navigation and the silent
-auto-save run in the window; the steps drive the real engines with the simulator.
+This matters because the job is to see the Sun, not to read a form. The rail
+guides a newcomer without taking the image away from an experienced observer.
 
-### 4.2 The four steps
+**Status**: Wired (simulator). The rail, the free navigation, the silent
+auto-save and the collapsible layout run in the window; the steps drive the real
+engines with the simulator.
+
+### 4.2 The five steps
 
 | Step | What it does | Why it matters |
 | --- | --- | --- |
-| **Find the Sun** | GOTO to the Sun by local ephemeris, then coarse and fine centring on the slit | The scan needs the disk on the slit before anything else |
-| **Polar alignment** | Samples the Sun's Dec over time and separates azimuth from altitude error | Daytime tracking error smears the disk and biases the scan rate |
-| **ROI** | The user selects the capture strip and the spectral band; the tilt is measured and the ROI validated | The ROI sets the frame rate, the SER size and the data rate |
-| **Scanning** | Fine centring, scan-rate autocalibration, then a simple scan or a mosaic | This is where the data is actually written |
+| **Find Sun** | Points at the Sun by local ephemeris, then centres it coarsely and finely on the slit | The scan needs the disk on the slit before anything else |
+| **Polar** | Samples the Sun's Dec over time and separates azimuth from altitude error | Daytime tracking error smears the disk and biases the scan rate |
+| **Focus** | Three focusers with live metrics, then the slit-to-Dec tilt and the ROI height it needs | A soft spectrum or a tilted slit costs contrast and forces a taller ROI |
+| **ROI** | The user selects the capture strip and the spectral band; the ROI is validated and the tilt can be checked quickly | The ROI sets the frame rate, the SER size and the data rate |
+| **Scan** | Fine centring, scan-rate autocalibration, then a simple scan or a mosaic | This is where the data is actually written |
 
-Fine centring and rate calibration are **preparation inside the Scanning step**,
-not a fifth step. The prototype taught that lesson: the two operations belong
-together and both depend on the final exposure.
+Focus is a step of its own because the three focusers and the slit alignment are
+a task, not a dialog: they need live metrics, a running best and a guided tilt.
+The ROI step keeps a quick tilt measure because the strip height needs it.
+
+Fine centring and rate calibration are **preparation inside the Scan step**, not
+another step: the two operations belong together and both depend on the final
+exposure.
 
 **Status**: Wired (simulator). The rail, the free navigation and the silent
 auto-save run in the window; the steps drive the real engines with the simulator.
@@ -255,8 +271,11 @@ what actually arrives.
   derivative is zero there (the chord is `L = 2·√(R² − q²)`), so the histogram
   alone cannot resolve the centre. That is the **dead zone**, a geometric limit,
   not a tuning problem. The interface says so and chains the fine step.
-- **Manual fallback**: the telescope panel is always available for N/S/E/W moves,
-  GOTO by coordinates, sync, tracking and park.
+- **Manual fallback**: the telescope panel (visible by default, collapsible from
+  its title bar or **Tools → Panels**) has connect, find mount, **Go to the
+  Sun**, N/S/E/W with a rate selector, Stop, tracking and park. Coordinate GOTO
+  and Sync are not in the interface; the mount contract keeps them for a future
+  advanced mode.
 
 The local ephemeris means the GOTO works with no network. A wrong observatory
 location is the most common cause of a bad first GOTO: check latitude and
@@ -289,7 +308,49 @@ the wiring and the guidance, not the sky.
 can be separated. The assistant says when a measurement is weak instead of
 showing a confident number that is not.
 
-### 5.4 The ROI: the strip that makes the scan possible
+### 5.4 Focus: three focusers and the slit
+
+**Status**: Wired (simulator). The `shg.focus` metrics and the `shg.tilt` fit run
+live. The simulator has no tilted slit line, so the tilt reads about 0.0°; a real
+frame is what proves it.
+
+The SHG has three focusers that interact, so focusing is an iteration, not a
+single knob:
+
+1. **Spectrograph** (camera focus): maximise the **line contrast** and the
+   **line sharpness** of the absorption lines.
+2. **Collimator**: maximise the **edge sharpness** of the slit and minimise the
+   **edge wobble**, so the edge is sharp and straight.
+3. **Telescope**: maximise the **detail contrast** and the **detail sharpness**
+   of the solar surface, and keep the **detail count** high.
+
+Each metric updates live and keeps a **running best since the last reset**; the
+second number is the best. **Reset the best values** clears the hold, so the next
+focuser position is compared against a fresh baseline. Focus is a judgement:
+compare with the best, then measure the tilt.
+
+- **What the figures mean**: contrast says how much the absorption lines stand
+  out from the continuum; sharpness says how fast the brightness changes across a
+  line, so a defocused line is smooth; edge sharpness says how strong the step at
+  the slit edge is; edge wobble says how much the edge wanders along the slit in
+  grid cells; detail count says how many surface structures the profile finds.
+  Exposure cancels out in the ratio-based figures, so changing it does not move
+  them.
+- **Slit to Dec**: the tilt is the angle between the spectral line and the frame,
+  in **degrees** and in **drift pixels**. Zero means the slit is parallel to the
+  declination axis. Rotate the slit until it is near zero. A tilt does not stop
+  the scan, but the line covers more rows and the ROI must be taller.
+- **ROI height**: `band + |drift| + 2 px margin`; the step says the height it
+  needs. A smaller ROI would crop the order.
+- **Measure the slit tilt**: fits a line to the slit edge of the current frame
+  and reports the tilt and the height it needs. If the edge is irregular, it says
+  so and calls the tilt provisional instead of hiding the warning.
+- **What it does not do**: capture does not deskew the frames. Post-processing
+  applies the correction and receives the recorded tilt.
+- **The quick check in ROI**: the ROI step keeps a fast tilt measurement because
+  the strip height needs it; the guided alignment lives here.
+
+### 5.5 The ROI: the strip that makes the scan possible
 
 **Status**: Wired (simulator). The rectangles are sent to the real capture engine
 and the preset is restored from the profile when the camera opens; the simulator
@@ -335,26 +396,6 @@ post-processing.
 capture ROI, so the editor draws the spectral band over it. A capture rectangle
 larger than the frame would be fiction; the camera panel is where the delivered
 rectangle is changed.
-
-### 5.5 Tilt measurement
-
-**Status**: Wired (simulator), with one honest exception: the simulator has no
-tilted slit line, so the tilt reads about 0.0°. The fit is exercised by the unit
-tests; a real frame is what proves it.
-
-- **What it does**: fits a straight line to the position of the slit edge (or an
-  absorption line) across the width of the ROI. The slope is the tilt, shown in
-  **degrees** and in **drift pixels** across the ROI.
-- **Straightness**: the fit also reports how straight the edge is. A wavy edge
-  means the tilt figure is not trustworthy, and the interface says that instead
-  of showing a number.
-- **What it is used for**: sizing the ROI height, guiding you to leave the line
-  straight (ideally close to 0°) and recording the value for post-processing.
-- **What it does not do**: capture does not deskew the frames. Correcting the
-  tilt is the job of post-processing, which does it better and must not find
-  already-modified raw data.
-- **When it is recalculated**: if the optic, the ROI or the camera orientation
-  changes.
 
 ### 5.6 Scan preparation: fine centring and rate calibration
 
@@ -438,20 +479,27 @@ camera; a rejected value comes back as a message, not a silent change.
   binning, the session says which one and keeps the previous value. The technical
   detail goes to the log.
 
-### 5.9 Live scan visualisation, quick recon and summary
+### 5.9 Histogram, scan strip and quick recon
 
-**Status**: Wired (simulator). The visualisation follows the real scan progress
-and the summary comes from the scan result.
+**Status**: Wired (simulator). The histogram reads the live band, the scan strip
+follows the real progress and the quick recon comes from the SHG layer.
 
-- **During the scan**: the viewer shows the strip already captured, the slit line
-  and the percentage completed, over a **schematic disk** that works offline. If
-  there is a connection, the day's real Sun image (SDO) can replace the
-  schematic disk. The percentage refers to the planned sweep, so 100% means the
-  plan finished, not that the image is processed.
-- **As the scan advances**: a **quick recon**, computed by the SHG layer with
-  `shg.quick_recon`. It collapses each frame's spectral band into one profile and
-  stacks the profiles in time into a disk; the window paints the result on screen
-  as the sweep runs. The caption says how many frames and rows went into it.
+- **Brightness histogram**: always present as a 24 px header, and it folds open
+  when you need it. It has 256 bins in log scale, computed **only on the spectral
+  band**, so the dark rows do not flatten the spectrum. Two handles, black and
+  white: drag one, or click near one to move the nearest; the white never crosses
+  the black. The shaded zones are what the stretch clips. The header warns with
+  the fraction of the band already at the maximum level; lower the exposure or
+  raise the white handle so the spectrum is not clipped.
+- **Scan strip**: a 24 px header with the percentage and cycle that **opens by
+  itself when a scan starts**. It shows the captured disk, the slit line and the
+  quick recon, and it can be folded again when the scan ends.
+- **The percentage** is of the planned sweep, so 100% means the plan finished,
+  not that the image is processed.
+- **Quick recon**: as the scan advances, the SHG layer runs `shg.quick_recon`. It
+  collapses each frame's spectral band into one profile and stacks the profiles
+  in time into a disk; the window paints the result on screen. The caption says
+  how many frames and rows went into it.
 - **What the quick recon is not**: calibrated, aligned, flat-fielded or
   photometric. It is not exported, it does not read the SER back and it does not
   replace post-processing.
@@ -459,15 +507,45 @@ and the summary comes from the scan result.
   stable reason behind it: too little contrast to show a disk, no frames yet, a
   spectral band with no pixels, or frames that cannot produce a preview. The
   reason names the step to check.
-- **Summary**: captured frames, dropped frames, duration and session path, with a
-  button to open the session folder.
+- **Summary**: captured frames, dropped frames, duration and data folder, with a
+  button to open the folder.
 
 **Honesty**: the quick recon is not authoritative. If it looks good, the data is
 probably usable; if it looks bad, the reason is usually in the logs, and the
 summary points there. The caption "light preview, not for measurement" is part of
 the widget on purpose.
 
-### 5.10 Health panel and performance counters
+### 5.10 Spectral lines
+
+**Status**: Wired (simulator). The identification is native (`shg.spectrum`); it
+does not call JSol'Ex or any external service.
+
+- **What it does**: detects absorption dips in the spectral band and matches them
+  against a built-in catalog, naming the lines and sorting them by their row in
+  the frame. It runs about twice a second while the panel is on.
+- **The two inputs**: in **Settings → Spectrum**, the **target line** is the
+  wavelength the grating is tuned to (H-alpha at 6562.81 Å by default) and the
+  **dispersion** is how many angstroms one pixel covers. The target line anchors
+  the pixel-to-wavelength mapping; the dispersion turns a pixel distance into a
+  wavelength. A dispersion of 0 turns identification off.
+- **Why both matter**: a wrong target line slides every name with it; a wrong
+  dispersion stretches or compresses the pattern. They are inputs, not
+  measurements, so the panel cannot guess them.
+- **What the panel shows**: the anchor (name, wavelength and row), a confidence
+  figure, and a table of lines with their depth, their residual from the catalog
+  rest wavelength and their kind, solar or telluric. The names are sorted by row.
+- **Confidence**: an F1 score over the strong catalog lines and the detected
+  dips. It says how well the pattern supports the names, not how accurate a
+  wavelength is. Below the configured minimum, no names are shown.
+- **Telluric lines** come from Earth's atmosphere, not from the Sun. The panel
+  labels them so they are not read as solar features.
+- **Honest limit**: this is a pattern match, not a wavelength calibration. It
+  helps identify the lines; it does not replace a spectrograph calibration.
+- **When it cannot identify**: no spectrum on screen, no pixels in the band, no
+  absorption line, no catalog match, a missing target line or a zero dispersion.
+  Each message names the step or the setting to check.
+
+### 5.11 Health panel and performance counters
 
 **Status**: Wired (simulator). The counters come from the real capture engine;
 with the simulator they prove the wiring, not the sustained rate.
@@ -494,7 +572,7 @@ panel.
 camera can prove 120 fps and the 207 MB/s. The panel says which of the two it is
 looking at.
 
-### 5.11 Sky calendar, Sun tab
+### 5.12 Sky calendar, Sun tab
 
 **Status**: Available. The figures are computed locally from the observatory
 position; the optional SDO image needs a network.
@@ -517,22 +595,40 @@ Under **Tools → Sky calendar… → Sun** the solar utilities live together:
 figures are local, and the visualisation falls back to the schematic disk. If the
 ephemeris module is missing, the figures are hidden instead of guessed.
 
-### 5.12 Profiles, settings and language
+### 5.13 Named profiles, settings and language
 
-**Status**: Wired (simulator). The profile is read and written by the
-configuration store; the settings dialog edits the same schema.
+**Status**: Wired (simulator). `profiles.json` is read and written by the
+configuration store; the profile bar and the manager use the same API.
 
-- **One profile**, not a list of competing ones: telescope data (focal length,
-  aperture, slit length), camera data (model, pixel size, binning) and ROI
-  presets per camera and optic.
-- **ROI presets** are restored when a camera opens and written back when you
-  apply a ROI, so the next session starts from the same strip. A preset that does
-  not fit the sensor is fitted and reported.
-- **INI settings** inherited from `nightscribe-scan`, plus the new ROI, tilt,
-  mount, capture-limit and session keys. Every key has a default and an
+- **Profile bar**: the top bar shows the **active profile**. **Save as…** stores
+  the current optics, camera and ROI presets under a new name; **Manage…** opens
+  the manager. The active profile is loaded at startup.
+- **What a profile stores**: telescope data (focal length, aperture, slit
+  length), camera data (model, pixel size, binning) and ROI presets per camera
+  and optic, for one instrument setup. The observatory position is separate: it
+  lives in Settings and the welcome assistant.
+- **Switching profiles** reloads the optics and ROI presets and keeps the camera
+  connected. It does not move the telescope or restart the camera; apply a ROI
+  preset if the strip changed.
+- **Manager**: lists the profiles, marks the active one, creates a new profile
+  from the current setup, renames, deletes and uses one. The last profile cannot
+  be deleted, and deleting asks first because that profile's optics and ROI
+  presets are lost.
+- **One file**: `profiles.json` in the configuration folder holds every name and
+  the active one; each block is a full v2 profile. The old single `profile.json`
+  is read as the `default` profile, and a `nightscribe-profiles.json` v1 is
+  migrated. A hand-edited active name that does not exist leaves no active
+  profile instead of silently choosing another.
+- **Single user**: two app instances writing at once can overwrite each other,
+  as in the prototype.
+- **ROI presets** live in the profile: restored when a camera opens and written
+  back when you apply a ROI. A preset that does not fit the sensor is fitted and
+  reported.
+- **INI settings** inherited from `nightscribe-scan`, plus the ROI, tilt, mount,
+  capture-limit, session and spectrum keys. Every key has a default and an
   explanation, so a hand-edited file never stops the app from starting.
-- **Hand editable**: the file is plain text. A value that cannot be parsed falls
-  back to its default, and the settings dialog explains what each key controls.
+- **Settings → Spectrum** holds the target line and the dispersion used by the
+  spectral-lines panel (see §5.10).
 - **Language**: the system language by default, with Spanish and English
   available. Changing it asks for a restart so the application reloads its
   catalogues.
@@ -542,7 +638,7 @@ schema, translated through the `Settings` context and looked up at runtime. A
 Spanish session shows them in Spanish; if a lookup is missing, the dialog falls
 back to the developer text instead of showing an empty tooltip.
 
-### 5.13 Dry run and simulators
+### 5.14 Dry run and simulators
 
 **Status**: Available. `--dry-run` checks the geometry without opening the camera
 or moving the mount; the GUI simulator runs the real engines against a synthetic
@@ -570,38 +666,22 @@ the noise and the disk throughput.
 The simulators are also what makes the automated tests possible, which is why
 they are part of the product design and not an afterthought.
 
-### 5.14 Focus aid
+### 5.15 Device diagnostics and mount backends
 
-**Status**: the dialog is present in the interface; the full routine and its
-tests are planned (phase 2).
-
-The focus indicators follow the SHG-700 routine:
-
-1. **Spectrograph**: maximise the contrast and gradient of the absorption lines.
-   H-alpha is the main line.
-2. **Collimator**: maximise the sharpness of the slit edge and minimise its
-   flatness.
-3. **Telescope**: maximise the contrast, gradient and number of surface
-   structures.
-
-The indicators are computed along both axes, so camera orientation does not
-matter. The design schedules the full routine for phase 2; the dialog in the
-current interface shows the mean level and the contrast of the live frame, which
-are the two indicators that matter most.
-
-### 5.15 Device diagnostics and extra mount backends
-
-**Status**: the `--diagnostics` mode is available in this build; the extra mount
-backends are planned (phase 3).
+**Status**: the `--diagnostics` mode and the INDIGO mount backend are available
+in this build; the direct serial fallback is planned (phase 3).
 
 - A **device diagnostics** mode reports which SDKs and backends were found, what
   each camera reports and what the mount accepts. It runs with
   `python -m solarscribe --diagnostics` and prints the paths, the optics, the ROI
   presets and the state of the device layer.
-- Extra mount backends: a direct serial fallback (LX200, OnStep) and INDIGO.
-
-The extra backends are not needed to scan with the reference hardware, which is
-why they come after the MVP.
+- **Mount backends**: ASCOM COM on Windows, INDI on Linux, INDIGO on both, and
+  the mount simulator. INDIGO speaks JSON over TCP to `indigo_server`; it selects
+  one of the mount's rate classes instead of an arbitrary arcsec/s, so the scan
+  calibration measures the rate it really gets.
+- A direct **serial fallback** (LX200, OnStep) is planned (phase 3). It is not
+  needed to scan with the reference hardware, which is why it comes after the
+  MVP.
 
 ---
 
@@ -647,7 +727,7 @@ with its own, and the post-processing tools.
 | 5 | Consistency checks between scans | Wired (simulator) |
 | 6 | `scan_log.csv`, `scan_stats.jsonl`, `session_meta.json` | Wired (simulator) |
 | 7 | Control panel with profiles and configuration | Available in the simulator, as the PySide6 session UI |
-| 8 | Focus aid | Dialog present; full routine planned (phase 2) |
+| 8 | Focus: three focusers and the slit-to-Dec tilt | Wired (simulator) |
 | 9 | Simple scan and multi-row mosaic with chord-based Dec centring | Wired (simulator) |
 | 10 | Auto-exposure loop | Wired (simulator) |
 | 11 | Dec centring: left/right loop and chord | Wired (simulator) |
@@ -695,29 +775,30 @@ the map.
 | The Sun leaves the slit mid-scan | Tracking error or a bump | Pauses, warns and waits | Recentre with the telescope panel, then continue |
 | The app starts without a camera or a mount | Missing SDK or platform backend | Says what is missing and keeps running | Install the SDK or the platform backend; use the simulator to explore |
 
-**Status**: the behaviours are planned; the wording in the interface will be
-written with the code and translated with the rest of the strings.
+**Status**: the behaviours are wired in the simulator and the wording is the one
+in the interface; the hardware column still has to be proven on real devices.
 
 ---
 
 ## 9. Files and logs
 
 **Status**: Wired (simulator). The scan engine writes the three logs and the SER
-in a real capture; the simulator records no SER, so its session folder holds the
+in a real capture; the simulator records no SER, so its data folder holds the
 state, the logs and the summary but no SER files. The formats are inherited from
 `nightscribe-scan`; the new columns are added, never replacing the old ones.
 
-### 9.1 The session folder
+### 9.1 The data folder
 
-One folder per session, named with its date and time, inside a configurable base
-folder. Files are named:
+The app calls it the **data folder**; the design and the logs call it the session
+folder. There is one folder per run, named with its date and time, inside a
+configurable base folder. Files are named:
 
 ```
 sun_AAAAMMDD_HHMM_scanNN.ser    one file per scan or per mosaic row
 scan_log.csv                    one row per scan, rewritten after each scan
 scan_stats.jsonl                one JSON sample per scan
 session_meta.json               the effective configuration and geometry
-session_state.json              the app's own memory of the four steps
+session_state.json              the app's own memory of the five steps
 ```
 
 The spelling above is the one fixed in the configuration contract. The exact
@@ -950,6 +1031,36 @@ The figures in the interface are translated as sentences, never as bare codes:
 the engine reports a stable reason code and the interface turns it into a
 sentence with its numbers.
 
+### 10.11 How the spectral lines are named
+
+The panel is native: it reads the live band, not a SER file, and it does not call
+JSol'Ex or any external service. The steps are:
+
+1. **Collapse the slit axis.** The slit axis is X (frame width) and the dispersion
+   axis is Y (frame height). Averaging over X keeps the absorption lines, which
+   run along X, and removes the surface detail.
+2. **Find the local continuum.** A moving upper quartile over a window several
+   times wider than a line: a narrow dip does not own the quartile, so the blaze
+   and the illumination gradient cancel without the line becoming its own
+   continuum. A dip is a local minimum below a fraction of that continuum.
+3. **Anchor the mapping.** `wavelength(px) = anchor + (px - anchor_px) * dispersion * sign`.
+   The anchor is the configured target line; `sign` is negative when the
+   dispersion direction is flipped. Without a measured anchor pixel, the MVP
+   assumes the strongest dip is the target line. That is an assumption, not a
+   measurement, and the panel says so when the confidence is low.
+4. **Match and score.** The detected dips are compared with the strong catalog
+   lines inside the window. The match is refined by shifting the anchor a few
+   pixels, and the reported confidence is an F1 score over catalog lines found
+   and detected dips named. A tie keeps the smallest shift, so the anchor does
+   not wander when the match is symmetric.
+5. **Label the kind.** The catalog marks solar and telluric lines; a telluric line
+   comes from Earth's atmosphere, not from the Sun.
+
+The output is a **pattern match**, not a wavelength calibration. The target line
+and the dispersion are inputs because the panel cannot measure them from one
+frame; a wrong target slides every name, and a wrong dispersion stretches or
+compresses the pattern.
+
 ---
 
 ## 11. Limits and honesty
@@ -964,6 +1075,14 @@ These are the limits you should know before trusting a take:
   from altitude, and the assistant says so instead of inventing precision.
 - **Tilt is measured, not corrected.** The raw frames stay raw; post-processing
   applies the correction.
+- **Focus figures are relative.** Contrast, sharpness and detail count compare
+  focuser positions; the running best is the reference, not an absolute quality
+  score. The simulator has no tilted slit line, so the tilt reads about 0.0 there.
+- **Line names are a pattern match.** The spectral-lines panel identifies dips
+  against a catalog; it is not a wavelength calibration. A wrong target line
+  slides every name, and a wrong dispersion stretches or compresses the pattern.
+- **Named profiles are single-user.** Each save is atomic, but two app instances
+  writing at once can overwrite each other, as in the prototype.
 - **The quick recon is not the result.** It answers "did the take work?", not
   "what does the Sun look like?".
 - **There is no post-processing in SolarScribe.** Recon, stacking and mosaics
@@ -985,6 +1104,7 @@ These are the limits you should know before trusting a take:
 - [ADR index](../../design/adr/README.md). The decisions most visible here:
   ADR-006 (centring), ADR-007 (polar alignment), ADR-010 (ROI), ADR-011 (session
   steps), ADR-013 (performance), ADR-018 (post-processing contract), ADR-019
-  (mount), ADR-020 (result), ADR-021 (network), ADR-022 (tilt).
+  (mount), ADR-020 (result), ADR-021 (network), ADR-022 (tilt), ADR-026
+  (image-first layout), ADR-027 (named profiles), ADR-028 (five-step rail).
 - `nightscribe-scan` user guide and tools, the prototype this application
   replaces in capture.

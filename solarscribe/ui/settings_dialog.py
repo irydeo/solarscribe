@@ -175,6 +175,8 @@ class SettingsDialog(QDialog):
             return self.tr("Session")
         if section == "polar":
             return self.tr("Polar alignment")
+        if section == "spectrum":
+            return self.tr("Spectrum")
         return section
 
     # @args: section - the schema section
@@ -188,6 +190,11 @@ class SettingsDialog(QDialog):
             return self.tr(
                 "The budget of ADR-013. These are the figures the health panel "
                 "compares against.")
+        if section == "spectrum":
+            return self.tr(
+                "Line identification. The target line anchors the wavelength "
+                "scale and the dispersion turns pixels into angstroms. Both are "
+                "inputs, so a wrong one names the lines wrongly.")
         return self.tr("Every value has a default, so a partial file still starts "
                        "the app.")
 

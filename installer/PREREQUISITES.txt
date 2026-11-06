@@ -18,6 +18,7 @@ MOUNT: ASCOM PLATFORM
     - ASCOM Platform 7 (or the current version), and
     - the .NET runtime that the ASCOM Platform installer asks for.
   Neither is bundled: they are separate installations from ascom-standards.org.
+  The Python COM bridge (pywin32) IS included in this build.
 
   Without the ASCOM Platform the camera, the SHG engine and the session flow
   still work; the telescope panel reports that the mount backend is missing

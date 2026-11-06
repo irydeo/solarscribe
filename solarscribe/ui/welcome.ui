@@ -80,15 +80,15 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="welcomeDataRow">
-     <item>
+    <layout class="QGridLayout" name="welcomeDataGrid">
+     <item row="0" column="0">
       <widget class="QLabel" name="welcomeLatCaption">
        <property name="text">
         <string>Latitude (deg, north positive)</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QDoubleSpinBox" name="welcomeLatSpin">
        <property name="decimals">
         <number>4</number>
@@ -104,14 +104,14 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QLabel" name="welcomeLonCaption">
        <property name="text">
         <string>Longitude (deg, east positive)</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="3">
       <widget class="QDoubleSpinBox" name="welcomeLonSpin">
        <property name="decimals">
         <number>4</number>
@@ -127,27 +127,14 @@
        </property>
       </widget>
      </item>
-     <item>
-      <spacer name="welcomeDataSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
+     <item row="1" column="0" colspan="2">
       <widget class="QLabel" name="welcomeCameraStatus">
        <property name="text">
         <string>Camera: searching</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="1" column="2" colspan="2">
       <widget class="QLabel" name="welcomeMountStatus">
        <property name="text">
         <string>Mount: searching</string>

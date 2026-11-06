@@ -102,10 +102,11 @@ def test_every_screen_has_a_ui_file():
     expected = {
         "main_window", "telescope_panel", "camera_panel", "health_panel",
         "welcome", "settings_dialog", "logs_viewer", "sky_calendar",
-        "roi_manager", "focus_aid",
+        "roi_manager", "profile_manager",
     }
     present = {path.stem for path in UI_DIR.glob("*.ui")}
     assert expected <= present
-    for code_only in ("live_viewer", "histogram", "roi_editor"):
+    for code_only in ("live_viewer", "histogram", "roi_editor",
+                      "spectrum_panel"):
         assert code_only not in present, (
             f"{code_only} must stay a placeholder + replaceWidget (ADR-009)")

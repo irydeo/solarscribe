@@ -17,8 +17,11 @@
 # The split with config/schema.py is deliberate (ADR-023): schema.py holds the
 # value types and the table, this module holds the algorithms. No layer above
 # needs to know how an INI comment is stripped or how a v1 profile is migrated;
-# it asks for a Settings, a Profile or a SessionState and gets a complete object
-# with every default already applied.
+# it asks for a Settings, a ProfileStore, a Profile or a SessionState and gets a
+# complete object with every default already applied.
+#
+# Named profiles (ADR-027): profiles.json holds every name and the active one;
+# the single profile.json is still read and becomes the "default" profile.
 #
 # Three rules drive every choice here:
 #
@@ -43,13 +46,15 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
 from solarscribe.config.schema import (
     LEGACY_KEYS,
+    PROFILE_FILE,
     PROFILE_VERSION,
+    PROFILES_VERSION,
     SCAN_LOG_FILE,
     SCAN_STATS_FILE,
     SCHEMA,
@@ -69,12 +74,21 @@ from solarscribe.config.schema import (
 
 __all__ = [
     "SESSION_FOLDER_FORMAT",
+    "ProfileStore",
     "Settings",
+    "active_profile",
+    "default_profile_store",
     "default_settings",
+    "delete_profile",
     "load_profile",
+    "load_profiles",
     "load_session_state",
     "load_settings",
+    "profile_names",
+    "rename_profile",
+    "save_named_profile",
     "save_profile",
+    "save_profiles",
     "save_session_state",
     "save_settings",
     "scan_log_path",
@@ -83,6 +97,7 @@ __all__ = [
     "session_folder",
     "session_meta_path",
     "session_state_path",
+    "set_active_profile",
 ]
 
 # The session folder name: local date and minute, sortable as text, and readable
@@ -504,11 +519,12 @@ def load_profile(path: str | Path) -> Profile:
     return _profile_from_json(data)
 
 
-# @args: profile - what to save; path - where
-# @return: nothing. Writes the v2 shape of ARCHITECTURE 3.2 with lists for the
-#          rectangles, because JSON has no tuples
-def save_profile(profile: Profile, path: str | Path) -> None:
-    data = {
+# @args: profile - one profile
+# @return: the v2 JSON body of that profile (lists for the rectangles, because
+#          JSON has no tuples). Shared by the single-file writer and the named
+#          store so a profile exported from either is the same document
+def _profile_to_json(profile: Profile) -> dict:
+    return {
         "version": PROFILE_VERSION,
         "telescope": {
             "focal_length_mm": profile.telescope.focal_length_mm,
@@ -527,7 +543,233 @@ def save_profile(profile: Profile, path: str | Path) -> None:
             for preset in profile.roi_presets
         ],
     }
+
+
+# @args: profile - what to save; path - where
+# @return: nothing. Writes the v2 shape of ARCHITECTURE 3.2. This is the single
+#          profile file: the named store lives in profiles.json (ADR-027)
+def save_profile(profile: Profile, path: str | Path) -> None:
+    _write_atomic(
+        Path(path), json.dumps(_profile_to_json(profile), indent=2, ensure_ascii=False) + "\n"
+    )
+
+
+@dataclass(frozen=True)
+class ProfileStore:
+    # Every named profile plus the active selection: the content of
+    # profiles.json (ADR-027).
+    #
+    # One file, not one file per profile, because startup needs the list and the
+    # active choice in one read, and rename or delete must be one atomic write.
+    # It is also the shape nightscribe-scan used, so a user's named profiles
+    # migrate as they are.
+    #
+    # `profiles` keeps insertion order: the UI lists names in the order the user
+    # created them, not in an arbitrary order. `active` may name a profile that
+    # is missing (a hand-written file): the string is preserved and
+    # active_profile() returns None instead of silently choosing another
+    # instrument.
+    version: int = PROFILES_VERSION
+    active: str = ""
+    profiles: dict[str, Profile] = field(default_factory=dict)
+
+
+# @return: the startup store: one profile called "default", active. A fresh
+#          install must show a usable profile, not an empty list
+def default_profile_store() -> ProfileStore:
+    return ProfileStore(active="default", profiles={"default": Profile()})
+
+
+# @args: name - a profile name typed by the user
+# @return: the name without surrounding spaces. Raises ValueError when nothing
+#          is left: an unnamed profile could not be selected or deleted
+def _clean_profile_name(name: str) -> str:
+    cleaned = name.strip()
+    if not cleaned:
+        raise ValueError("a profile name cannot be empty")
+    return cleaned
+
+
+# @args: data - anything json.loads returned for profiles.json
+# @return: the ProfileStore, or None when the document is not a store at all.
+#          It accepts the SolarScribe store, a single Profile document, a map of
+#          names with no wrapper, and the nightscribe-scan v1 file; every block
+#          goes through _profile_from_json, which migrates v1 bodies
+def _store_from_json(data: object) -> ProfileStore | None:
+    if not isinstance(data, dict):
+        return None
+
+    raw_profiles = data.get("profiles")
+    if isinstance(raw_profiles, dict):
+        profiles: dict[str, Profile] = {}
+        for name, block in raw_profiles.items():
+            if not isinstance(name, str):
+                continue
+            cleaned = name.strip()
+            if not cleaned:
+                continue
+            # A broken body keeps the name with the default values: the name is
+            # the user's, the values are ours to repair.
+            profiles[cleaned] = _profile_from_json(block)
+        return ProfileStore(active=_as_str(data.get("active"), "").strip(),
+                            profiles=profiles)
+
+    # A single profile document: the legacy profile.json or an exported profile.
+    if any(marker in data for marker in
+           ("telescope", "camera", "roi_presets", "meta", "config")):
+        return ProfileStore(active="default",
+                            profiles={"default": _profile_from_json(data)})
+
+    # A map of profiles with no wrapper, minus the store metadata. This is the
+    # shape the prototype's panel could download for one profile set.
+    metadata = ("version", "active")
+    entries = {name: block for name, block in data.items() if name not in metadata}
+    if entries and all(isinstance(block, dict) for block in entries.values()):
+        profiles = {}
+        for name, block in entries.items():
+            cleaned = str(name).strip()
+            if cleaned:
+                profiles[cleaned] = _profile_from_json(block)
+        return ProfileStore(active=_as_str(data.get("active"), "").strip(),
+                            profiles=profiles)
+
+    # A flat v1 config passed as a store: one profile called "default".
+    if data:
+        return ProfileStore(active="default",
+                            profiles={"default": _profile_from_json(data)})
+
+    # An explicitly empty document is an empty store. A missing file is the one
+    # that gets the startup default; deleting the last profile must stick.
+    return ProfileStore(active="", profiles={})
+
+
+# @args: path - profiles.json; legacy_path - the old single profile.json (None
+#        looks for profile.json next to path)
+# @return: the named store, loaded at startup. A missing file falls back to the
+#          legacy profile as "default", and to the startup default when there is
+#          none. A broken file tries the legacy profile first, then the default.
+#          Loading never writes: the caller saves when the user changes
+#          something (ADR-027)
+def load_profiles(path: str | Path, *,
+                  legacy_path: str | Path | None = None) -> ProfileStore:
+    path = Path(path)
+    if legacy_path is None:
+        # The startup call is load_profiles(paths.profiles_path()): the old
+        # profile.json lives in the same folder, so looking for it here keeps
+        # the migration automatic instead of making every caller remember a
+        # second path.
+        sibling = path.with_name(PROFILE_FILE)
+        if sibling != path and sibling.exists():
+            legacy_path = sibling
+    text = _read_text(path)
+    if text is not None:
+        try:
+            data = json.loads(text)
+        except (json.JSONDecodeError, ValueError):
+            data = None
+        if data is not None:
+            store = _store_from_json(data)
+            if store is not None:
+                return store
+
+    if legacy_path is not None:
+        legacy_text = _read_text(Path(legacy_path))
+        if legacy_text is not None:
+            try:
+                legacy_data = json.loads(legacy_text)
+            except (json.JSONDecodeError, ValueError):
+                legacy_data = None
+            return ProfileStore(active="default",
+                                profiles={"default": _profile_from_json(legacy_data)})
+
+    return default_profile_store()
+
+
+# @args: store - every named profile and the active one; path - where to write
+# @return: nothing. One atomic file with the version, the active name and one
+#          complete v2 profile body per name, so a profile can be exported from
+#          here into a single profile.json without a converter
+def save_profiles(store: ProfileStore, path: str | Path) -> None:
+    data = {
+        "version": PROFILES_VERSION,
+        "active": store.active,
+        "profiles": {name: _profile_to_json(profile)
+                     for name, profile in store.profiles.items()},
+    }
     _write_atomic(Path(path), json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+
+
+# @args: store - the named profiles
+# @return: the names in file order, which is the order the user created them
+def profile_names(store: ProfileStore) -> tuple[str, ...]:
+    return tuple(store.profiles)
+
+
+# @args: store - the named profiles
+# @return: the active Profile, or None when the active name is empty or does not
+#          exist. None is honest: the caller must not pretend another profile is
+#          the active one
+def active_profile(store: ProfileStore) -> Profile | None:
+    return store.profiles.get(store.active)
+
+
+# @args: store - the named profiles; name - an existing profile
+# @return: a new store with that profile active. Raises KeyError when the name
+#          is not there, because a typo must not change the instrument silently
+def set_active_profile(store: ProfileStore, name: str) -> ProfileStore:
+    cleaned = name.strip()
+    if cleaned not in store.profiles:
+        raise KeyError(cleaned)
+    return ProfileStore(version=store.version, active=cleaned,
+                        profiles=dict(store.profiles))
+
+
+# @args: store - the named profiles; name - the profile to add or replace;
+#        profile - its data; make_active - also switch to it
+# @return: a new store. The name is trimmed and cannot be empty. Saving a new
+#          first profile makes it active, because a store with one profile and
+#          no active one has nothing for the UI to show
+def save_named_profile(store: ProfileStore, name: str, profile: Profile, *,
+                       make_active: bool = False) -> ProfileStore:
+    cleaned = _clean_profile_name(name)
+    profiles = dict(store.profiles)
+    profiles[cleaned] = profile
+    active = cleaned if make_active or not store.active else store.active
+    return ProfileStore(version=store.version, active=active, profiles=profiles)
+
+
+# @args: store - the named profiles; old - the current name; new - the new one
+# @return: a new store with the same profile under the new name. The active
+#          selection follows the rename. Raises KeyError for a missing old name,
+#          ValueError for an empty or already used new name
+def rename_profile(store: ProfileStore, old: str, new: str) -> ProfileStore:
+    old_name = _clean_profile_name(old)
+    new_name = _clean_profile_name(new)
+    if old_name not in store.profiles:
+        raise KeyError(old_name)
+    if old_name == new_name:
+        return store
+    if new_name in store.profiles:
+        raise ValueError(f"a profile called {new_name!r} already exists")
+    profiles = {}
+    for name, profile in store.profiles.items():
+        profiles[new_name if name == old_name else name] = profile
+    active = new_name if store.active == old_name else store.active
+    return ProfileStore(version=store.version, active=active, profiles=profiles)
+
+
+# @args: store - the named profiles; name - the profile to remove
+# @return: a new store without it. Deleting the active profile clears the
+#          selection instead of silently activating another instrument; deleting
+#          the last one leaves an empty store, which the loader respects
+def delete_profile(store: ProfileStore, name: str) -> ProfileStore:
+    cleaned = _clean_profile_name(name)
+    if cleaned not in store.profiles:
+        raise KeyError(cleaned)
+    profiles = {key: value for key, value in store.profiles.items()
+                if key != cleaned}
+    active = "" if store.active == cleaned else store.active
+    return ProfileStore(version=store.version, active=active, profiles=profiles)
 
 
 # @args: raw - the metrics member of a saved step
@@ -549,7 +791,7 @@ def _as_metrics(raw: object) -> dict[str, float]:
 
 
 # @args: path - the session_state.json of a session
-# @return: the SessionState, complete for the four steps. A missing file, a
+# @return: the SessionState, complete for the five steps. A missing file, a
 #          missing step, an unknown step or an unknown status all resolve to
 #          something the rail can paint (ADR-011)
 def load_session_state(path: str | Path) -> SessionState:
@@ -586,8 +828,8 @@ def load_session_state(path: str | Path) -> SessionState:
     )
 
 
-# @args: state - the four steps and the session dates; path - where to save
-# @return: nothing. Writes the four steps in rail order and drops anything else,
+# @args: state - the five steps and the session dates; path - where to save
+# @return: nothing. Writes the five steps in rail order and drops anything else,
 #          so the file has one canonical shape
 def save_session_state(state: SessionState, path: str | Path) -> None:
     steps = {}

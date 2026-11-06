@@ -359,85 +359,151 @@ manual). Los indicadores se muestran en el visor y en el panel de sesión.
 
 ## 9. Interfaz de usuario (PySide6)
 
-Sigue el **mismo estilo y los mismos patrones que NightScribe** (ADR-009):
+Sigue el **mismo estilo y los mismos patrones que NightScribe** (ADR-009) y la
+revisión de ADR-026: **la imagen primero**. La ventana enseña el vídeo, no la
+administración.
 
 - **Tema**: `theme.py` como fuente única de la identidad visual; **solo tema
   oscuro**, con **icono, logo y acento propios** de SolarScribe (sol). Ficheros
   `.ui` + `ui_loader.py`; i18n `.ts` ES/EN.
 - **Idioma**: el del sistema por defecto, con una opción para cambiarlo.
 - **Menú**: `QMenuBar` con **File / Tools / Help**. En **Tools** viven las
-  utilidades: Settings…, **Sky calendar…**, **ROI manager…**, Focus aid…,
-  Device diagnostics… y **Logs** (visor de logs dentro de la app). No hay barra
-  de navegación superior.
+  utilidades: Settings…, **Sky calendar…**, **ROI manager…**, Device
+  diagnostics…, **Logs** y **Panels** (mostrar u ocultar el telescopio, la
+  cámara y la salud del stream). En **File** quedan **Open data folder** y
+  **Quit**: no hay ceremonia de sesión. No hay barra de navegación superior.
 - **Tools → Sky calendar… → Sun**: las utilidades de observación solar se
   integran aquí, en la pestaña **Sun** (copia propia adaptada del calendario de
-  NightScribe): imagen real del Sol (SDO), regiones activas (NOAA), datos del Sol
-  de hoy y utilidades del SHG (diámetro y ángulo solar, rotación, coordenadas
+  NightScribe): imagen real del Sol (SDO), regiones activas (NOAA), datos del
+  Sol de hoy y utilidades del SHG (diámetro y ángulo solar, rotación, coordenadas
   heliográficas).
 
 ### 9.1 Disposición
 
-- **Raíl de pasos arriba** (horizontal), con el estado de cada paso.
-- **Panel lateral** con las opciones del paso activo.
-- **Vídeo** en el área principal, con **histograma, stretch, zoom, rejilla y
-  cruz** de la rendija, y una **vista ampliada de la franja del espectro**.
+- **Barra de perfiles arriba, compacta (32 px)**: el **perfil activo por su
+  nombre**, un selector para cambiar, **Save as…** y **Manage…**, y una frase
+  que explica qué guarda un perfil. El perfil activo se **carga al arrancar**;
+  un perfil es la óptica, la cámara y los presets de ROI de un montaje. La
+  posición del observatorio no vive aquí: está en Settings y en el asistente de
+  bienvenida.
+- **Asistente de bienvenida como diálogo de primera vez**, no como bloque
+  permanente: pide la latitud y la longitud y se cierra. El chrome permanente no
+  lleva la posición, así que no crece ni al maximizar.
+- **Indicador de pasos arriba, mínimo**: una sola línea de 28 px por paso
+  (`1. Find Sun · Pending`), no el raíl de 64 px de ADR-011. El estado se
+  escribe con palabras además del color.
+- **Tarjeta de paso a la izquierda**, de 280 a 320 px: título, una frase corta
+  de por qué, lecturas vivas y **una sola acción principal**. Los párrafos
+  largos viven en el tooltip; el espaciado es compacto, los campos caben y la
+  tarjeta se desplaza en vertical si hace falta.
+- **Vídeo en el área principal**, con histograma, stretch, zoom, rejilla, cruz
+  y overlay de ROI. El visor crece con la ventana: en 1280 x 820 ocupa el 68%
+  de la altura con el histograma abierto y la tira de barrido plegada.
+- **Histograma abierto por defecto y compacto** (ADR-026): 24 px de cabecera y
+  una banda de ~56 px, acotada para que no robe altura; 256 bins en escala
+  logarítmica calculados sobre la **banda espectral**, con asas arrastrables
+  negro/blanco, zonas de recorte sombreadas y aviso de saturación. Se puede
+  plegar, pero no empieza plegado.
+- **Progreso del barrido en una tira plegable**, no en una caja fija de 130 px:
+  disco capturado, línea de la rendija, porcentaje y recon rápido. Su cabecera
+  lleva el porcentaje y el ciclo. **Mientras un barrido corre la tira está
+  abierta y no se puede plegar**; al terminar vuelve a plegarse si el observador
+  quiere.
+- **Panel de telescopio plegable a la derecha** (cerrable y reabrible desde
+  Tools → Panels), y **cámara y salud del stream** en pestañas, también
+  cerrables. El bando derecho está **capado a 210 px**; el panel de líneas, si
+  se enciende, mide 220 px. El contenido es compacto para que el ancho no
+  crezca.
 - **Barra de estado** abajo: fps, frames perdidos, estado de cámara y montura, y
-  espacio en disco.
-- **Ventana principal + diálogos** (calendario, ajustes, visor de logs).
+  espacio en disco, cada cifra con su explicación.
+- **Ventana principal + diálogos** (bienvenida, perfiles, calendario, ajustes,
+  visor de logs).
 
 ### 9.2 Sesión por pasos
 
-La vista principal es una **sesión por pasos**, con el mismo lenguaje que los
-pasos de proyecto de NightScribe: un **raíl** con el estado de cada paso
-(pendiente / en curso / hecho), **navegación libre**, **recomendaciones** (nunca
-puertas que bloqueen), **autoguardado silencioso** y **«reabrir paso»**. **Todos
-los controles están visibles siempre**: el raíl guía, no esconde (no hay un modo
-experto aparte).
+La vista principal sigue siendo una **sesión por pasos**, con el mismo lenguaje
+que los pasos de proyecto de NightScribe: un **indicador** con el estado de cada
+paso (pendiente / en curso / hecho), **navegación libre**, **recomendaciones**
+(nunca puertas que bloqueen), **autoguardado silencioso** y **«reabrir paso»**.
+La presentación es la de ADR-026: el indicador guía, no ocupa. **Todos los
+controles del paso están visibles** en su tarjeta.
 
-Los pasos son cuatro:
+Los pasos son cinco:
 
 1. **Buscar el Sol**: GOTO automático al Sol por efeméride y centrado grueso
    sobre la rendija (§8.1–8.2), con el panel de telescopio.
 2. **Alineación polar**: asistente de alineación solar (§8.3).
-3. **ROI**: el usuario selecciona el ROI de captura (editor en vivo), se mide el
-   **tilt** (§6.1, ADR-022), se alinea la rendija y se estiman FPS y caudal.
-4. **Escaneado**: preparación (centrado fino y autocalibración, §7) y barrido
+3. **Enfoque**: los tres focusers del SHG-700 y la alineación de la rendija con
+   Dec. Muestra en vivo las métricas de `shg.focus` (contraste y nitidez de las
+   líneas del espectrógrafo; nitidez y tambaleo del borde del colimador;
+   contraste, nitidez y número de detalles del telescopio) con su mejor valor
+   desde el último reinicio, y el tilt de `shg.tilt` en grados y píxeles de
+   deriva. Guía a girar la rendija hasta dejarla paralela a Dec y dice la altura
+   de ROI que necesita. Las métricas y el tilt son de shg; la interfaz solo mide
+   en vivo y explica. El paso ROI conserva una medición rápida del tilt porque
+   la altura de la tira la necesita.
+4. **ROI**: el usuario selecciona el ROI de captura (editor en vivo), se estiman
+   FPS y caudal y se valida que la tira aguanta el tilt medido (§6.1, ADR-010,
+   ADR-022).
+5. **Escaneado**: preparación (centrado fino y autocalibración, §7) y barrido
    simple o mosaico, con progreso, frames perdidos y stats.
 
 Cada paso muestra, en **lenguaje llano**, qué hace y por qué, un indicador en
 vivo y **una sola acción principal** destacada. El visor en vivo permanece
-visible.
+visible y crece con la ventana. El paso Focus es pesado y su tarjeta puede
+desplazarse: sus tres grupos de métricas y el bloque del tilt no caben en una
+sola pantalla de 13 pulgadas.
 
 ### 9.3 Visualización del barrido y resultado
 
 - **Barrido en vivo**: sobre una imagen del Sol se dibuja la **franja ya
-  capturada**, la **línea de la rendija** y el **porcentaje** completado. El
-  fondo es un **disco esquemático** (funciona sin red) y, si hay conexión, la
-  **imagen real del Sol** del día (ADR-021).
+  capturada**, la **línea de la rendija** y el **porcentaje** completado, en la
+  tira plegable bajo el vídeo. El fondo es un **disco esquemático** (funciona sin
+  red) y, si hay conexión, la **imagen real del Sol** del día (ADR-021).
 - **Recon rápido**: al terminar, una reconstrucción **ligera y no autoritativa**
   del disco para saber si el barrido salió bien; se ve en pantalla (no se
   exporta) y **no sustituye al post-proceso**.
 - **Resumen de la sesión**: frames, perdidos, duración y ruta, con un botón para
-  **abrir la carpeta** de la sesión.
+  **abrir la carpeta de datos** de la toma.
 
 ### 9.4 Resto de la interfaz
 
-- **Panel de telescopio** (como SharpCap): conectar/desconectar, GOTO por
-  coordenadas y al Sol, movimiento N/S/E/W con selector de tasa, seguimiento,
-  park/unpark, sync y abortar slew, con lectura viva de RA/Dec. Presente en el
-  paso *Buscar el Sol* y accesible siempre.
+- **Panel de telescopio** (ADR-019, revisado en ADR-026): conectar,
+  desconectar, buscar montura, **Go to the Sun**, movimiento N/S/E/W con
+  selector de tasa, Stop, seguimiento y park/unpark, con un mensaje en lenguaje
+  llano. Es plegable y se reabre desde **Tools → Panels**. **No** expone GOTO
+  por coordenadas, Sync ni Abort slew, ni la lectura viva de RA/Dec: en solar el
+  único blanco es el Sol y el seguimiento ya está en su casilla.
+- **Perfiles con nombre**: el perfil activo se ve en la barra superior y se
+  carga al arrancar; el selector lo cambia, **Save as…** guarda el montaje actual
+  con un nombre y **Manage…** abre la lista para usar, renombrar o borrar. El
+  almacén de perfiles con nombre vive en `config/store.py` (ADR-027); la UI
+  habla con un adaptador (`ui/profiles.py`) y usa `load_profiles`,
+  `save_profiles`, `profile_names`, `active_profile`, `set_active_profile`,
+  `save_named_profile`, `rename_profile` y `delete_profile` sobre
+  `profiles_path()`. El guardado de un preset de ROI pasa por el adaptador con
+  `Session.profile_saver`, no por el antiguo `profile.json`.
+- **Panel de líneas espectrales**: una casilla **Identify lines** en la barra
+  del vídeo muestra u oculta un panel a la derecha del vídeo con las líneas que
+  identifica `shg.spectrum` (nombre y longitud de onda en Å, fila en el
+  fotograma), el ancla y la confianza. La interfaz solo presenta los nombres y
+  dice cuándo no son fiables; el **dispersion** y la **línea objetivo** se
+  ajustan en Settings → Spectrum. La identificación corre en un hilo aparte, a
+  2 Hz, sobre una copia del perfil: nunca bloquea la captura ni lee el búfer del
+  fotograma vivo.
 - Panel de sesión (modo, ciclos, padding, parámetros con ajuste).
 - Configuración y perfiles (con datos del telescopio).
-- Ayuda al enfoque (los indicadores de `nightscribe-focus`).
+- **Enfoque**: vive en el paso Focus, con las métricas de `shg.focus` y el tilt
+  de `shg.tilt`. No hay un diálogo aparte de ayuda al enfoque.
 - Estado, consola y avisos.
-
----
 
 ## 10. Configuración y perfiles
 
 Esquema INI igual que `nightscribe-scan` (mismas claves) más las claves de ROI,
-tilt y sesión, editable a mano y desde la UI. Un **solo perfil** con los datos
-del telescopio (focal, píxel, rendija) y el preset de ROI. La herencia es
+tilt y sesión, editable a mano y desde la UI. Un **almacén de perfiles con
+nombre** (`profiles.json`) con los datos del telescopio (focal, píxel, rendija),
+la cámara y los presets de ROI; uno está activo y se carga al arrancar, y el
+antiguo `profile.json` se migra como `default` (ADR-027). La herencia es
 deliberada: el post-proceso existente y los hábitos del usuario no cambian.
 
 **Sesiones**: una **carpeta por sesión** (con fecha y hora) dentro de una carpeta
@@ -509,13 +575,14 @@ cataloga.
   pasos, **visualización del barrido**, **recon rápido**, **visor de logs**,
   i18n `.ts` ES/EN y **Tools → Sky calendar… → Sun**.
 - Autoexposición con objetivo, binning configurable, 16 bits y 3 ciclos.
-- Asistente de bienvenida, perfil único, sesiones en carpetas y modo seco.
+- Asistente de bienvenida, perfiles con nombre, sesiones en carpetas y modo seco.
 - **Empaquetado Windows 10/11 x64 y Linux (.deb/.rpm)** con CI matricial y
   **GitHub Releases**.
 
 **Fase 2**
 - Más drivers de cámara (ASCOM/Alpaca, INDI, INDIGO).
-- Ayuda al enfoque.
+- Más métricas de enfoque y diagnóstico dentro del paso Focus (no hay un diálogo
+  aparte, §9.4).
 - CLI de diagnóstico de dispositivos.
 
 **Fase 3**
@@ -583,7 +650,7 @@ Estado inicial:
   Sun).
 - ADR-010: gestión del ROI (cuatro regiones, editor en vivo, presets, medición de
   tilt y validación; sin propuesta automática).
-- ADR-011: flujo de sesión por pasos (raíl de cuatro pasos, navegación libre,
+- ADR-011: flujo de sesión por pasos (raíl de pasos, navegación libre,
   recomendaciones, autoguardado y reabrir paso).
 - ADR-012: contratos entre capas y modelo de datos (`design/ARCHITECTURE.md`).
 - ADR-013: presupuesto de rendimiento y observabilidad.
@@ -604,6 +671,15 @@ Estado inicial:
   `config/store.py` (claves heredadas con su ortografía y defaults, alias de los
   nombres antiguos, perfil v2 con migración v1 y carpetas por plataforma con el id
   `SolarScribe`).
+- ADR-025: corrección de la guía de alineación polar solar (erratum de ADR-007).
+- ADR-026: interfaz simplificada, la imagen primero (presentación de ADR-011,
+  histograma plegable, panel de telescopio plegable, paso **Focus** y sin
+  ceremonia de sesión).
+- ADR-027: perfiles con nombre (un `profiles.json` con todos los nombres y el
+  activo, API de listar/elegir/guardar/renombrar/borrar y migración del
+  `profile.json` único).
+- ADR-028: raíl de cinco pasos con **Focus** (migración de los
+  `session_state.json` de cuatro pasos con el paso nuevo pendiente).
 
 ---
 

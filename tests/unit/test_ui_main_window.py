@@ -19,13 +19,14 @@
 import os
 import time
 
+import numpy as np
 import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import (  # noqa: E402
-    QApplication, QComboBox, QLabel, QPushButton, QSpinBox, QStackedWidget,
-    QWidget,
+    QApplication, QComboBox, QDockWidget, QLabel, QPushButton, QSpinBox,
+    QStackedWidget, QToolButton, QWidget,
 )
 
 from solarscribe.config import store  # noqa: E402
@@ -68,10 +69,16 @@ def test_the_three_menus_exist_with_their_tools(qapp, make_window):
     titles = [action.text().replace("&", "") for action in window.menuBar().actions()]
     assert titles == ["File", "Tools", "Help"]
     for name in ("actionSettings", "actionSkyCalendar", "actionRoiManager",
-                 "actionFocusAid", "actionDiagnostics", "actionLogs",
-                 "actionNewSession", "actionOpenSession", "actionQuit",
-                 "actionQuickStart", "actionAbout"):
+                 "actionDiagnostics", "actionLogs",
+                 "actionOpenSessionFolder", "actionQuit",
+                 "actionQuickStart", "actionAbout",
+                 "actionTelescopePanel", "actionCameraPanel",
+                 "actionHealthPanel"):
         assert window._action(name) is not None, name
+    # The visible session ceremony is gone (ADR-026): the data folder is still
+    # one click away, but there is no "New session" or "Open session".
+    assert window._action("actionNewSession") is None
+    assert window._action("actionOpenSession") is None
 
 
 def test_custom_widgets_are_swapped_into_their_placeholders(qapp, make_window):
@@ -82,8 +89,89 @@ def test_custom_widgets_are_swapped_into_their_placeholders(qapp, make_window):
     assert window.histogram.objectName() == "histogramHost"
     assert window.scan_view.objectName() == "scanViewHost"
     assert window.recon.objectName() == "reconHost"
-    assert window.magnifier.objectName() == "magnifierHost"
-    assert window.rail.steps() == ("find_sun", "polar", "roi", "scan")
+    assert window.rail.steps() == ("find_sun", "polar", "focus", "roi", "scan")
+    # The spectrum magnifier was removed with ADR-026.
+    assert not hasattr(window, "magnifier")
+    assert window.findChild(QWidget, "magnifierHost") is None
+
+
+def test_the_image_owns_the_window_and_the_strips(qapp, make_window):
+    window = make_window()
+    window.resize(1280, 820)
+    window.show()
+    qapp.processEvents()
+    # The image is the point: more than half of the window is video, the slim
+    # rail is not a 64 px monster, and the right docks are capped hard.
+    assert window.viewer.height() > window.height() * 0.5
+    assert window.rail.button("find_sun").maximumHeight() <= 28
+    assert window.findChild(QWidget, "sidePanel").maximumWidth() <= 320
+    assert window.telescope_dock.maximumWidth() == 210
+    assert window.camera_dock.maximumWidth() == 210
+    # The histogram is open by default; the scan strip is folded until a scan.
+    histogram = window.findChild(QToolButton, "histogramToggle")
+    scan = window.findChild(QToolButton, "scanStripToggle")
+    assert histogram is not None and scan is not None
+    assert histogram.isChecked()
+    assert window.findChild(QWidget, "histogramBody").isVisible()
+    assert not window.findChild(QWidget, "scanBody").isVisible()
+    histogram.setChecked(False)
+    assert not window.findChild(QWidget, "histogramBody").isVisible()
+    histogram.setChecked(True)
+    assert window.findChild(QWidget, "histogramBody").isVisible()
+    # The profile is visible at startup, with the active name.
+    profile = window.findChild(QComboBox, "profileCombo")
+    assert profile is not None and profile.currentText() == "default"
+    assert window.findChild(QToolButton, "profileSaveButton") is not None
+    assert window.findChild(QToolButton, "profileManageButton") is not None
+
+
+def test_the_telescope_panel_collapses_and_comes_back(qapp, make_window):
+    window = make_window()
+    window.show()
+    qapp.processEvents()
+    action = window._action("actionTelescopePanel")
+    dock = window.findChild(QDockWidget, "telescopeDock")
+    assert action is not None and dock is not None
+    assert action.isChecked() and dock.isVisible()
+    action.setChecked(False)
+    assert not dock.isVisible()
+    action.setChecked(True)
+    assert dock.isVisible()
+
+
+class _BandFrame:
+    def __init__(self, width=240, height=120, value=1200, saturated=False):
+        array = np.full((height, width), value, dtype=np.uint16)
+        if saturated:
+            array[:20, :] = 65535
+        self._array = array
+        self.data = memoryview(array)
+        self.width = width
+        self.height = height
+        self.dtype = np.dtype(np.uint16)
+        self.roi = (0, 0, width, height)
+
+    def cut_roi(self, roi):
+        x, y, width, height = roi
+        piece = np.ascontiguousarray(self._array[y:y + height, x:x + width])
+        frame = _BandFrame()
+        frame._array = piece
+        frame.data = memoryview(piece)
+        frame.width, frame.height = piece.shape[1], piece.shape[0]
+        return frame
+
+
+def test_the_histogram_reads_the_spectral_band_and_warns_about_saturation(
+        qapp, make_window):
+    window = make_window()
+    window.session.set_roi(window.session.roi.capture, (0, 0, 240, 80))
+    window._on_frame(_BandFrame(saturated=True))
+    # The histogram is fed the cut band, not the 240 x 120 frame.
+    assert window.histogram.frame_size() == (240, 80)
+    assert window.histogram.saturation_fraction() > 0.1
+    label = window.findChild(QLabel, "histogramSaturation")
+    assert "clipped" in label.text()
+    assert label.property("state") == "warning"
 
 
 def test_status_bar_shows_the_figures_with_their_meaning(qapp, make_window):
@@ -101,14 +189,15 @@ def test_free_navigation_from_the_rail_does_not_gate(qapp, make_window):
     window.rail.button("scan").click()
     assert window.session.current_step() == "scan"
     assert window.session.status_of("find_sun").value == "pending"
-    # The scanning panel is really the one on screen.
+    # The scanning panel is really the one on screen (fifth card, index 4).
     pages = window.findChild(QStackedWidget, "sideStack")
-    assert pages.currentIndex() == 3
+    assert pages.currentIndex() == 4
 
 
 def test_each_step_has_exactly_one_primary_action(qapp, make_window):
     window = make_window()
-    for page_name in ("findPage", "polarPage", "roiPage", "scanPage"):
+    for page_name in ("findPage", "polarPage", "focusPage", "roiPage",
+                      "scanPage"):
         page = window.findChild(QWidget, page_name)
         primaries = [button for button in page.findChildren(QPushButton)
                      if button.property("primary")]
@@ -170,8 +259,8 @@ def test_close_saves_the_step_state(qapp, make_window):
 def test_recommendation_is_an_invitation_not_an_order(qapp, make_window):
     window = make_window()
     label = window.findChild(QLabel, "recommendationLabel")
-    assert "Recommended next: Find the Sun" in label.text()
-    assert "any time" in label.text()
+    assert "Next: Find the Sun" in label.text()
+    assert "Any step is open" in label.text()
 
 
 def test_welcome_banner_answers_and_saves_the_location(qapp, make_window):
@@ -190,12 +279,10 @@ def test_tool_dialogs_open_off_the_gui_thread(qapp, make_window):
     window.open_logs()
     window.open_sky_calendar()
     window.open_roi_manager()
-    window.open_focus_aid()
     assert window._logs_dialog.isVisible()
     assert window._calendar_dialog.isVisible()
     window._logs_dialog.close()
     window._calendar_dialog.close()
-    window._focus_dialog.close()
 
 
 def test_new_session_resets_the_steps_and_changes_the_folder(qapp, make_window):

@@ -6,25 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>330</width>
-    <height>640</height>
+    <width>220</width>
+    <height>360</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="telescopeLayout">
    <property name="spacing">
-    <number>7</number>
+    <number>6</number>
    </property>
    <property name="leftMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <property name="topMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <property name="rightMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <property name="bottomMargin">
-    <number>10</number>
+    <number>8</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="connectionRow">
@@ -95,161 +95,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="positionBox">
-     <property name="title">
-      <string>Where it points</string>
-     </property>
-     <layout class="QGridLayout" name="positionLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="raCaption">
-        <property name="text">
-         <string>RA</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="raValue">
-        <property name="role" stdset="0">
-         <string>number</string>
-        </property>
-        <property name="text">
-         <string>--</string>
-        </property>
-        <property name="toolTip">
-         <string>Right ascension in hours. The scan sweeps along this axis, so it must move smoothly while tracking.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="decCaption">
-        <property name="text">
-         <string>Dec</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="decValue">
-        <property name="role" stdset="0">
-         <string>number</string>
-        </property>
-        <property name="text">
-         <string>--</string>
-        </property>
-        <property name="toolTip">
-         <string>Declination in degrees. The Sun sits at about +10 to +23 degrees depending on the season.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="trackingCaption">
-        <property name="text">
-         <string>Tracking</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="trackingValue">
-        <property name="text">
-         <string>Unknown</string>
-        </property>
-        <property name="toolTip">
-         <string>Whether the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="parkCaption">
-        <property name="text">
-         <string>Park</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="parkValue">
-        <property name="text">
-         <string>Unknown</string>
-        </property>
-        <property name="toolTip">
-         <string>Whether the mount is in its park position. Park before closing the observatory so the optics are safe.</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="gotoBox">
-     <property name="title">
-      <string>Go to a position</string>
-     </property>
-     <layout class="QGridLayout" name="gotoLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="gotoRaCaption">
-        <property name="text">
-         <string>RA (h)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="gotoRaSpin">
-        <property name="decimals">
-         <number>5</number>
-        </property>
-        <property name="maximum">
-         <double>24.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="gotoDecCaption">
-        <property name="text">
-         <string>Dec (deg)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="gotoDecSpin">
-        <property name="decimals">
-         <number>4</number>
-        </property>
-        <property name="minimum">
-         <double>-90.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>90.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="gotoButton">
-        <property name="text">
-         <string>Go to</string>
-        </property>
-        <property name="toolTip">
-         <string>Slews to the coordinates above. The mount stops tracking while it slews and resumes afterwards.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="syncButton">
-        <property name="text">
-         <string>Sync here</string>
-        </property>
-        <property name="toolTip">
-         <string>Tells the mount that it is really at the coordinates above. Use it when you have centred the Sun by hand.</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="gotoSunButton">
      <property name="text">
       <string>Go to the Sun</string>
@@ -262,9 +107,12 @@
    <item>
     <widget class="QGroupBox" name="moveBox">
      <property name="title">
-      <string>Move by hand</string>
+      <string>Nudge</string>
      </property>
      <layout class="QGridLayout" name="moveLayout">
+      <property name="spacing">
+       <number>5</number>
+      </property>
       <item row="0" column="1">
        <widget class="QPushButton" name="northButton">
         <property name="text">
@@ -343,9 +191,22 @@
         <string>Tracking</string>
        </property>
        <property name="toolTip">
-        <string>Keeps the Sun still in the frame while the mount follows the sky.</string>
+        <string>Keeps the Sun still in the frame while the mount follows the sky. The scan adds its sweep on top of this, so tracking off smears the disk.</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="trackSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="parkButton">
@@ -354,16 +215,6 @@
        </property>
        <property name="toolTip">
         <string>Moves to the park position and stops tracking. Use it before closing the observatory.</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="abortButton">
-       <property name="text">
-        <string>Abort slew</string>
-       </property>
-       <property name="toolTip">
-        <string>Cancels a GOTO without parking. The mount stays where it is.</string>
        </property>
       </widget>
      </item>

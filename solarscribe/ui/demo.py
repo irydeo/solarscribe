@@ -22,7 +22,7 @@
 #
 # What it emulates, and what it does not:
 #   - frames: a dispersed spectrum with a slightly tilted slit line, a limb and
-#     shot noise, so the viewer, the histogram and the magnifier have real work;
+#     shot noise, so the viewer and the histogram have real work;
 #   - mount: the Mount contract, with position, rate moves, slew, sync, park;
 #   - streams: counters against the ADR-013 budget, honest about being simulated;
 #   - scan and polar: progress callbacks with the dataclasses shg declares, so
@@ -347,9 +347,9 @@ class DemoHarness(QObject):
                  height: int = 248, parent=None) -> None:
         super().__init__(parent)
         # The demo frames keep the reference geometry (3480 x 248) on purpose:
-        # the ROI step, the histogram and the magnifier then see exactly the
-        # strip the observer will see from the Touptek, and no number is a
-        # convenient lie. The frame rate is the only thing lowered (DEMO_FPS).
+        # the ROI step and the histogram then see exactly the strip the observer
+        # will see from the Touptek, and no number is a convenient lie. The frame
+        # rate is the only thing lowered (DEMO_FPS).
         self.folder = Path(folder)
         self.band = band
         self.width = max(64, min(int(width), 4096))

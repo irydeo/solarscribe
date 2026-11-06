@@ -924,7 +924,7 @@ def test_config_schema_is_the_contract_of_files_steps_and_optics():
     assert PROFILE_VERSION == 2
 
     # The rail order is the order the UI paints and the JSON persists.
-    assert SESSION_STEPS == ("find_sun", "polar", "roi", "scan")
+    assert SESSION_STEPS == ("find_sun", "polar", "focus", "roi", "scan")
     assert {member.value for member in StepStatus} == {
         "pending", "current", "done", "skipped"
     }

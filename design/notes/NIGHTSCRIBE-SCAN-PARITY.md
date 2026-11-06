@@ -109,7 +109,7 @@ No había código consumiéndolas (solo `config/schema.py`), así que la migraci
 nula. Una herramienta que aún las escriba las verá en `Settings.unknown` y el
 diálogo de ajustes podrá avisar.
 
-### 2.4 Claves nuevas de SolarScribe (38, `origin="new"`)
+### 2.4 Claves nuevas de SolarScribe (44, `origin="new"`)
 
 Se **añaden**, nunca se renombra una heredada:
 
@@ -118,6 +118,8 @@ Se **añaden**, nunca se renombra una heredada:
   SharpCap; la efeméride local las necesita, ADR-021).
 - `[camera]`: id, exposición, ganancia, offset, binning, bits, readout.
 - `[roi]`: preset, rectángulos de captura y banda, y tilt (ADR-010, ADR-022).
+- `[spectrum]`: línea objetivo, dispersión, sentido, tolerancia, confianza y
+  ventana del ancla (identificación nativa de líneas, `shg/spectrum.py`).
 - `[mount]`: backend, id, seguimiento, tasa manual (ADR-019).
 - `[scan]`: método de centrado fino, tasa forzada, filas y paso de mosaico.
 - `[capture]`: presupuesto de la cola y FPS objetivo (ADR-013).
@@ -140,20 +142,31 @@ Se **añaden**, nunca se renombra una heredada:
 ## 3. Perfiles
 
 `nightscribe-scan` guarda un `profiles.json` v1 y lo edita desde su panel HTML.
-SolarScribe usa el **perfil JSON v2** de `config/schema.py` (`Profile`: datos del
-telescopio, datos de cámara y presets de ROI) y lo edita desde Ajustes y el paso
-ROI.
+SolarScribe usa un **almacén de perfiles con nombre** (`profiles.json` v2,
+ADR-027): cada nombre guarda un `Profile` v2 con los datos del telescopio, los de
+la cámara y los presets de ROI, y uno está activo. Se carga al arrancar y se
+edita desde Ajustes y el paso ROI; el antiguo `profile.json` se migra como el
+perfil `default`.
 
-Implementado en `config/store.py` (ADR-024):
+Implementado en `config/store.py` (ADR-024, ADR-027):
 
-- `load_profile()` es tolerante: un fichero v2 escrito a mano, con números como
-  texto, secciones ausentes o claves desconocidas, arranca la app con defaults en
-  lo que no se puede leer.
+- `load_profiles()` lee el almacén, acepta el `nightscribe-profiles.json` v1
+  entero (todos los nombres y el `active`) y migra cada bloque. Sin
+  `profiles.json`, carga el `profile.json` antiguo como `default`; con los dos,
+  manda `profiles.json`. Un fichero truncado intenta el antiguo y, si no hay,
+  arranca con el perfil por defecto.
+- `profile_names()`, `active_profile()`, `set_active_profile()`,
+  `save_named_profile()`, `rename_profile()` y `delete_profile()` son la API de
+  la UI; las operaciones devuelven un almacén nuevo y solo `save_profiles()`
+  escribe, de forma atómica.
+- `load_profile()` sigue siendo el lector de un perfil suelto (legado o
+  exportado) y es tolerante: un fichero v2 escrito a mano, con números como
+  texto, secciones ausentes o claves desconocidas, arranca con defaults en lo que
+  no se puede leer.
 - Migra un v1 si el usuario lo aporta: `FOCAL_LENGTH`, `PIXEL_SIZE`,
   `MOSAIC_SLIT_LENGTH_MM` y `meta.camera`/`meta.aperture_mm` se convierten en
   `TelescopeData` y `CameraData`. El resto de claves v1 es del INI y allí sigue.
-- Un JSON truncado devuelve los defaults y el siguiente guardado lo reescribe.
-- El **INI manda en la sesión**; el perfil es una instantánea con nombre que se
+- El **INI manda en la sesión**; cada perfil es una instantánea con nombre que se
   aplica explícitamente desde Ajustes. No hay fusión automática de dos fuentes
   (ADR-024).
 

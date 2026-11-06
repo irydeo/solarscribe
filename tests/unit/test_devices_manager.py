@@ -155,3 +155,25 @@ def test_mount_backend_availability_controls_its_mounts():
     indi = next(b for b in infos if b.name == "indi")
     assert indi.reason is BackendReason.SERVER_MISSING
     assert [m.mount_id for m in manager.mounts()] == ["sim:mount0"]
+
+
+def test_missing_indigo_server_hides_only_its_own_mount(monkeypatch):
+    # ADR-019: INDIGO is an optional path. A missing indigo_server must report
+    # SERVER_MISSING and leave the simulator (and every other backend) working.
+    from solarscribe.devices.mount import default_mount_backends
+
+    def refuse(*_args, **_kwargs):
+        raise OSError("connection refused")
+
+    monkeypatch.setattr("socket.create_connection", refuse)
+    manager = DeviceManagerImpl(
+        camera_backends=[SimCameraBackend()],
+        mount_backends=default_mount_backends(),
+    )
+    infos = manager.backends()
+    indigo = next(b for b in infos if b.name == "indigo")
+    assert not indigo.available
+    assert indigo.reason is BackendReason.SERVER_MISSING
+    ids = [m.mount_id for m in manager.mounts()]
+    assert "sim:mount0" in ids
+    assert not any(mount_id.startswith("indigo:") for mount_id in ids)
